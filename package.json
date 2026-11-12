@@ -1,0 +1,12 @@
+{
+  "name": "family-portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db:check": "node --env-file=.env scripts/check-db.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
+  }
+}
