@@ -1,0 +1,79 @@
+/* Family portal chrome. Calm, warm, mobile-first. */
+
+.portal { min-height: 100dvh; display: flex; flex-direction: column; }
+.portal > main { flex: 1; }
+
+.portal-header { border-bottom: 1px solid var(--border); background: var(--color-surface); }
+.portal-header-solid .portal-header { background: var(--color-primary); color: var(--color-on-primary); border-bottom: 0; }
+.portal-header-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 68px;
+  flex-wrap: wrap;
+  padding-block: var(--space-2);
+}
+.portal-brand { display: inline-flex; align-items: center; color: inherit; text-decoration: none; }
+.portal-logo { height: 44px; width: auto; display: block; }
+.portal-wordmark { font-family: var(--font-heading); font-weight: 600; font-size: 1.15rem; }
+
+.portal-nav { order: 3; width: 100%; overflow-x: auto; }
+.portal-nav ul { display: flex; gap: var(--space-1); list-style: none; margin: 0; padding: 0; }
+.portal-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.portal-nav a:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+.portal-account { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); }
+.portal-signin { color: inherit; font-weight: 600; }
+.portal-user { font-size: 0.9rem; opacity: 0.85; }
+@media (min-width: 900px) {
+  .portal-nav { order: 0; width: auto; margin-left: var(--space-5); }
+}
+
+/* Home */
+.home-hero { padding-block: var(--space-7) var(--space-6); }
+.home-eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.home-hero h1 { margin-top: var(--space-2); max-width: 18ch; }
+.home-hero p.lead { margin-top: var(--space-3); font-size: 1.1rem; color: var(--color-text-muted); max-width: 52ch; }
+
+.home-grid { display: grid; gap: var(--space-5); padding-bottom: var(--space-8); }
+@media (min-width: 900px) { .home-grid { grid-template-columns: 2fr 1fr; align-items: start; } }
+.home-grid.home-grid-single { grid-template-columns: minmax(0, 440px); }
+
+.section-title { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-3); }
+.section-title h2 { font-size: 1.2rem; }
+
+.contact-card { display: grid; gap: var(--space-3); }
+.contact-card .label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); font-weight: 600; }
+.contact-card a { font-weight: 600; font-size: 1.05rem; }
+.accent-rule { height: 4px; width: 48px; background: var(--color-accent); border-radius: 2px; }
+
+.empty { color: var(--color-text-muted); }
+
+/* Footer */
+.portal-footer { border-top: 1px solid var(--border); background: var(--color-surface); padding-block: var(--space-6); font-size: 0.925rem; }
+.portal-footer-inner { display: grid; gap: var(--space-4); }
+@media (min-width: 768px) { .portal-footer-inner { grid-template-columns: 1fr auto; } }
+.portal-footer-name { font-family: var(--font-heading); font-weight: 600; font-size: 1.05rem; }
+.portal-footer-contact { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+
+/* Auth */
+.auth-wrap { display: grid; place-items: center; padding: var(--space-7) var(--space-4); }
+.auth-card { width: 100%; max-width: 420px; display: grid; gap: var(--space-4); }
+.auth-card h1 { font-size: 1.6rem; }

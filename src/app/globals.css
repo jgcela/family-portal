@@ -1,0 +1,177 @@
+/* Shared design system. School branding only changes the --color-*, --font-*
+   and --radius tokens (injected per tenant); spacing, type scale and layout are
+   fixed so no colour/font combination can break the layout. */
+
+:root {
+  --color-primary: #1f3a5f;
+  --color-on-primary: #ffffff;
+  --color-secondary: #3d5a80;
+  --color-on-secondary: #ffffff;
+  --color-accent: #e0a100;
+  --color-on-accent: #111827;
+  --color-background: #fafaf7;
+  --color-surface: #ffffff;
+  --color-text: #1a1f2b;
+  --color-text-muted: #5b6270;
+  --color-link: #1f3a5f;
+  --font-heading: 'Source Serif 4 Variable', Georgia, serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
+  --radius: 10px;
+
+  --border: color-mix(in srgb, var(--color-text) 12%, transparent);
+  --border-strong: color-mix(in srgb, var(--color-text) 22%, transparent);
+  --surface-sunken: color-mix(in srgb, var(--color-text) 4%, var(--color-background));
+  --focus: color-mix(in srgb, var(--color-link) 85%, transparent);
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
+  --danger: #b42318;
+  --success: #067647;
+  --warning: #93370d;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --content: 1120px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  line-height: 1.2;
+  margin: 0;
+  font-weight: 600;
+  text-wrap: balance;
+}
+h1 { font-size: clamp(1.9rem, 4vw, 2.75rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; }
+
+a {
+  color: var(--color-link);
+  text-underline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -48px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  z-index: 100;
+}
+.skip-link:focus { top: var(--space-2); }
+
+.container {
+  width: 100%;
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+@media (min-width: 768px) {
+  .container { padding: 0 var(--space-6); }
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Buttons and fields */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn-primary:hover { background: color-mix(in srgb, var(--color-primary) 88%, black); }
+.btn-accent { background: var(--color-accent); color: var(--color-on-accent); }
+.btn-quiet { background: transparent; color: var(--color-text); border-color: var(--border-strong); }
+.btn-quiet:hover { background: var(--surface-sunken); }
+.btn[disabled] { opacity: 0.6; cursor: progress; }
+
+.field { display: grid; gap: var(--space-1); }
+.field label { font-weight: 600; font-size: 0.9rem; }
+.field input {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: calc(var(--radius) * 0.7);
+  border: 1px solid var(--border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+.field-error { color: var(--danger); font-size: 0.875rem; }
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-5);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--surface-sunken);
+  color: var(--color-text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.badge-on { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); border-color: transparent; }
+.badge-off { color: var(--color-text-muted); }
+.badge-future { background: transparent; border-style: dashed; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
