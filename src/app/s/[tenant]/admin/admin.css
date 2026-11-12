@@ -1,0 +1,50 @@
+/* School admin: denser, neutral chrome. Brand colour used sparingly. */
+.admin { display: grid; min-height: 100dvh; grid-template-columns: 1fr; background: var(--surface-sunken); font-size: 0.9375rem; }
+@media (min-width: 960px) { .admin { grid-template-columns: 248px 1fr; } }
+
+.admin-side { background: var(--color-surface); border-right: 1px solid var(--border); padding: var(--space-4); }
+.admin-school { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); margin-bottom: var(--space-4); }
+.admin-school-mark {
+  width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--color-primary); color: var(--color-on-primary); font-weight: 700; font-size: 0.85rem;
+}
+.admin-school-name { font-weight: 600; line-height: 1.25; }
+.admin-nav h2 { font-family: var(--font-body); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); margin: var(--space-4) var(--space-2) var(--space-1); }
+.admin-nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.admin-nav a { display: flex; align-items: center; min-height: 36px; padding: 0 var(--space-2); border-radius: 6px; color: var(--color-text); text-decoration: none; }
+.admin-nav a:hover { background: var(--surface-sunken); }
+.admin-nav a[aria-current='page'] { background: color-mix(in srgb, var(--color-primary) 10%, transparent); color: var(--color-link); font-weight: 600; }
+@media (max-width: 959px) {
+  .admin-nav { display: flex; gap: var(--space-2); overflow-x: auto; }
+  .admin-nav h2 { display: none; }
+  .admin-nav ul { display: flex; }
+  .admin-nav a { white-space: nowrap; }
+}
+
+.admin-main { padding: var(--space-5) var(--space-4) var(--space-8); min-width: 0; }
+@media (min-width: 960px) { .admin-main { padding: var(--space-6) var(--space-7); } }
+.admin-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-5); }
+.admin-head h1 { font-family: var(--font-body); font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
+.admin-head p { color: var(--color-text-muted); margin-top: var(--space-1); max-width: 70ch; }
+
+.stat-grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: var(--space-5); }
+.stat { background: var(--color-surface); border: 1px solid var(--border); border-radius: 8px; padding: var(--space-4); }
+.stat dt { font-size: 0.8rem; color: var(--color-text-muted); }
+.stat dd { margin: var(--space-1) 0 0; font-size: 1.25rem; font-weight: 650; }
+
+.panel { background: var(--color-surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: var(--space-5); }
+.panel-head { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.panel-head h2 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 650; }
+.panel-body { padding: var(--space-4); }
+
+.table-wrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+table.data th, table.data td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; }
+table.data thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); font-weight: 600; background: var(--surface-sunken); position: sticky; top: 0; }
+table.data tbody tr:hover { background: color-mix(in srgb, var(--surface-sunken) 60%, transparent); }
+table.matrix tbody th[scope='row'] { min-width: 240px; }
+table.matrix td.cell, table.matrix th.cell { text-align: center; width: 1%; white-space: nowrap; }
+.yes { color: var(--success); font-weight: 700; }
+.no { color: var(--border-strong); }
+.muted { color: var(--color-text-muted); }
+.group-row th { background: var(--color-surface) !important; font-size: 0.8rem !important; color: var(--color-text) !important; padding-top: var(--space-4) !important; }
