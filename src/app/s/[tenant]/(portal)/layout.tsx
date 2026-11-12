@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getPortalView, getSession, getTenantOr404, tenantBase } from '@/server/request';
 import { loadAuthzContext } from '@/server/rbac/context';
 import { hasAnywhere } from '@/server/rbac/authorize';
+import { listPublicAnnouncements } from '@/server/services/content';
 import '../portal.css';
 
 type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
@@ -13,6 +14,9 @@ export default async function PortalLayout({ children, params }: Props) {
   const ctx = session ? await loadAuthzContext(tenant.id, session.user.id) : null;
   const isStaff = hasAnywhere(ctx, 'dashboard.view');
   const p = view.profile;
+  const urgent = view.activeModules.some((m) => m.id === 'announcements')
+    ? (await listPublicAnnouncements(tenant.id, { limit: 3 })).filter((x) => x.isUrgent)
+    : [];
 
   const nav = [
     ...view.activeModules
@@ -63,6 +67,17 @@ export default async function PortalLayout({ children, params }: Props) {
           </div>
         </div>
       </header>
+      {urgent.length > 0 && (
+        <div className="urgent-banner" role="region" aria-label="Urgent announcements">
+          <div className="container">
+            {urgent.map((u) => (
+              <p key={u.id}>
+                <span className="urgent-tag">Urgent</span> <Link href={`${base}/updates/${u.id}`}>{u.title}</Link>
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
       <main id="main">{children}</main>
       <footer className="portal-footer">
         <div className="container portal-footer-inner">

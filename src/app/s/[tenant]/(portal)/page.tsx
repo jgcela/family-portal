@@ -4,6 +4,8 @@ import type { HomepageBlock } from '@/server/tenancy/homepage-defaults';
 import { listPublicOccurrences } from '@/server/services/calendar';
 import { addDays, toDateStr } from '@/server/calendar/time';
 import { EventList } from './calendar/event-list';
+import { AnnouncementList } from './updates/announcement-list';
+import { listPublicAnnouncements } from '@/server/services/content';
 
 // Which module supplies each homepage block. Blocks whose module is not active
 // for the school are skipped, so families never see empty placeholders.
@@ -20,7 +22,7 @@ const BLOCK_SOURCE: Partial<Record<HomepageBlock['type'], string>> = {
 };
 
 // Blocks that have a working renderer. Others stay hidden until their module ships.
-const RENDERED = new Set<HomepageBlock['type']>(['welcome', 'this-week', 'upcoming-events']);
+const RENDERED = new Set<HomepageBlock['type']>(['welcome', 'this-week', 'upcoming-events', 'school-updates']);
 
 type Props = { params: Promise<{ tenant: string }> };
 
@@ -47,7 +49,13 @@ export default async function FamilyHome({ params }: Props) {
     ...calBlocks.map((b) => (b.type === 'this-week' ? num(b.settings.days, 7, 1, 21) : num(b.settings.withinDays, 60, 7, 180))),
   );
   const occurrences = calBlocks.length ? await listPublicOccurrences(tenant.id, { from: today, to: addDays(today, horizon) }) : [];
+  const updates = content.some((b) => b.type === 'school-updates') ? await listPublicAnnouncements(tenant.id, { limit: 20 }) : [];
   const renderBlock = (b: HomepageBlock) => {
+    if (b.type === 'school-updates') {
+      return (
+        <AnnouncementList items={updates.slice(0, num(b.settings.limit, 4, 1, 20))} base={base} tz={tenant.timezone} emptyText="No updates right now." />
+      );
+    }
     if (b.type === 'this-week') {
       const days = num(b.settings.days, 7, 1, 21);
       const end = addDays(today, days - 1);
@@ -94,6 +102,7 @@ export default async function FamilyHome({ params }: Props) {
                 <div className="section-title">
                   <h2 id={`block-${b.id}`}>{b.title}</h2>
                   {(b.type === 'this-week' || b.type === 'upcoming-events') && <Link href={`${base}/calendar`}>Full calendar</Link>}
+                  {b.type === 'school-updates' && <Link href={`${base}/updates`}>All updates</Link>}
                 </div>
                 {renderBlock(b)}
               </section>

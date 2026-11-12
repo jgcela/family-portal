@@ -9,8 +9,8 @@ import {
   listAudiences,
   listCalendars,
   listEventCategories,
-  type EventTransition,
 } from '@/server/services/calendar';
+import { availableTransitions } from '@/server/services/workflow';
 import { toDateStr, toTimeStr } from '@/server/calendar/time';
 import { describeRrule } from '@/lib/when';
 import { EventForm } from '../event-form';
@@ -42,13 +42,7 @@ export default async function EditEventPage({ params, searchParams }: Props) {
   ]);
 
   // Offer only the transitions that make sense now; the server re-checks each one.
-  const actions: EventTransition[] = [];
-  const pub = hasAnywhere(ctx, 'events.publish');
-  if (ev.status === 'draft' && settings.requireApproval) actions.push('submit');
-  if (ev.status === 'in_review' && hasAnywhere(ctx, 'events.approve')) actions.push('approve');
-  if (pub && (ev.status === 'approved' || (ev.status === 'draft' && !settings.requireApproval))) actions.push('publish');
-  if (pub && ev.status === 'published') actions.push('unpublish');
-  if (hasAnywhere(ctx, 'events.archive')) actions.push(ev.status === 'archived' ? 'restore' : 'archive');
+  const actions = availableTransitions((perm) => hasAnywhere(ctx, perm), 'events', ev.status, settings);
 
   const canEdit = hasAnywhere(ctx, 'events.edit') && ev.status !== 'archived';
   const allDayEnd = ev.allDay ? (ev.endDate !== ev.startDate ? ev.endDate! : '') : '';

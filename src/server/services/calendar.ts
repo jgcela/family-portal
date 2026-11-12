@@ -5,11 +5,13 @@
 import { and, asc, desc, eq, ilike, inArray, isNotNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { platformDb, withTenant, type Db, type Tx } from '../db/client';
-import { audienceGrades, audiences, calendarImports, calendars, events, tenantSettings } from '../db/schema';
+import { audiences, calendarImports, calendars, events } from '../db/schema';
 import { audit } from '../audit/log';
 import { assertVerifiedContext } from '../rbac/context';
-import { AuthorizationError, assertCan, can, canApprove, hasAnywhere, type AuthzContext, type ResourceRef } from '../rbac/authorize';
+import { AuthorizationError, assertCan, can, hasAnywhere, type AuthzContext } from '../rbac/authorize';
 import { ValidationError } from './modules';
+import { nextStatus, type Transition } from './workflow';
+import { eventResource, gradeLookup, settingsFor } from './scope';
 import { addDays, expandOccurrences, isValidTimeZone, toDateStr, validateRrule, zonedTimeToUtc, type Occurrence } from '../calendar/time';
 import { parseCsv, parseIcs, type CsvMapping, type ParseError, type ParsedEvent } from '../calendar/parse';
 import { planImport, type ImportPlan, type PlanAction } from '../calendar/plan';
@@ -23,25 +25,6 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 function zodMessage(e: z.ZodError) {
   return e.issues.map((i) => (i.path.length ? `${i.path.join('.')}: ${i.message}` : i.message)).join('; ');
-}
-
-// ---------- Resource scoping ----------
-
-/** Builds the authorization resource for an event's audiences (audiences → grades). */
-async function eventResource(tx: Tx, audienceIds: string[], authorUserId: string | null): Promise<ResourceRef> {
-  if (!audienceIds.length) return { audienceIds: [], gradeIds: [], authorUserId };
-  const found = await tx.select({ id: audiences.id }).from(audiences).where(inArray(audiences.id, audienceIds));
-  if (found.length !== new Set(audienceIds).size) throw new ValidationError('One of the selected audiences does not exist.');
-  const g = await tx
-    .selectDistinct({ gradeId: audienceGrades.gradeId })
-    .from(audienceGrades)
-    .where(inArray(audienceGrades.audienceId, audienceIds));
-  return { audienceIds, gradeIds: g.map((x) => x.gradeId), authorUserId };
-}
-
-async function settingsFor(tx: Tx, tenantId: string) {
-  const [s] = await tx.select().from(tenantSettings).where(eq(tenantSettings.tenantId, tenantId));
-  return { requireApproval: s?.requireApproval ?? false, independentApproval: s?.independentApproval ?? true };
 }
 
 // ---------- Calendars ----------
@@ -233,7 +216,7 @@ export async function updateEvent(ctx: AuthzContext, eventId: string, input: unk
   );
 }
 
-export type EventTransition = 'submit' | 'approve' | 'publish' | 'unpublish' | 'archive' | 'restore';
+export type EventTransition = Transition;
 
 /**
  * Workflow: Draft → (In review → Approved) → Published → Archived.
@@ -248,49 +231,7 @@ export async function transitionEvent(ctx: AuthzContext, eventId: string, action
       const ev = await loadEvent(tx, eventId);
       const res = await eventResource(tx, ev.audienceIds, ev.createdByUserId);
       const settings = await settingsFor(tx, ctx.tenantId);
-      let status: EventRow['status'];
-      switch (action) {
-        case 'submit':
-          assertCan(ctx, 'events.edit', res);
-          if (ev.status !== 'draft') throw new ValidationError('Only drafts can be sent for review.');
-          status = 'in_review';
-          break;
-        case 'approve':
-          if (ev.status !== 'in_review') throw new ValidationError('Only events in review can be approved.');
-          if (!canApprove(ctx, 'events', res, settings)) {
-            throw new AuthorizationError(
-              settings.independentApproval && ev.createdByUserId === ctx.userId
-                ? 'Someone else must approve an event you created.'
-                : 'Not allowed: events.approve',
-              'events.approve',
-            );
-          }
-          status = 'approved';
-          break;
-        case 'publish':
-          assertCan(ctx, 'events.publish', res);
-          if (ev.status === 'published') throw new ValidationError('This event is already published.');
-          if (ev.status === 'archived') throw new ValidationError('Restore the event before publishing it.');
-          if (settings.requireApproval && ev.status !== 'approved') {
-            throw new ValidationError('This school requires approval before publishing. Send the event for review first.');
-          }
-          status = 'published';
-          break;
-        case 'unpublish':
-          assertCan(ctx, 'events.publish', res);
-          if (ev.status !== 'published') throw new ValidationError('This event is not published.');
-          status = 'draft';
-          break;
-        case 'archive':
-          assertCan(ctx, 'events.archive', res);
-          status = 'archived';
-          break;
-        case 'restore':
-          assertCan(ctx, 'events.archive', res);
-          if (ev.status !== 'archived') throw new ValidationError('This event is not archived.');
-          status = 'draft';
-          break;
-      }
+      const status = nextStatus(ctx, 'events', 'event', ev.status, action, res, settings);
       const [row] = await tx
         .update(events)
         .set({ status, updatedByUserId: ctx.userId, updatedAt: new Date() })
@@ -365,11 +306,7 @@ export async function listEventsForStaff(ctx: AuthzContext, f: StaffEventFilter 
         .orderBy(desc(sql`coalesce(${events.startDate}::timestamptz, ${events.startsAt})`))
         .limit(Math.min(f.limit ?? 500, 2000))
         .offset(f.offset ?? 0);
-      const audIds = [...new Set(rows.flatMap((r) => r.audienceIds))];
-      const links = audIds.length
-        ? await tx.select().from(audienceGrades).where(inArray(audienceGrades.audienceId, audIds))
-        : [];
-      const gradesOf = (ids: string[]) => [...new Set(links.filter((l) => ids.includes(l.audienceId)).map((l) => l.gradeId))];
+      const gradesOf = await gradeLookup(tx, rows.flatMap((r) => r.audienceIds));
       return rows.filter((r) =>
         can(ctx, 'events.view', { audienceIds: r.audienceIds, gradeIds: gradesOf(r.audienceIds), authorUserId: r.createdByUserId }),
       );

@@ -48,11 +48,22 @@ Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `
 | Activar y desactivar módulos desde el Module Manager | Hecho | Pruebas (servicio) |
 | Suscripción a un calendario externo por URL (sincronización periódica) | Pendiente | — |
 
-Resultado de pruebas: `npm test` → **91 de 91** pasan.
+### Anuncios y páginas (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Anuncios con resumen, texto, urgente, fijado, audiencias, "mostrar desde" y "ocultar después" | Hecho | Pruebas + navegador |
+| Aviso de urgentes en todas las páginas del portal y bloque "School Updates" en la portada | Hecho | Navegador |
+| Páginas del colegio (manual, lista de material) con dirección propia, índice automático y audiencias | Hecho | Pruebas + navegador |
+| Versiones de páginas: cada publicación guarda una copia que no se puede modificar (ni con SQL); las familias ven la última publicada mientras se edita un borrador; se puede volver a una versión anterior | Hecho | Pruebas |
+| Flujo de aprobación compartido por eventos, anuncios y páginas | Hecho | Pruebas |
+| Editor con vista previa. Solo Markdown: el HTML, los scripts y los enlaces `javascript:` se muestran como texto o se descartan | Hecho | Pruebas (intentos de inyección) + navegador |
+
+Resultado de pruebas: `npm test` → **103 de 103** pasan.
 
 ## Lo que todavía no existe (no simulado)
 
-Anuncios, documentos, páginas, Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, editor de portada, editor de tema, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+Documentos, Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, editor de portada, editor de tema, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 
 ## Bloqueos y riesgos abiertos
 

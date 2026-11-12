@@ -29,6 +29,20 @@
       "when": 1794508172763,
       "tag": "0003_calendar_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794509477813,
+      "tag": "0004_content",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794509483128,
+      "tag": "0005_content_rls",
+      "breakpoints": true
     }
   ]
 }
