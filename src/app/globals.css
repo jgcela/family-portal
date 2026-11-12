@@ -175,3 +175,19 @@ a {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* Rendered Markdown (announcements, pages). */
+.prose { max-width: 70ch; line-height: 1.65; }
+.prose > * + * { margin-top: var(--space-3); }
+.prose h2 { font-size: 1.35rem; margin-top: var(--space-6); scroll-margin-top: var(--space-5); }
+.prose h3 { font-size: 1.1rem; margin-top: var(--space-5); scroll-margin-top: var(--space-5); }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose li + li { margin-top: var(--space-1); }
+.prose blockquote { margin: 0; padding-left: var(--space-4); border-left: 3px solid var(--color-accent); color: var(--color-text-muted); }
+.prose img { max-width: 100%; height: auto; border-radius: var(--radius); }
+.prose code { font-size: 0.9em; background: var(--surface-sunken); padding: 1px 4px; border-radius: 4px; }
+.prose hr { border: 0; border-top: 1px solid var(--border); margin-block: var(--space-6); }
+.prose .table-scroll { overflow-x: auto; }
+.prose table { border-collapse: collapse; width: 100%; font-size: 0.925rem; }
+.prose th, .prose td { border: 1px solid var(--border); padding: var(--space-2) var(--space-3); text-align: left; vertical-align: top; }
+.prose th { background: var(--surface-sunken); }

@@ -86,3 +86,9 @@ fieldset.field legend { font-weight: 600; font-size: 0.9rem; padding: 0; margin-
 .steps { display: flex; gap: var(--space-2); list-style: none; padding: 0; margin: 0 0 var(--space-4); font-size: 0.85rem; color: var(--color-text-muted); flex-wrap: wrap; }
 .steps li[aria-current='step'] { color: var(--color-text); font-weight: 650; }
 .steps li + li::before { content: '›'; margin-right: var(--space-2); color: var(--border-strong); }
+.md-head { display: flex; justify-content: space-between; align-items: end; gap: var(--space-3); }
+.md-tabs { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 6px; overflow: hidden; }
+.md-tabs button { font: inherit; font-size: 0.8rem; font-weight: 600; padding: 4px 12px; background: var(--color-surface); color: var(--color-text); border: 0; cursor: pointer; min-height: 32px; }
+.md-tabs button[aria-selected='true'] { background: var(--surface-sunken); }
+.md-input { font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important; font-size: 0.875rem !important; line-height: 1.5; }
+.md-preview { border: 1px solid var(--border-strong); border-radius: calc(var(--radius) * 0.7); padding: var(--space-4); min-height: 160px; background: var(--color-surface); }
