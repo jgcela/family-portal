@@ -6,6 +6,7 @@ import { adjustForContrast, contrastRatio, isHexColor, readableOn } from './cont
 export const FONT_OPTIONS = {
   inter: { label: 'Inter', stack: "'Inter Variable', 'Inter', system-ui, sans-serif", kind: 'sans' },
   'libre-franklin': { label: 'Libre Franklin', stack: "'Libre Franklin Variable', system-ui, sans-serif", kind: 'sans' },
+  'open-sans': { label: 'Open Sans', stack: "'Open Sans Variable', system-ui, sans-serif", kind: 'sans' },
   'nunito-sans': { label: 'Nunito Sans', stack: "'Nunito Sans Variable', system-ui, sans-serif", kind: 'sans' },
   'atkinson-hyperlegible': {
     label: 'Atkinson Hyperlegible',

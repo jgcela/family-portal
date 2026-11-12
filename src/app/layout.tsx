@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import '@fontsource-variable/inter';
+import '@fontsource-variable/open-sans';
 import '@fontsource-variable/source-serif-4';
 import '@fontsource-variable/lora';
 import '@fontsource-variable/nunito-sans';

@@ -9,7 +9,7 @@ Fecha: 12 de noviembre de 2026.
 - **No se tuvo acceso:** a los archivos fuente locales, al hosting de `stmarycommunication.javiercela.me` ni a ningún panel de administración.
 - Todo lo que aparece abajo se vio en las páginas. Donde algo no se pudo comprobar, se dice.
 
-**Pendiente para cerrar la auditoría:** acceso a la carpeta con el código fuente del portal (HTML, CSS, JS, `assets/`). Con eso se verifican colores, fuentes, la fuente de datos del calendario y el archivo del Messenger.
+**Actualización (12 nov, 11:30 MT):** se revisó el código fuente desde Google Drive (`stmary-portal-202627_1.zip` y la carpeta `Portal_202627`). Ver "Hallazgos en el código fuente" más abajo. La carpeta `Test_Portal` estaba vacía al consultarla.
 
 ## Páginas revisadas
 
@@ -40,17 +40,32 @@ Páginas enlazadas que no se abrieron: `volunteer-opportunities_202627.html`, `t
 | Redes | Instagram `stmarycatholicvirtueschool`, Facebook `id=100064244336751` | Web |
 | Logo blanco | `stmarycommunication.javiercela.me/portal/assets/logo_white.png` | Portal 2026‑27 |
 | Logo horizontal | `images.squarespace-cdn.com/.../St.MarySchool_Horizontal.png` | Web |
-| Colores | #16335B (navy) y #FCBC40 (dorado) | **No verificados**: los diste tú como referencia; el CSS no se pudo leer. |
+| Colores | Navy #16335B, dorado #FCBC40, cerúleo #006D8F (enlaces), texto #333333, fondo suave #F4F8FA | `assets/css/portal-2627.css` |
+| Tipografías | Inter (títulos) y Open Sans (texto), desde Google Fonts | `portal_202627.html` y CSS |
+| Calendario de Google | `c_f07a110a…a92e@group.calendar.google.com` (público) | `CONFIG.googleCalendarId` en `portal_202627.html` |
 
 ## Problemas encontrados
 
 1. **[Seguro] Contacto roto en el portal anterior:** el teléfono visible es (303) 798‑2375, pero el enlace llama a `+15551234567`. El email visible es officemanager@…, pero el enlace escribe a `families@stmary.edu`. En la versión 2026‑27 está corregido.
-2. **[Seguro] Botones de suscripción al calendario sin destino:** "Add to Google Calendar", "Apple or Outlook (iCal)" y "Subscribe" apuntan a `#` en el texto leído. Puede que el JavaScript los rellene; sin el código no se puede confirmar.
+2. **[Seguro] Suscripción al calendario:** los botones salen como `#` en el HTML, pero el JavaScript los rellena con el calendario público de Google (`calendar.google.com/...?cid=` y `webcal://.../basic.ics`). Funcionan.
 3. **[Seguro] Rutas inconsistentes:** conviven `/portal/assest/` (mal escrito), `/portal/assets/`, `/portal/assets/Documents/` y `/Portal_202627/assets/`. Un enlace (`2026-2027_Parent_Handbook_Preschool`) no tiene extensión. Varios nombres de archivo llevan espacios.
 4. **[Seguro] La URL del portal anterior es "secreta"** (`0531525gfk2026.html`). No es control de acceso: cualquiera con el enlace lo ve. Las páginas tienen `noindex, nofollow`.
 5. **[Seguro] No existe administración.** Cada cambio exige editar HTML y volver a subir archivos.
 6. **[Probable] El portal está fuera del dominio del colegio** (`javiercela.me`), lo que no inspira confianza a las familias y complica el correo y el SSO.
 7. **[Seguro] FACTS:** el portal enlaza a `sis.factsmgt.com/accounts/Account/Login`; la web del colegio enlaza a `accounts.renweb.com/...`. Son dos puertas distintas al mismo sistema.
+
+## Hallazgos en el código fuente
+
+- **[Seguro] Todo el contenido vive dentro del HTML como listas de JavaScript.** No hay base de datos ni panel. Por eso la migración es mecánica:
+  - `EVENTS` en `portal_202627.html`: **132 eventos** con fecha, categoría (`noclasses`, `faith`, `academic`, `community`, `health`), título, detalle, etiquetas, enlace y fin opcional del aviso de "no school".
+  - `DOCS`: **23 documentos** en 6 categorías (Forms to return, Handbooks & policies, Health & safety, Preschool, Academics, Flyers), con palabras clave para el buscador. Las categorías son distintas de las del portal anterior.
+  - `OPPS` en `volunteer-opportunities_202627.html`: **12 oportunidades** con enlaces a SignUpGenius, Google Forms, emails y teléfonos.
+  - `LISTS` en `teacher-wishlists_202627.html`: **18 listas** de Amazon por profesor y aula.
+  - `STAFF` en `staff-favorites_202627.html`: fichas del personal con 12 campos (bebidas, snacks, alergias…) agrupadas en 7 equipos.
+  - `assets/messenger/manifest.js`: **13 boletines** (el más reciente, 9 nov 2026). Cada uno es el HTML del email de Flocknote guardado en `assets/messenger/data/AAAA-MM-DD.html`, mostrado en un iframe.
+- **[Seguro] Un aviso automático "No school"** aparece 14 días antes de cada día sin clase (`alertDays: 14`).
+- **[Seguro] Privacidad:** `.htaccess` añade `X-Robots-Tag: noindex` a todo y `robots.txt` bloquea a los rastreadores de IA. No hay login: cualquiera con el enlace ve emails y teléfonos personales de voluntarios y las **alergias del personal**. En la plataforma nueva, Staff favorites y los contactos de voluntarios deberían ir detrás del login de familias.
+- **[Seguro] El JS admite `?today=AAAA-MM-DD`** para probar fechas. Útil para comparar resultados durante la migración.
 
 ## Checklist de migración, función por función
 
@@ -68,18 +83,19 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links / Featured Resources | 3–4 | ☐ |
 | 9 | "This week and next" | Bloque This Week (calendario) | 3–4 | ☐ |
 | 10 | Calendario mes/lista con leyenda por categorías | Calendar & Events | 3–4 | ☐ |
-| 11 | ~150 eventos 2026‑27 (con categorías Faith, Academic, No School, Health…) | Importación + migración | 6 | ☐ |
+| 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (ICS de Google o script desde `EVENTS`) | 3 / 6 | ☐ |
 | 12 | Suscripción ICS / Google Calendar | Feed ICS por calendario | 3 | ☐ |
 | 13 | PDF del calendario completo | Documents | 3 / 6 | ☐ |
-| 14 | 22 documentos en 5 categorías (Academic, Handbook & Conduct, Health & Safety, Summer Assignments, Flyers) | Documents + Resources | 3 / 6 | ☐ |
+| 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ☐ |
 | 15 | Manual HTML con índice, buscador y PDF | Pages (página larga con índice) + Documents | 3 / 6 | ☐ |
 | 16 | Manual de Preschool (HTML + PDF) | Pages + Documents (audiencia Preschool) | 3 / 6 | ☐ |
-| 17 | Archivo del School Messenger con buscador | Módulo Messenger | 4 / 6 | ☐ — falta ver de dónde salen los boletines |
+| 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ☐ |
 | 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ☐ |
 | 19 | Teacher wishlists | Community | 4 / 6 | ☐ |
 | 20 | Staff favorites | Community / Directory | 4 / 6 | ☐ |
 | 21 | Supply list por curso | Pages (audiencia por curso) | 4 / 6 | ☐ |
 | 22 | Fechas límite de salud (vacunas, físico, medicación, Tdap 7th) | Action Required | 3 / 6 | ☐ |
+| 23 | Aviso automático "No school" 14 días antes | Bloque Action Required / alerta | 4 | ☐ |
 
 ## Lo que se conserva tal cual
 

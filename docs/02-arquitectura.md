@@ -10,8 +10,8 @@ Un **monolito modular** en Next.js que sirve a muchas escuelas desde un solo des
 | Base de datos | PostgreSQL en Neon | Ya contratado. Postgres permite aislamiento por fila (RLS). |
 | Acceso a datos | Drizzle ORM + driver `pg` | Esquema tipado y migraciones SQL revisables. `pg` permite transacciones interactivas, necesarias para RLS. |
 | Login | Better Auth (en la propia base de datos) | Sin coste por usuario, con 2FA, sesiones en BD y límite de intentos. Los usuarios quedan en nuestra base, no en un tercero. |
-| Archivos | **Pendiente (Fase 3).** Recomendación: Vercel Blob para logos e imágenes públicas, y Cloudflare R2 (o S3) con URLs firmadas para documentos privados. | Neon no guarda archivos. |
-| Correo | **Pendiente (Fase 3).** Recomendación: Resend. | Invitaciones y recuperación de contraseña. |
+| Archivos | Cloudflare R2 (compatible con S3): un bucket público para logos e imágenes y uno privado con URLs firmadas de corta duración para documentos. | Un solo proveedor, 10 GB gratis y sin coste por descarga. Neon no guarda archivos. |
+| Correo | Resend (Fase 3). | Invitaciones y recuperación de contraseña. |
 | Pruebas | Vitest contra PostgreSQL real | Las pruebas de aislamiento solo valen si corren contra Postgres con RLS. |
 
 Alternativas descartadas: **Clerk** (cobra por usuario y duplicaría nuestro modelo de escuelas y roles), **Auth.js** (2FA y contraseñas poco maduros), **Supabase** (ya elegiste Neon).

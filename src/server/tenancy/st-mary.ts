@@ -5,18 +5,19 @@ import type { ThemeTokens } from '../theme/tokens';
 import type { ProvisionInput } from './provision';
 import { PK8_GRADES } from './provision';
 
-// Colours were given as reference values by the platform owner; they have not
-// yet been checked against the current portal's CSS (source not available).
+// Verified against assets/css/portal-2627.css of the current portal:
+// --navy #16335B, --gold #FCBC40, --cerulean #006D8F (links), --jet #333333
+// (text), --tint #F4F8FA; headings in Inter, body text in Open Sans.
 export const ST_MARY_THEME: ThemeTokens = {
   colors: {
     primary: '#16335B',
-    secondary: '#2C4F7C',
+    secondary: '#006D8F',
     accent: '#FCBC40',
-    background: '#FAF8F4',
+    background: '#F4F8FA',
     surface: '#FFFFFF',
-    text: '#1B2433',
+    text: '#333333',
   },
-  fonts: { heading: 'source-serif-4', body: 'inter' },
+  fonts: { heading: 'inter', body: 'open-sans' },
   radius: 'soft',
   header: 'solid',
   appearance: 'light',

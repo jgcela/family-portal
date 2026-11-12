@@ -7,7 +7,7 @@
 | Entregable | Estado |
 |---|---|
 | Lectura de las 6 URLs indicadas | Hecho, solo texto (ver límites en `01-auditoria.md`) |
-| Revisión del código fuente, CSS, JS y datos del calendario | **Bloqueado:** falta acceso a la carpeta local del portal |
+| Revisión del código fuente, CSS, JS y datos del calendario | Hecho desde Google Drive (132 eventos, 23 documentos, 13 boletines) |
 | Checklist de migración función por función | Hecho (`01-auditoria.md`) |
 | Arquitectura | Hecho (`02-arquitectura.md`) |
 
@@ -37,8 +37,8 @@ Calendario, anuncios, documentos, páginas, Messenger, búsqueda, directorio, vo
 
 ## Bloqueos y riesgos abiertos
 
-1. **Código fuente del portal actual:** sin él no se pueden verificar colores, fuentes ni migrar el calendario y el Messenger con exactitud.
+1. **Privacidad del contenido actual:** alergias del personal y teléfonos personales de voluntarios están públicos para quien tenga el enlace.
 2. **Contraseña de Neon expuesta en el chat:** hay que hacer "Reset password" antes de guardar datos reales.
-3. **Almacenamiento de archivos y correo:** hay que crear cuentas (recomendado Vercel Blob o R2, y Resend) antes de la Fase 3.
+3. **Almacenamiento de archivos y correo:** decidido Cloudflare R2 para archivos y Resend para correo; faltan las cuentas.
 4. **Dominio de la plataforma:** para subdominios por escuela hace falta un dominio propio apuntado a Vercel. Mientras tanto, modo ruta (`/s/stmary`).
 5. **Vercel Hobby** no permite uso comercial.
