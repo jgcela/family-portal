@@ -56,7 +56,7 @@ export const MODULES: ModuleDefinition[] = [
     description: 'School calendars, events, imports (ICS/CSV) and Add to Calendar.',
     category: 'school-life',
     stage: 'core',
-    implemented: false,
+    implemented: true,
     configSchema: z
       .object({
         defaultView: z.enum(['month', 'week', 'agenda']).default('month'),

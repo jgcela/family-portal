@@ -29,7 +29,10 @@ export async function tenantBase(key: string): Promise<string> {
 }
 
 export const getSession = cache(async () => {
-  return auth().api.getSession({ headers: await headers() });
+  // Read the request headers first: that marks the page as dynamic, so the
+  // build never tries to prerender it (and never needs a database).
+  const h = await headers();
+  return auth().api.getSession({ headers: h });
 });
 
 export const getPortalView = cache(async (tenantId: string) => {

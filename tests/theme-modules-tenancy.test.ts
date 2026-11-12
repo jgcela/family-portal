@@ -92,7 +92,9 @@ describe('module rules', () => {
     const sub = { status: 'active' as const, includedModules: ['calendar'], extraModules: ['volunteer'] };
     expect([...entitledModules(sub)].sort()).toEqual(['calendar', 'home', 'volunteer']);
     expect([...entitledModules({ ...sub, status: 'canceled' })]).toEqual(['home']);
-    expect(activeModules(new Set(['calendar']), entitledModules(sub)).map((m) => m.id)).toEqual(['home']);
+    // Enabled + entitled + implemented = active; unimplemented modules never are.
+    expect(activeModules(new Set(['calendar', 'volunteer']), entitledModules(sub)).map((m) => m.id)).toEqual(['home', 'calendar']);
+    expect(activeModules(new Set(['calendar']), entitledModules({ ...sub, status: 'canceled' })).map((m) => m.id)).toEqual(['home']);
   });
 
   it('every module contract is complete and dependencies exist', () => {

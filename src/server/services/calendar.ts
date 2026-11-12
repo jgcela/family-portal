@@ -510,7 +510,7 @@ const importSourceSchema = z
     calendarId: z.uuid(),
     kind: z.enum(['ics_file', 'csv_file']),
     fileName: z.string().max(255).nullish(),
-    text: z.string().max(5_000_000, 'File is too large (5 MB maximum).'),
+    text: z.string().max(3_900_000, 'File is too large (about 4 MB maximum).'),
     timezone: z.string().refine(isValidTimeZone, 'Unknown time zone.'),
     csvMapping: z.record(z.string(), z.string()).optional(),
   })
@@ -745,6 +745,21 @@ export async function listImports(ctx: AuthzContext, db: Db = platformDb()) {
         .from(calendarImports)
         .orderBy(desc(calendarImports.createdAt))
         .limit(50),
+    db,
+  );
+}
+
+// ---------- Lookups for forms and filters ----------
+
+export async function listAudiences(tenantId: string, db: Db = platformDb()) {
+  return withTenant(
+    tenantId,
+    (tx) =>
+      tx
+        .select({ id: audiences.id, key: audiences.key, name: audiences.name, kind: audiences.kind })
+        .from(audiences)
+        .where(sql`${audiences.kind} <> 'school'`)
+        .orderBy(asc(audiences.kind), asc(audiences.name)),
     db,
   );
 }

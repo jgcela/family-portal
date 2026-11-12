@@ -39,7 +39,7 @@ export const ST_MARY: Omit<ProvisionInput, 'planId'> = {
   grades: PK8_GRADES,
   academicYear: { label: '2026–27', startsOn: '2026-08-17', endsOn: '2027-05-28' },
   theme: ST_MARY_THEME,
-  enabledModules: ['home'],
+  enabledModules: ['home', 'calendar'],
   profile: {
     displayName: 'St. Mary Catholic Virtue School',
     shortName: 'St. Mary',

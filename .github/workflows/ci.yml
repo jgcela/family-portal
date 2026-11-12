@@ -27,7 +27,6 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      # Built without database settings on purpose: a build must never need
+      # the database (Vercel builds before the app can reach it).
       - run: npm run build
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-          BETTER_AUTH_SECRET: ci-only-secret-not-used-in-production-000

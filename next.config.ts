@@ -11,6 +11,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ['pg'],
+  // Calendar imports upload .ics/.csv files through server actions. Vercel caps
+  // request bodies at 4.5 MB, so stay below that.
+  experimental: { serverActions: { bodySizeLimit: '4mb' } },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
