@@ -77,3 +77,75 @@
 .auth-wrap { display: grid; place-items: center; padding: var(--space-7) var(--space-4); }
 .auth-card { width: 100%; max-width: 420px; display: grid; gap: var(--space-4); }
 .auth-card h1 { font-size: 1.6rem; }
+
+/* Home blocks */
+.home-block + .home-block { margin-top: var(--space-4); }
+.home-block .section-title a { font-size: 0.875rem; font-weight: 600; }
+
+/* Agenda (lists of events) */
+.agenda { display: grid; gap: var(--space-4); }
+.agenda-date { font-family: var(--font-body); font-size: 0.8rem; font-weight: 650; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--space-2); }
+.agenda ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.agenda-item { display: grid; grid-template-columns: 4px 1fr; gap: var(--space-3); align-items: stretch; }
+.agenda-bar { border-radius: 2px; }
+.agenda-title { font-weight: 600; text-decoration: none; color: var(--color-text); }
+.agenda-title:hover { text-decoration: underline; color: var(--color-link); }
+.agenda-item.is-important .agenda-title::after { content: ' ●'; color: var(--color-accent); font-size: 0.7em; vertical-align: middle; }
+.agenda-meta { font-size: 0.875rem; color: var(--color-text-muted); }
+.cat-tag { display: inline-block; margin-left: var(--space-2); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; background: var(--surface-sunken); color: var(--color-text-muted); }
+
+/* Calendar page */
+.cal-page { padding-block: var(--space-6) var(--space-8); }
+.cal-head { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: end; justify-content: space-between; margin-bottom: var(--space-4); }
+.cal-sub { color: var(--color-text-muted); margin-top: var(--space-1); font-size: 0.9rem; }
+.cal-actions { display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; }
+.segmented { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--radius); overflow: hidden; }
+.segmented a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-4); text-decoration: none; color: var(--color-text); font-weight: 600; font-size: 0.9rem; }
+.segmented a + a { border-left: 1px solid var(--border-strong); }
+.segmented a[aria-current='true'] { background: var(--color-primary); color: var(--color-on-primary); }
+.subscribe { position: relative; }
+.subscribe summary { list-style: none; }
+.subscribe summary::-webkit-details-marker { display: none; }
+.subscribe-panel { position: absolute; right: 0; top: calc(100% + 6px); z-index: 10; width: min(360px, calc(100vw - 32px)); background: var(--color-surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 24px rgb(16 24 40 / 0.12); padding: var(--space-4); display: grid; gap: var(--space-3); font-size: 0.9rem; }
+.subscribe-panel ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
+.subscribe-panel li { display: grid; gap: 2px; }
+.cal-filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: end; margin-bottom: var(--space-5); }
+.cal-filters select { min-height: 44px; padding: 0 var(--space-3); border-radius: calc(var(--radius) * 0.7); border: 1px solid var(--border-strong); background: var(--color-surface); color: var(--color-text); font: inherit; }
+.month-nav { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+.month-nav h2 { min-width: 9ch; text-align: center; }
+.month-nav .btn { padding: 0 var(--space-4); font-size: 1.2rem; }
+.today-link { margin-left: auto; font-weight: 600; }
+
+.month-grid { width: 100%; border-collapse: collapse; table-layout: fixed; background: var(--color-surface); border: 1px solid var(--border); }
+.month-grid th { font-size: 0.75rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); padding: var(--space-2); border-bottom: 1px solid var(--border); text-align: left; }
+.month-grid td { vertical-align: top; height: 112px; padding: var(--space-1) var(--space-1) var(--space-2); border: 1px solid var(--border); }
+.month-grid td.is-out { background: var(--surface-sunken); }
+.month-grid td.is-out .day-num { color: var(--color-text-muted); }
+.day-num { display: inline-grid; place-items: center; min-width: 26px; height: 26px; font-size: 0.85rem; font-weight: 600; border-radius: 999px; margin: 2px 2px 4px; }
+.month-grid td.is-today .day-num { background: var(--color-primary); color: var(--color-on-primary); }
+.month-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.chip { display: block; font-size: 0.75rem; line-height: 1.35; padding: 1px 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; color: var(--color-text); border-left: 3px solid var(--chip); background: color-mix(in srgb, var(--chip) 8%, var(--color-surface)); }
+.chip-allday { background: color-mix(in srgb, var(--chip) 18%, var(--color-surface)); font-weight: 600; }
+.chip:hover { background: color-mix(in srgb, var(--chip) 24%, var(--color-surface)); }
+.month-grid .more { font-size: 0.72rem; color: var(--color-text-muted); padding-left: 6px; }
+.month-agenda { display: none; }
+@media (max-width: 719px) {
+  .month-grid { display: none; }
+  .month-agenda { display: block; }
+}
+.cal-legend { margin-top: var(--space-5); font-size: 0.85rem; color: var(--color-text-muted); }
+
+/* Event page */
+.event-page { padding-block: var(--space-6) var(--space-8); display: grid; gap: var(--space-4); max-width: 760px; }
+.event-card { display: grid; gap: var(--space-4); }
+.event-cal { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); font-size: 0.875rem; font-weight: 600; color: var(--color-text-muted); }
+.event-cal .cat-tag { margin-left: 0; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.event-facts { display: grid; gap: var(--space-3); margin: 0; }
+.event-facts dt { font-size: 0.75rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); }
+.event-facts dd { margin: 2px 0 0; font-weight: 600; }
+.event-desc { white-space: pre-line; max-width: 65ch; }
+.event-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.event-tz { font-size: 0.8rem; }
+.month-grid li { min-width: 0; overflow: hidden; }
+.chip-time { font-weight: 600; margin-right: 3px; }

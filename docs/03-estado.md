@@ -31,9 +31,28 @@
 
 Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `npm run build` sin errores.
 
+## Fase 3 — Administración (en curso)
+
+### Calendario y eventos (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Tablas `calendars`, `events`, `calendar_imports` con RLS y claves compuestas por escuela | Hecho | Pruebas: otra escuela no ve ni puede enlazar eventos, ni con SQL directo |
+| Crear, editar, borrar eventos; todo el día o con hora; varios días; repetición (diaria, semanal, mensual o regla RFC 5545) con fechas excluidas | Hecho | Pruebas + navegador |
+| Zonas horarias: se guarda el instante; las repeticiones se calculan en la hora local de la escuela (la misa de las 8:00 sigue a las 8:00 tras el cambio de hora) | Hecho | Pruebas con el cambio de hora del 1 nov 2026 |
+| Flujo Borrador → En revisión → Aprobado → Publicado → Archivado; aprobación independiente si la escuela la exige | Hecho | Pruebas |
+| Permisos por audiencia: un profesor de 5º solo crea y edita eventos de 5º; no puede ampliarlos a toda la escuela | Hecho | Pruebas |
+| Importación ICS (Google, Outlook, Apple) y CSV con mapeo de columnas, vista previa, errores por fila, detección de duplicados y reimportación que actualiza en vez de duplicar | Hecho | Pruebas + navegador |
+| Portal: vista mes y lista, filtro por curso y calendario, ficha del evento, "Add to Google Calendar", descarga .ics, suscripción por calendario | Hecho | Navegador a 1280 px y 390 px |
+| Bloques "This Week" y "Upcoming events" en la portada | Hecho | Navegador |
+| Activar y desactivar módulos desde el Module Manager | Hecho | Pruebas (servicio) |
+| Suscripción a un calendario externo por URL (sincronización periódica) | Pendiente | — |
+
+Resultado de pruebas: `npm test` → **91 de 91** pasan.
+
 ## Lo que todavía no existe (no simulado)
 
-Calendario, anuncios, documentos, páginas, Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, editor de portada, editor de tema, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+Anuncios, documentos, páginas, Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, editor de portada, editor de tema, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 
 ## Bloqueos y riesgos abiertos
 

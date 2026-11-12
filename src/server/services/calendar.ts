@@ -763,3 +763,25 @@ export async function listAudiences(tenantId: string, db: Db = platformDb()) {
     db,
   );
 }
+
+/** Workflow settings that change which buttons the editor shows. */
+export async function getContentSettings(tenantId: string, db: Db = platformDb()) {
+  return withTenant(tenantId, (tx) => settingsFor(tx, tenantId), db);
+}
+
+/** Categories already used by the school's events, for the form's suggestions. */
+export async function listEventCategories(tenantId: string, db: Db = platformDb()): Promise<string[]> {
+  return withTenant(
+    tenantId,
+    async (tx) => {
+      const rows = await tx
+        .selectDistinct({ c: events.category })
+        .from(events)
+        .where(isNotNull(events.category))
+        .orderBy(asc(events.category))
+        .limit(100);
+      return rows.map((r) => r.c!);
+    },
+    db,
+  );
+}

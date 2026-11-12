@@ -2,13 +2,16 @@ import { notFound } from 'next/navigation';
 import { hasAnywhere } from '@/server/rbac/authorize';
 import { getModuleState } from '@/server/services/modules';
 import { requireStaff } from '@/server/request';
+import { ModuleToggle } from './toggle';
 
 export const metadata = { title: 'Module Manager' };
 
 type Props = { params: Promise<{ tenant: string }> };
 
 export default async function ModulesPage({ params }: Props) {
-  const { tenant, ctx } = await requireStaff((await params).tenant);
+  const key = (await params).tenant;
+  const { tenant, ctx } = await requireStaff(key);
+  const canToggle = hasAnywhere(ctx, 'modules.toggle');
   if (!hasAnywhere(ctx, 'modules.view')) notFound();
   const state = await getModuleState(tenant.id);
   const core = state.catalog.filter((m) => m.stage === 'core');
@@ -45,6 +48,7 @@ export default async function ModulesPage({ params }: Props) {
                   <th scope="col">Description</th>
                   <th scope="col">Needs</th>
                   <th scope="col">Status</th>
+                  {canToggle && <th scope="col"><span className="visually-hidden">Action</span></th>}
                 </tr>
               </thead>
               <tbody>
@@ -54,6 +58,13 @@ export default async function ModulesPage({ params }: Props) {
                     <td className="muted">{m.description}</td>
                     <td className="muted">{m.dependencies.join(', ') || '—'}</td>
                     <td>{status(m)}</td>
+                    {canToggle && (
+                      <td>
+                        {m.implemented && m.entitled && !m.required && (
+                          <ModuleToggle tenantKey={key} moduleId={m.id} name={m.name} enabled={m.enabled} />
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
