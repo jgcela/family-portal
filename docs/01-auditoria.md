@@ -81,10 +81,10 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 6 | Botón FACTS Login | Quick Links | 3–4 | ☐ |
 | 7 | Buscador "forms, events and policies" | Módulo Search | 4 | ☐ |
 | 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links / Featured Resources | 3–4 | ☐ |
-| 9 | "This week and next" | Bloque This Week (calendario) | 3–4 | ☐ |
-| 10 | Calendario mes/lista con leyenda por categorías | Calendar & Events | 3–4 | ☐ |
-| 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (ICS de Google o script desde `EVENTS`) | 3 / 6 | ☐ |
-| 12 | Suscripción ICS / Google Calendar | Feed ICS por calendario | 3 | ☐ |
+| 9 | "This week and next" | Bloque This Week (calendario, días configurables) | 3–4 | ☑ |
+| 10 | Calendario mes/lista con leyenda por categorías | Calendar & Events | 3–4 | ☑ |
+| 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (ICS de Google o script desde `EVENTS`) | 3 / 6 | ◐ (importador listo; falta migrar los datos) |
+| 12 | Suscripción ICS / Google Calendar | Feed ICS por calendario | 3 | ☑ |
 | 13 | PDF del calendario completo | Documents | 3 / 6 | ☐ |
 | 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ☐ |
 | 15 | Manual HTML con índice, buscador y PDF | Pages (página larga con índice) + Documents | 3 / 6 | ☐ |

@@ -19,6 +19,7 @@ import {
   tenantDomains,
   tenantModules,
   tenantSettings,
+  calendars,
   tenants,
   themeVersions,
 } from '../db/schema';
@@ -96,6 +97,8 @@ export async function provisionTenant(input: ProvisionInput, db: Db = platformDb
         const tenantId = tenant.id;
         await tx.insert(schoolProfiles).values({ displayName: input.name, ...input.profile, tenantId });
         await tx.insert(tenantSettings).values({ tenantId });
+        // Every school starts with one public calendar; more can be added later.
+        await tx.insert(calendars).values({ tenantId, key: 'school', name: 'School Calendar', isPublic: true });
         await tx.insert(themeVersions).values({
           tenantId,
           status: 'published',

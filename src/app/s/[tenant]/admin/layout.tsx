@@ -14,6 +14,10 @@ export default async function AdminLayout({ children, params }: Props) {
   const sections: { title: string; items: { href: string; label: string; show: boolean }[] }[] = [
     { title: 'Overview', items: [{ href: a, label: 'Dashboard', show: true }] },
     {
+      title: 'School life',
+      items: [{ href: `${a}/calendar`, label: 'Calendar & Events', show: hasAnywhere(ctx, 'events.view') }],
+    },
+    {
       title: 'People',
       items: [{ href: `${a}/roles`, label: 'Roles & Permissions', show: hasAnywhere(ctx, 'roles.view') }],
     },
