@@ -2793,3 +2793,34 @@ button {
 .site-footer .wordmark-desc {
   white-space: normal;
 }
+
+/* Narrow phones: long plan names in Anton must fit the card. */
+.plan {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.plan-name {
+  font-size: clamp(44px, 13vw, 64px);
+  overflow-wrap: anywhere;
+}
+
+/* Admin task tabs scroll sideways on phones: fade the right edge as a cue. */
+@media (max-width: 960px) {
+  .admin-nav {
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+    padding-right: 48px;
+  }
+}
+
+@media (max-width: 400px) {
+  .price-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .price-pair > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--hairline-strong);
+    padding-left: 0;
+  }
+}
