@@ -7,6 +7,7 @@ import { announcements, pages, pageVersions } from '../db/schema';
 import { audit } from '../audit/log';
 import { assertVerifiedContext } from '../rbac/context';
 import { AuthorizationError, assertCan, can, hasAnywhere, type AuthzContext } from '../rbac/authorize';
+import { assertViewer, visibleTo, type Viewer } from '../viewer';
 import { ValidationError } from './modules';
 import { nextStatus, type Transition } from './workflow';
 import { eventResource, gradeLookup, settingsFor } from './scope';
@@ -33,6 +34,7 @@ export const announcementInputSchema = z
     body: z.string().max(50_000, 'Text is too long (50,000 characters maximum).').default(''),
     isUrgent: z.boolean().default(false),
     isPinned: z.boolean().default(false),
+    visibility: z.enum(['public', 'families', 'staff']).default('public'),
     audienceIds: z.array(z.uuid()).max(50).default([]),
     publishAt: optionalDate,
     expiresAt: optionalDate,
@@ -194,9 +196,11 @@ export async function listAnnouncementsForStaff(
 /** What families see: published, started, not expired; urgent and pinned first. */
 export async function listPublicAnnouncements(
   tenantId: string,
+  viewer: Viewer,
   opts: { audienceIds?: string[]; limit?: number; now?: Date } = {},
   db: Db = platformDb(),
 ) {
+  assertViewer(viewer, tenantId);
   const now = opts.now ?? new Date();
   return withTenant(
     tenantId,
@@ -209,6 +213,7 @@ export async function listPublicAnnouncements(
             eq(announcements.status, 'published'),
             or(isNull(announcements.publishAt), lte(announcements.publishAt, now)),
             or(isNull(announcements.expiresAt), gt(announcements.expiresAt, now)),
+            visibleTo(announcements, viewer),
             opts.audienceIds?.length
               ? or(
                   sql`cardinality(${announcements.audienceIds}) = 0`,
@@ -227,7 +232,8 @@ export async function listPublicAnnouncements(
   );
 }
 
-export async function getPublicAnnouncement(tenantId: string, id: string, now = new Date(), db: Db = platformDb()) {
+export async function getPublicAnnouncement(tenantId: string, id: string, viewer: Viewer, now = new Date(), db: Db = platformDb()) {
+  assertViewer(viewer, tenantId);
   if (!UUID.test(id)) return null;
   return withTenant(
     tenantId,
@@ -241,6 +247,7 @@ export async function getPublicAnnouncement(tenantId: string, id: string, now = 
             eq(announcements.status, 'published'),
             or(isNull(announcements.publishAt), lte(announcements.publishAt, now)),
             or(isNull(announcements.expiresAt), gt(announcements.expiresAt, now)),
+            visibleTo(announcements, viewer),
           ),
         );
       return row ?? null;
@@ -264,6 +271,7 @@ export const pageInputSchema = z
     title: z.string().trim().min(1, 'Title is required.').max(200),
     body: z.string().max(400_000, 'Page is too long (400,000 characters maximum).').default(''),
     showToc: z.boolean().default(false),
+    visibility: z.enum(['public', 'families', 'staff']).default('public'),
     audienceIds: z.array(z.uuid()).max(50).default([]),
     sortOrder: z.number().int().min(0).max(1000).default(0),
   })
@@ -477,7 +485,8 @@ export async function listPagesForStaff(ctx: AuthzContext, db: Db = platformDb()
 }
 
 /** The published snapshot of a page, by address. Drafts are never returned. */
-export async function getPublishedPage(tenantId: string, slug: string, db: Db = platformDb()) {
+export async function getPublishedPage(tenantId: string, slug: string, viewer: Viewer, db: Db = platformDb()) {
+  assertViewer(viewer, tenantId);
   if (!/^[a-z0-9][a-z0-9-]{0,59}$/.test(slug)) return null;
   return withTenant(
     tenantId,
@@ -486,14 +495,15 @@ export async function getPublishedPage(tenantId: string, slug: string, db: Db = 
         .select({ page: pages, version: pageVersions })
         .from(pages)
         .innerJoin(pageVersions, eq(pageVersions.id, pages.publishedVersionId))
-        .where(eq(pages.slug, slug));
+        .where(and(eq(pages.slug, slug), visibleTo(pages, viewer)));
       return row ?? null;
     },
     db,
   );
 }
 
-export async function listPublishedPages(tenantId: string, db: Db = platformDb()) {
+export async function listPublishedPages(tenantId: string, viewer: Viewer, db: Db = platformDb()) {
+  assertViewer(viewer, tenantId);
   return withTenant(
     tenantId,
     (tx) =>
@@ -501,6 +511,7 @@ export async function listPublishedPages(tenantId: string, db: Db = platformDb()
         .select({ slug: pages.slug, title: pageVersions.title, audienceIds: pages.audienceIds })
         .from(pages)
         .innerJoin(pageVersions, eq(pageVersions.id, pages.publishedVersionId))
+        .where(visibleTo(pages, viewer))
         .orderBy(asc(pages.sortOrder), asc(pageVersions.title)),
     db,
   );

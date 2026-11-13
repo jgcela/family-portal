@@ -41,7 +41,7 @@ export default async function NewDocument({ params }: { params: Promise<{ tenant
             maxMb={MAX_UPLOAD_BYTES / 1048576}
             audiencePicker={
               <>
-                <AudiencePicker audiences={auds} selected={[]} />
+                <AudiencePicker audiences={auds} selected={[]} visibility="public" />
                 <p className="hint">{AUDIENCE_NOTE}</p>
               </>
             }

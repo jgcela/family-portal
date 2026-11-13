@@ -1,4 +1,5 @@
 // Announcements, pages and safe Markdown, end to end against PostgreSQL.
+import { PUBLIC_VIEWER } from '@/server/viewer';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { closeDb, platformDb, withTenant } from '@/server/db/client';
@@ -90,11 +91,11 @@ describe('announcements', () => {
     await mk('Later', { publishAt: '2026-12-01T00:00:00Z' });
     await mk('Expired', { expiresAt: '2026-11-01T00:00:00Z' });
     await createAnnouncement(b.ownerCtx, { title: 'Draft' });
-    const list = await listPublicAnnouncements(b.tenant.id, { now });
+    const list = await listPublicAnnouncements(b.tenant.id, PUBLIC_VIEWER, { now });
     expect(list.map((x) => x.title)).toEqual(['Urgent closure', 'Normal']);
     const later = (await withTenant(b.tenant.id, (tx) => tx.select().from(announcements).where(eq(announcements.title, 'Later'))))[0]!;
-    expect(await getPublicAnnouncement(b.tenant.id, later.id, now)).toBeNull();
-    expect(await getPublicAnnouncement(b.tenant.id, later.id, new Date('2026-12-02T00:00:00Z'))).not.toBeNull();
+    expect(await getPublicAnnouncement(b.tenant.id, later.id, PUBLIC_VIEWER, now)).toBeNull();
+    expect(await getPublicAnnouncement(b.tenant.id, later.id, PUBLIC_VIEWER, new Date('2026-12-02T00:00:00Z'))).not.toBeNull();
   });
 
   it('rejects an end before the start', async () => {
@@ -131,26 +132,26 @@ describe('announcements', () => {
 describe('pages', () => {
   it('families see the published snapshot, not later edits, until republished', async () => {
     const p = await createPage(a.ownerCtx, { slug: 'supply-list', title: 'Supply List', body: 'v1 text' });
-    expect(await getPublishedPage(a.tenant.id, 'supply-list')).toBeNull();
+    expect(await getPublishedPage(a.tenant.id, 'supply-list', PUBLIC_VIEWER)).toBeNull();
     await transitionPage(a.ownerCtx, p.id, 'publish');
-    expect((await getPublishedPage(a.tenant.id, 'supply-list'))!.version.body).toBe('v1 text');
+    expect((await getPublishedPage(a.tenant.id, 'supply-list', PUBLIC_VIEWER))!.version.body).toBe('v1 text');
 
     const edited = await updatePage(a.ownerCtx, p.id, { slug: 'supply-list', title: 'Supply List', body: 'v2 text' });
     expect(edited.status).toBe('draft');
-    expect((await getPublishedPage(a.tenant.id, 'supply-list'))!.version.body).toBe('v1 text');
+    expect((await getPublishedPage(a.tenant.id, 'supply-list', PUBLIC_VIEWER))!.version.body).toBe('v1 text');
 
     await transitionPage(a.ownerCtx, p.id, 'publish');
-    const live = await getPublishedPage(a.tenant.id, 'supply-list');
+    const live = await getPublishedPage(a.tenant.id, 'supply-list', PUBLIC_VIEWER);
     expect(live!.version).toMatchObject({ body: 'v2 text', version: 2 });
 
     // Restore v1 into the working copy; live stays v2 until published.
     const v1 = (await withTenant(a.tenant.id, (tx) => tx.select().from(pageVersions).where(eq(pageVersions.version, 1))))[0]!;
     const restored = await restorePageVersion(a.ownerCtx, p.id, v1.id);
     expect(restored.body).toBe('v1 text');
-    expect((await getPublishedPage(a.tenant.id, 'supply-list'))!.version.body).toBe('v2 text');
+    expect((await getPublishedPage(a.tenant.id, 'supply-list', PUBLIC_VIEWER))!.version.body).toBe('v2 text');
 
     await transitionPage(a.ownerCtx, p.id, 'unpublish');
-    expect(await getPublishedPage(a.tenant.id, 'supply-list')).toBeNull();
+    expect(await getPublishedPage(a.tenant.id, 'supply-list', PUBLIC_VIEWER)).toBeNull();
   });
 
   it('published versions cannot be rewritten, even with direct SQL in the tenant context', async () => {

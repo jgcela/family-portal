@@ -1,4 +1,5 @@
 // Documents: upload checks, versions, stable-link access, quotas and isolation.
+import { PUBLIC_VIEWER } from '@/server/viewer';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { closeDb, platformDb, withTenant } from '@/server/db/client';
@@ -40,7 +41,7 @@ async function addMember(tenantId: string, roleKey: string) {
 }
 
 const link = (tenantId: string, slug: string, viewer: Parameters<typeof resolveDocumentLink>[2], o: { version?: number } = {}) =>
-  resolveDocumentLink(tenantId, slug, viewer, { moduleActive: true, ...o });
+  resolveDocumentLink(tenantId, slug, viewer, { moduleActive: true, viewer: PUBLIC_VIEWER, ...o });
 
 beforeAll(async () => {
   a = await createSchool('docs-a');
@@ -106,13 +107,13 @@ describe('documents', () => {
     expect((await link(a.tenant.id, 'lunch-menu', null))?.version).toBe(1);
 
     // Module off: public link stops working, staff still can open it.
-    expect(await resolveDocumentLink(a.tenant.id, 'lunch-menu', null, { moduleActive: false })).toBeNull();
-    expect(await resolveDocumentLink(a.tenant.id, 'lunch-menu', a.ownerCtx, { moduleActive: false })).not.toBeNull();
+    expect(await resolveDocumentLink(a.tenant.id, 'lunch-menu', null, { moduleActive: false, viewer: PUBLIC_VIEWER })).toBeNull();
+    expect(await resolveDocumentLink(a.tenant.id, 'lunch-menu', a.ownerCtx, { moduleActive: false, viewer: PUBLIC_VIEWER })).not.toBeNull();
   });
 
   it('keeps audience-limited documents away from the public', async () => {
     const [aud] = await withTenant(a.tenant.id, (tx) => tx.select().from(audiences).where(eq(audiences.key, 'grade-5')));
-    const doc = await createDocument(a.ownerCtx, meta('grade5-list', { audienceIds: [aud!.id] }), { name: 'list.pdf', bytes: pdf() }, opts);
+    const doc = await createDocument(a.ownerCtx, meta('grade5-list', { audienceIds: [aud!.id], visibility: 'families' }), { name: 'list.pdf', bytes: pdf() }, opts);
     await transitionDocument(a.ownerCtx, doc.id, 'publish');
     expect(await link(a.tenant.id, 'grade5-list', null)).toBeNull();
     expect(await link(a.tenant.id, 'grade5-list', a.ownerCtx)).not.toBeNull();

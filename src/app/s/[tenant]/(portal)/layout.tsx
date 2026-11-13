@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { getDisplayView, getSession, getTenantOr404, tenantBase } from '@/server/request';
+import { getDisplayView, getSession, getTenantOr404, tenantBase, getViewer } from '@/server/request';
 import { themeToCss } from '@/server/theme/tokens';
 import { exitPreviewAction } from '../preview-actions';
 import { loadAuthzContext } from '@/server/rbac/context';
 import { hasAnywhere } from '@/server/rbac/authorize';
 import { listPublicAnnouncements } from '@/server/services/content';
+import { SignOutButton } from './account/sign-out';
 import '../portal.css';
 
 type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
@@ -15,9 +16,10 @@ export default async function PortalLayout({ children, params }: Props) {
   const [view, base, session] = await Promise.all([getDisplayView(tenant.id), tenantBase(key), getSession()]);
   const ctx = session ? await loadAuthzContext(tenant.id, session.user.id) : null;
   const isStaff = hasAnywhere(ctx, 'dashboard.view');
+  const viewer = await getViewer(tenant.id);
   const p = view.profile;
   const urgent = view.activeModules.some((m) => m.id === 'announcements')
-    ? (await listPublicAnnouncements(tenant.id, { limit: 3 })).filter((x) => x.isUrgent)
+    ? (await listPublicAnnouncements(tenant.id, await getViewer(tenant.id), { limit: 3 })).filter((x) => x.isUrgent)
     : [];
 
   const nav = [
@@ -25,7 +27,7 @@ export default async function PortalLayout({ children, params }: Props) {
       .filter((m) => m.nav?.area === 'primary')
       .map((m) => ({ label: m.nav!.label, href: `${base}${m.nav!.path === '/' ? '' : m.nav!.path}` || '/' })),
     ...view.customNav
-      .filter((n) => n.visibility === 'public' || session)
+      .filter((n) => n.visibility === 'public' || viewer.kind === 'staff' || (viewer.kind === 'family' && n.visibility === 'families'))
       .map((n) => ({ label: n.label, href: n.kind === 'url' ? n.target : `${base}${n.target}` })),
   ];
   const logo = view.theme.header === 'solid' ? view.theme.logo.onDark ?? view.theme.logo.primary : view.theme.logo.primary;
@@ -76,11 +78,17 @@ export default async function PortalLayout({ children, params }: Props) {
           </nav>
           <div className="portal-account">
             {isStaff ? (
-              <Link href={`${base}/admin`} className="btn btn-accent">
-                Manage portal
-              </Link>
+              <>
+                <Link href={`${base}/admin`} className="btn btn-accent">
+                  Manage portal
+                </Link>
+                <SignOutButton to={base || '/'} />
+              </>
             ) : session ? (
-              <span className="portal-user">{session.user.name}</span>
+              <>
+                <span className="portal-user">{session.user.name}</span>
+                <SignOutButton to={base || '/'} />
+              </>
             ) : (
               <Link href={`${base}/login`} className="portal-signin">
                 Sign in

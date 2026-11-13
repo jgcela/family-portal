@@ -73,6 +73,7 @@ function eventInput(fd: FormData) {
       .filter(Boolean),
     registrationUrl: str(fd, 'registrationUrl') || null,
     audienceIds: fd.getAll('audienceIds').filter((v): v is string => typeof v === 'string'),
+    visibility: (fd.get('visibility') as string | null) || 'public',
     isImportant: fd.get('isImportant') === 'on',
   };
 }

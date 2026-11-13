@@ -63,7 +63,7 @@ export default async function EditAnnouncementPage({ params, searchParams }: Pro
               canPublish={hasAnywhere(ctx, 'announcements.publish')}
               requireApproval={settings.requireApproval}
               timezone={tenant.timezone}
-              audiencePicker={<AudiencePicker audiences={auds} selected={row.audienceIds} />}
+              audiencePicker={<AudiencePicker audiences={auds} selected={row.audienceIds} visibility={row.visibility} />}
               defaults={{
                 title: row.title,
                 summary: row.summary ?? '',

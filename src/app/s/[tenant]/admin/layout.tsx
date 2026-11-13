@@ -33,6 +33,7 @@ export default async function AdminLayout({ children, params }: Props) {
       title: 'People',
       items: [
         { href: `${a}/staff`, label: 'Staff', show: hasAnywhere(ctx, 'users.view') },
+        { href: `${a}/families`, label: 'Families', show: hasAnywhere(ctx, 'users.view') },
         { href: `${a}/roles`, label: 'Roles & Permissions', show: hasAnywhere(ctx, 'roles.view') },
       ],
     },

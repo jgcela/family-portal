@@ -1,4 +1,5 @@
 // "Add to calendar" download for one event (Apple Calendar, Outlook).
+import { getViewer } from '@/server/request';
 import { getPublicEvent } from '@/server/services/calendar';
 import { findTenantByKey, isServable } from '@/server/tenancy/tenants';
 import { getModuleState } from '@/server/services/modules';
@@ -12,7 +13,7 @@ export async function GET(req: Request, { params }: Ctx) {
   if (!tenant || !isServable(tenant)) return new Response('Not found', { status: 404 });
   const modules = await getModuleState(tenant.id);
   if (!modules.active.some((x) => x.id === 'calendar')) return new Response('Not found', { status: 404 });
-  const row = await getPublicEvent(tenant.id, id);
+  const row = await getPublicEvent(tenant.id, id, await getViewer(tenant.id));
   if (!row) return new Response('Not found', { status: 404 });
   const body = buildIcs({ name: tenant.name, domain: new URL(req.url).hostname, events: [{ ...row.e, url: row.e.registrationUrl }] });
   const safe = row.e.title.replace(/[^\w\- ]+/g, '').trim().slice(0, 60) || 'event';

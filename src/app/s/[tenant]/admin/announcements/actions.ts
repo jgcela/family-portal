@@ -27,6 +27,7 @@ export async function saveAnnouncementAction(tenantKey: string, id: string | nul
       isUrgent: fd.get('isUrgent') === 'on',
       isPinned: fd.get('isPinned') === 'on',
       audienceIds: ids(fd, 'audienceIds'),
+      visibility: str(fd, 'visibility') || 'public',
       publishAt: localToIso(str(fd, 'publishAt'), tenant.timezone),
       expiresAt: localToIso(str(fd, 'expiresAt'), tenant.timezone),
     };

@@ -5,3 +5,4 @@ export * from './calendar';
 export * from './content';
 export * from './documents';
 export * from './invitations';
+export * from './families';

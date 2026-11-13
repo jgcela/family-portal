@@ -299,5 +299,7 @@ export const tenantSettings = pgTable('tenant_settings', {
   independentApproval: boolean('independent_approval').notNull().default(true),
   requireMfaForAdmins: boolean('require_mfa_for_admins').notNull().default(false),
   defaultVisibility: moduleVisibility('default_visibility').notNull().default('public'),
+  // Families request an account with this code; null = joining is closed.
+  familyJoinCode: text('family_join_code'),
   updatedAt: updatedAt(),
 });

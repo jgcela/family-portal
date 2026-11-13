@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
-import { getPortalView, getTenantOr404, tenantBase } from '@/server/request';
+import { getPortalView, getTenantOr404, tenantBase, getViewer } from '@/server/request';
 import { listAudiences, listCalendars, listPublicOccurrences, type PublicOccurrence } from '@/server/services/calendar';
 import { addDays, toDateStr } from '@/server/calendar/time';
 import { formatDate, formatTime } from '@/lib/when';
@@ -45,7 +45,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
   const gridEnd = addDays(monthEnd, trail);
   const range = mode === 'month' ? { from: gridStart, to: gridEnd } : { from: today, to: addDays(today, 55) };
 
-  const items = await listPublicOccurrences(tenant.id, range, {
+  const items = await listPublicOccurrences(tenant.id, await getViewer(tenant.id), range, {
     calendarKeys: calKey ? [calKey] : undefined,
     audienceIds: audId ? [audId] : undefined,
   });

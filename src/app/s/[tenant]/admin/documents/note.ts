@@ -1,2 +1,2 @@
 export const AUDIENCE_NOTE =
-  'Whole school: anyone with the link can open it. If you pick specific groups, only signed-in staff can open it for now; families will get access when family accounts arrive.';
+  'The link follows "Who can see it": public documents open for anyone with the link; family documents only for signed-in families in the groups you pick (or all families if none); staff documents only for staff.';

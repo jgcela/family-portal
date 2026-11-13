@@ -17,6 +17,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 import { tenants } from './platform';
+import { moduleVisibility } from './tenant';
 
 const tenantId = () =>
   uuid('tenant_id')
@@ -72,6 +73,9 @@ export const events = pgTable(
     registrationUrl: text('registration_url'),
     // Empty = whole school.
     audienceIds: uuid('audience_ids').array().notNull().default(sql`'{}'::uuid[]`),
+    // Who can see it once published: public (anyone), families (signed-in families
+    // in the audiences, or all families if none) or staff only.
+    visibility: moduleVisibility('visibility').notNull().default('public'),
     isImportant: boolean('is_important').notNull().default(false),
     status: contentStatus('status').notNull().default('draft'),
     // Import identity: stable UID from the source and a hash of its content.

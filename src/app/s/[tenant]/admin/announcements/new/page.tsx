@@ -34,7 +34,7 @@ export default async function NewAnnouncementPage({ params }: { params: Promise<
             canPublish={hasAnywhere(ctx, 'announcements.publish')}
             requireApproval={settings.requireApproval}
             timezone={tenant.timezone}
-            audiencePicker={<AudiencePicker audiences={auds} selected={[]} />}
+            audiencePicker={<AudiencePicker audiences={auds} selected={[]} visibility="public" />}
             defaults={{ title: '', summary: '', body: '', isUrgent: false, isPinned: false, publishAt: '', expiresAt: '' }}
           />
         </div>

@@ -10,6 +10,7 @@ import { assertVerifiedContext } from '../rbac/context';
 import { AuthorizationError, assertCan, can, hasAnywhere, type AuthzContext } from '../rbac/authorize';
 import { detectFileKind, sanitizeFileName, storageSafeName } from '../storage/files';
 import { getPrivateStorage, type ObjectStorage } from '../storage/storage';
+import { assertViewer, canSee, visibleTo, type Viewer } from '../viewer';
 import { ValidationError } from './modules';
 import { nextStatus, type Transition } from './workflow';
 import { eventResource, gradeLookup, settingsFor } from './scope';
@@ -38,6 +39,7 @@ export const documentInputSchema = z
       .regex(SLUG, 'Link name: lowercase letters, numbers and hyphens (max 80).'),
     description: z.string().trim().max(2000).default(''),
     category: z.string().trim().max(60).default(''),
+    visibility: z.enum(['public', 'families', 'staff']).default('public'),
     audienceIds: z.array(z.uuid()).max(50).default([]),
   })
   .strict();
@@ -51,6 +53,7 @@ function columns(input: unknown) {
     description: p.data.description || null,
     category: p.data.category || null,
     audienceIds: [...new Set(p.data.audienceIds)],
+    visibility: p.data.visibility,
   };
 }
 
@@ -418,9 +421,8 @@ export type ResolvedFile = { storageKey: string; fileName: string; contentType: 
 
 /**
  * Decides whether this viewer may download the document behind a stable link.
- * - Published, current version, no audience limit: anyone (families included).
- * - Audience-limited: only signed-in members allowed to view it. Family
- *   accounts arrive in Phase 4; until then that means staff.
+ * - Published, current version: whoever the document's visibility allows
+ *   (public, families in its audiences, or staff only).
  * - Drafts, archived documents and older versions: staff with documents.view.
  * Returns null for "not found" so the response never reveals that a private
  * document exists.
@@ -428,10 +430,11 @@ export type ResolvedFile = { storageKey: string; fileName: string; contentType: 
 export async function resolveDocumentLink(
   tenantId: string,
   slug: string,
-  viewer: AuthzContext | null,
-  opts: { version?: number; moduleActive: boolean },
+  staffCtx: AuthzContext | null,
+  opts: { version?: number; moduleActive: boolean; viewer: Viewer },
   db: Db = platformDb(),
 ): Promise<ResolvedFile | null> {
+  assertViewer(opts.viewer, tenantId);
   if (!SLUG.test(slug)) return null;
   return withTenant(
     tenantId,
@@ -439,10 +442,10 @@ export async function resolveDocumentLink(
       const [doc] = await tx.select().from(documents).where(eq(documents.slug, slug));
       if (!doc) return null;
       const res = await eventResource(tx, doc.audienceIds, doc.createdByUserId);
-      const staff = !!viewer && viewer.tenantId === tenantId && can(viewer, 'documents.view', res);
+      const staff = !!staffCtx && staffCtx.tenantId === tenantId && can(staffCtx, 'documents.view', res);
       const wantsOld = opts.version !== undefined;
       if (!staff) {
-        if (!opts.moduleActive || doc.status !== 'published' || wantsOld || doc.audienceIds.length > 0) return null;
+        if (!opts.moduleActive || doc.status !== 'published' || wantsOld || !canSee(doc, opts.viewer)) return null;
       }
       const where = wantsOld
         ? and(eq(documentVersions.documentId, doc.id), eq(documentVersions.version, opts.version!))
@@ -459,7 +462,8 @@ export async function resolveDocumentLink(
 }
 
 /** Titles and links for a set of slugs (used by pages that list documents). */
-export async function listPublicDocuments(tenantId: string, db: Db = platformDb()) {
+export async function listPublicDocuments(tenantId: string, viewer: Viewer, db: Db = platformDb()) {
+  assertViewer(viewer, tenantId);
   return withTenant(
     tenantId,
     (tx) =>
@@ -467,7 +471,7 @@ export async function listPublicDocuments(tenantId: string, db: Db = platformDb(
         .select({ slug: documents.slug, title: documents.title, category: documents.category, description: documents.description, fileName: documentVersions.fileName, contentType: documentVersions.contentType, sizeBytes: documentVersions.sizeBytes, updatedAt: documentVersions.createdAt })
         .from(documents)
         .innerJoin(documentVersions, eq(documentVersions.id, documents.currentVersionId))
-        .where(and(eq(documents.status, 'published'), sql`cardinality(${documents.audienceIds}) = 0`))
+        .where(and(eq(documents.status, 'published'), visibleTo(documents, viewer)))
         .orderBy(asc(documents.category), asc(documents.title)),
     db,
   );

@@ -1,4 +1,5 @@
 'use client';
+import { VisibilitySelect } from '../_components/audience-picker';
 import { useActionState, useState } from 'react';
 import { saveEventAction, type FormState } from './actions';
 
@@ -18,6 +19,7 @@ export type EventFormDefaults = {
   exdates: string;
   registrationUrl: string;
   audienceIds: string[];
+  visibility: string;
   isImportant: boolean;
 };
 
@@ -225,8 +227,9 @@ export function EventForm(p: Props) {
         <input id="registrationUrl" name="registrationUrl" type="url" placeholder="https://" defaultValue={d.registrationUrl} />
       </div>
 
+      <VisibilitySelect value={d.visibility} />
       <fieldset className="field">
-        <legend>Who is it for?</legend>
+        <legend>Which groups is it for?</legend>
         <span className="hint">Leave everything unchecked for the whole school.</span>
         <div className="check-grid">
           {p.audiences.map((x) => (

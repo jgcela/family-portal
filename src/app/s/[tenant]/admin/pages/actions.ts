@@ -20,6 +20,7 @@ export async function savePageAction(tenantKey: string, id: string | null, _prev
       showToc: fd.get('showToc') === 'on',
       sortOrder: Number(str(fd, 'sortOrder') || '0'),
       audienceIds: ids(fd, 'audienceIds'),
+      visibility: str(fd, 'visibility') || 'public',
     };
     savedId = id ? (await updatePage(ctx, id, input)).id : (await createPage(ctx, input)).id;
     const then = str(fd, 'then');

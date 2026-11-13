@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPortalView, getTenantOr404, tenantBase } from '@/server/request';
+import { getPortalView, getTenantOr404, tenantBase , getViewer } from '@/server/request';
 import { getPublicAnnouncement } from '@/server/services/content';
 import { renderMarkdown } from '@/server/content/markdown';
 
@@ -11,7 +11,7 @@ async function load(props: Props) {
   const tenant = await getTenantOr404(key);
   const view = await getPortalView(tenant.id);
   if (!view.activeModules.some((m) => m.id === 'announcements')) notFound();
-  const row = await getPublicAnnouncement(tenant.id, id);
+  const row = await getPublicAnnouncement(tenant.id, id, await getViewer(tenant.id));
   if (!row) notFound();
   return { key, tenant, row };
 }

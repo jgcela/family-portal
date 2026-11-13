@@ -35,7 +35,7 @@ export default async function NewPage({ params }: { params: Promise<{ tenant: st
             urlPrefix={base}
             canPublish={hasAnywhere(ctx, 'pages.publish')}
             requireApproval={settings.requireApproval}
-            audiencePicker={<AudiencePicker audiences={auds} selected={[]} />}
+            audiencePicker={<AudiencePicker audiences={auds} selected={[]} visibility="public" />}
             defaults={{ title: '', slug: '', body: '', showToc: false, sortOrder: 0 }}
           />
         </div>

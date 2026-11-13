@@ -4,6 +4,7 @@
 import { headers } from 'next/headers';
 import { auth } from '@/server/auth/auth';
 import { loadAuthzContext } from '@/server/rbac/context';
+import { loadViewer } from '@/server/viewer';
 import { resolveDocumentLink } from '@/server/services/documents';
 import { getModuleState } from '@/server/services/modules';
 import { getPrivateStorage, StorageNotConfiguredError } from '@/server/storage/storage';
@@ -26,10 +27,12 @@ export async function GET(req: Request, { params }: Ctx) {
   const version = v && /^\d{1,5}$/.test(v) ? Number(v) : undefined;
 
   const session = await auth().api.getSession({ headers: await headers() });
-  const viewer = session ? await loadAuthzContext(tenant.id, session.user.id) : null;
+  const staffCtx = session ? await loadAuthzContext(tenant.id, session.user.id) : null;
+  const viewer = await loadViewer(tenant.id, session?.user.id);
   const modules = await getModuleState(tenant.id);
-  const file = await resolveDocumentLink(tenant.id, slug, viewer, {
+  const file = await resolveDocumentLink(tenant.id, slug, staffCtx, {
     version,
+    viewer,
     moduleActive: modules.active.some((m) => m.id === 'documents'),
   });
   if (!file) return notFound();

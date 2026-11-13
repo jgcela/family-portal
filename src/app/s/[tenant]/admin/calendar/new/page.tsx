@@ -64,6 +64,7 @@ export default async function NewEventPage({ params, searchParams }: Props) {
                 exdates: '',
                 registrationUrl: '',
                 audienceIds: [],
+                visibility: 'public',
                 isImportant: false,
               }}
             />
