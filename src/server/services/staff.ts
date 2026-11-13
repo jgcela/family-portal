@@ -11,6 +11,7 @@ import { assertVerifiedContext } from '../rbac/context';
 import { AuthorizationError, can, isOwner, type AuthzContext, type ScopeType } from '../rbac/authorize';
 import { assertCanAssignRole } from '../rbac/escalation';
 import { ValidationError } from './modules';
+import { assertTenantOpen } from '../tenancy/tenants';
 
 export const INVITE_DAYS = 7;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -244,6 +245,7 @@ export async function viewInvitation(tenantId: string, token: string, db: Db = p
 export async function acceptInvitation(tenantId: string, token: string, userId: string, db: Db = platformDb()) {
   const [account] = await db.select({ email: user.email }).from(user).where(eq(user.id, userId));
   if (!account) throw new ValidationError('Account not found.');
+  await assertTenantOpen(tenantId, db);
   return withTenant(
     tenantId,
     async (tx) => {

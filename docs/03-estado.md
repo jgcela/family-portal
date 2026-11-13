@@ -118,7 +118,7 @@ Queda pendiente de la Fase 3, sin simular:
 - subida directa de archivos de más de 4 MB;
 - suscripción periódica a calendarios externos.
 
-## Fase 4 — Portal de familias (en curso)
+## Fase 4 — Portal de familias (cerrada para la demo el 13 nov 2026)
 
 ### Cuentas de familia (hecho)
 
@@ -140,9 +140,28 @@ Riesgo conocido: quien tenga el código puede *pedir* una cuenta con un email qu
 
 Resultado de pruebas: `npm test` → **143 de 143** pasan.
 
+## Fase 5 — Operaciones con varios colegios (en curso)
+
+### Super Admin: colegios, planes y primer administrador (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Panel `/platform` separado del panel de cada colegio, con roles de plataforma: owner y operator gestionan; support solo consulta. Un rol del colegio nunca da poder de plataforma | Hecho | Pruebas |
+| Lista de colegios con estado, plan, personal, familias y espacio usado. No muestra contenido de los colegios | Hecho | Navegador |
+| Asistente "New school" en 6 pasos: identidad y dirección, colores (con muestra), curso escolar y cursos, primer administrador, plan y módulos, revisión | Hecho | Pruebas + navegador (1280 y 390 px) |
+| El primer administrador recibe un enlace de invitación como School Owner (de un solo uso, 7 días). Desde la ficha se puede emitir otro para recuperar un colegio sin dueños | Hecho | Pruebas + navegador |
+| Estados: En preparación → Lanzado (exige un dueño que haya aceptado) → Suspendido (con motivo) → Reactivado. Suspender cierra el portal, el panel, las altas de familias y las invitaciones; no borra nada | Hecho | Pruebas + navegador |
+| Plan, estado de facturación, fin de prueba, renovación y módulos extra por colegio. Quitar un módulo lo oculta pero conserva sus datos | Hecho | Pruebas |
+| Registro de actividad de plataforma (global y por colegio) | Hecho | Pruebas + navegador |
+| Logo en el asistente | Pendiente: aún no hay subida de logo en ningún sitio | — |
+| Importación de contenido inicial en el asistente | No incluido: la hace el colegio desde su panel (importador de calendario) | — |
+| Cobro real | No incluido: no hay proveedor de pagos. Se registra el estado acordado | — |
+
+Resultado de pruebas: `npm test` → **149 de 149** pasan.
+
 ## Lo que todavía no existe (no simulado)
 
-Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+Messenger, búsqueda, directorio, voluntariado, notificaciones, sesiones de soporte, métricas de sistema, dominios propios, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 
 ## Bloqueos y riesgos abiertos
 

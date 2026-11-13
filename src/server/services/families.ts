@@ -13,6 +13,7 @@ import { audit } from '../audit/log';
 import { assertVerifiedContext } from '../rbac/context';
 import { AuthorizationError, can, type AuthzContext } from '../rbac/authorize';
 import { ValidationError } from './modules';
+import { assertTenantOpen } from '../tenancy/tenants';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** Open requests per school; stops a leaked code from flooding the queue. */
@@ -123,6 +124,7 @@ export async function requestToJoin(tenantId: string, userId: string, input: unk
   if (!p.success) throw new ValidationError('Check the form and try again.');
   const v = p.data;
   if (!v.note) throw new ValidationError("Tell the office your children's names and grades so they can confirm your family.");
+  await assertTenantOpen(tenantId, db);
   return withTenant(
     tenantId,
     async (tx) => {

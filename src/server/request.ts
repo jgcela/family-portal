@@ -5,8 +5,9 @@ import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { and, asc, eq } from 'drizzle-orm';
 import { auth } from './auth/auth';
-import { platformDb, withTenant } from './db/client';
-import { homepageVersions, navigationItems, platformAdmins, schoolProfiles } from './db/schema';
+import { withTenant } from './db/client';
+import { homepageVersions, navigationItems, schoolProfiles } from './db/schema';
+import { loadPlatformContext } from './services/platform';
 import { hasAnywhere, type AuthzContext } from './rbac/authorize';
 import { loadAuthzContext } from './rbac/context';
 import { getModuleState } from './services/modules';
@@ -119,9 +120,9 @@ export async function requireStaff(tenantKey: string): Promise<StaffContext & { 
 export async function requirePlatformAdmin() {
   const session = await getSession();
   if (!session) redirect('/login?next=/platform');
-  const [admin] = await platformDb().select().from(platformAdmins).where(eq(platformAdmins.userId, session.user.id));
-  if (!admin) notFound();
-  return { user: session.user, role: admin.role };
+  const ctx = await loadPlatformContext(session.user.id);
+  if (!ctx) notFound();
+  return { user: session.user, role: ctx.role, ctx };
 }
 
 export { isServable };

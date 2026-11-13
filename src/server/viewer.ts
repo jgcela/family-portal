@@ -9,7 +9,7 @@
 // loadViewer(), so a tenant id or audience list can't be supplied by a request.
 import { and, eq, inArray, or, sql, type SQL, type AnyColumn } from 'drizzle-orm';
 import { platformDb, withTenant, type Db } from './db/client';
-import { audienceGrades, audiences, familyGrades, memberships } from './db/schema';
+import { audienceGrades, audiences, familyGrades, memberships, tenants } from './db/schema';
 import { AuthorizationError } from './rbac/authorize';
 
 export type Viewer =
@@ -28,6 +28,8 @@ export function assertViewer(v: Viewer, tenantId: string): void {
 
 export async function loadViewer(tenantId: string, userId: string | null | undefined, db: Db = platformDb()): Promise<Viewer> {
   if (!userId) return PUBLIC_VIEWER;
+  const [t] = await db.select({ status: tenants.status }).from(tenants).where(eq(tenants.id, tenantId));
+  if (!t || (t.status !== 'active' && t.status !== 'onboarding')) return PUBLIC_VIEWER;
   return withTenant(
     tenantId,
     async (tx) => {
