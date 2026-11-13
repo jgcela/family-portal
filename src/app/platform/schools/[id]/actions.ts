@@ -8,6 +8,7 @@ import {
   updateSubscription,
   type SchoolStatusChange,
 } from '@/server/services/platform';
+import { endMySupportAccess, requestSupportAccess } from '@/server/services/support';
 import { platformDb } from '@/server/db/client';
 import { tenants } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -66,6 +67,32 @@ export async function revokeInviteAction(tenantId: string, invitationId: string)
     await revokeOwnerInvitation(ctx, tenantId, invitationId);
     revalidatePath(`/platform/schools/${tenantId}`);
     return { ok: 'Invitation cancelled.' };
+  } catch (err) {
+    return platformError(err);
+  }
+}
+
+export async function requestSupportAction(tenantId: string, _p: PlatformResult, fd: FormData): Promise<PlatformResult> {
+  const { ctx } = await requirePlatformAdmin();
+  try {
+    await requestSupportAccess(ctx, tenantId, {
+      reason: s(fd, 'reason'),
+      scopes: fd.getAll('scopes').filter((x): x is string => typeof x === 'string'),
+      hours: s(fd, 'hours'),
+    });
+    revalidatePath(`/platform/schools/${tenantId}`);
+    return { ok: 'Request sent. The School Owner sees it in their dashboard under Support access.' };
+  } catch (err) {
+    return platformError(err);
+  }
+}
+
+export async function endSupportAction(tenantId: string, grantId: string): Promise<PlatformResult> {
+  const { ctx } = await requirePlatformAdmin();
+  try {
+    await endMySupportAccess(ctx, grantId);
+    revalidatePath(`/platform/schools/${tenantId}`);
+    return { ok: 'Closed.' };
   } catch (err) {
     return platformError(err);
   }

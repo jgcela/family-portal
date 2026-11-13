@@ -5,8 +5,9 @@ import { getSchool, listPlans, platformCan } from '@/server/services/platform';
 import { MODULES } from '@/server/modules/registry';
 import { fmtDate, formatBytes, STATUS_LABEL, statusClass, SUB_LABEL } from '../../_components/format';
 import { ACTION_LABEL } from '../../_components/activity';
-import { OwnerInviteForm, RevokeButton, StatusForm, SubscriptionForm } from './forms';
-import { ownerInviteAction, revokeInviteAction, statusAction, subscriptionAction } from './actions';
+import { EndButton, OwnerInviteForm, RevokeButton, StatusForm, SubscriptionForm, SupportRequestForm } from './forms';
+import { endSupportAction, ownerInviteAction, requestSupportAction, revokeInviteAction, statusAction, subscriptionAction } from './actions';
+import { listMySupportGrants, SUPPORT_HOURS, SUPPORT_SCOPES } from '@/server/services/support';
 
 export const metadata = { title: 'School' };
 
@@ -20,6 +21,8 @@ export default async function SchoolPage({ params }: { params: Promise<{ id: str
   const { tenant: t, subscription: sub, plan } = school;
   const manage = platformCan(ctx, 'schools.manage');
   const plans = manage ? await listPlans() : [];
+  const mine = await listMySupportGrants(ctx, t.id);
+  const openGrant = mine.find((g) => g.state === 'pending' || g.state === 'active');
   const portal = school.domains.find((d) => d.isPrimary && d.verifiedAt)?.hostname;
   const portalHref = portal ? `https://${portal}` : `/s/${t.slug}`;
 
@@ -160,6 +163,46 @@ export default async function SchoolPage({ params }: { params: Promise<{ id: str
           </div>
         </section>
       )}
+
+      <section className="panel" aria-labelledby="support-title">
+        <div className="panel-head">
+          <h2 id="support-title">Support access</h2>
+        </div>
+        <div className="panel-body form">
+          <p className="muted">
+            You can’t see this school’s dashboard unless its School Owner approves a request. Access is read-only and ends
+            on its own; the school can end it sooner and sees every step in its activity log.
+          </p>
+          {openGrant?.state === 'active' && (
+            <div className="notice notice-ok">
+              <p>
+                <strong>Approved.</strong> Read-only until {openGrant.expiresAt.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' })} UTC.
+              </p>
+              <div className="form-actions">
+                <a className="btn btn-primary btn-sm" href={`${portalHref}/admin`} target="_blank" rel="noopener">
+                  Open the school dashboard
+                </a>
+                <EndButton key="end" run={endSupportAction.bind(null, t.id, openGrant.id)} label="End access now" />
+              </div>
+            </div>
+          )}
+          {openGrant?.state === 'pending' && (
+            <div className="notice">
+              <p>
+                <strong>Waiting for the school.</strong> The request lapses at {openGrant.expiresAt.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' })} UTC if nobody approves it.
+              </p>
+              <EndButton key="withdraw" run={endSupportAction.bind(null, t.id, openGrant.id)} label="Withdraw request" />
+            </div>
+          )}
+          {!openGrant && t.status !== 'suspended' && (
+            <SupportRequestForm
+              run={requestSupportAction.bind(null, t.id)}
+              scopes={Object.entries(SUPPORT_SCOPES).map(([id, sc]) => ({ id, label: sc.label, description: sc.description }))}
+              hours={SUPPORT_HOURS}
+            />
+          )}
+        </div>
+      </section>
 
       <section className="panel" aria-labelledby="domains-title">
         <div className="panel-head">

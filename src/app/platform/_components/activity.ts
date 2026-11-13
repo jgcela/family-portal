@@ -7,4 +7,10 @@ export const ACTION_LABEL: Record<string, string> = {
   'platform.school_suspended': 'School suspended',
   'platform.school_reactivated': 'School reactivated',
   'platform.subscription_changed': 'Plan or billing changed',
+  'support.requested': 'Support access requested',
+  'support.approved': 'Support access approved by the school',
+  'support.declined': 'Support access declined by the school',
+  'support.revoked': 'Support access ended by the school',
+  'support.ended': 'Support access ended by platform',
+  'support.session_started': 'Support opened the dashboard',
 };

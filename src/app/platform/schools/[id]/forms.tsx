@@ -211,3 +211,58 @@ export function RevokeButton({ run }: { run: () => Promise<PlatformResult> }) {
     </form>
   );
 }
+
+export function SupportRequestForm({ run, scopes, hours }: { run: Run; scopes: { id: string; label: string; description: string }[]; hours: readonly number[] }) {
+  const [state, action, pending] = useActionState(run, undefined);
+  return (
+    <form action={action} className="form">
+      <div className="field">
+        <label htmlFor="support-reason">What do you need to look at?</label>
+        <textarea id="support-reason" name="reason" required minLength={10} maxLength={500} placeholder="The office says the calendar import shows errors for the October file." />
+        <span className="hint">The School Owner reads this before deciding.</span>
+      </div>
+      <fieldset className="field">
+        <legend>Areas</legend>
+        {scopes.map((sc) => (
+          <label key={sc.id} className="check" style={{ alignItems: 'flex-start' }}>
+            <input type="checkbox" name="scopes" value={sc.id} defaultChecked={sc.id === 'content'} style={{ marginTop: 3 }} />
+            <span>
+              {sc.label}
+              <span className="muted" style={{ display: 'block', fontSize: '0.8rem' }}>
+                {sc.description}
+              </span>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+      <div className="field" style={{ maxWidth: 240 }}>
+        <label htmlFor="support-hours">For how long</label>
+        <select id="support-hours" name="hours" defaultValue="8">
+          {hours.map((h) => (
+            <option key={h} value={h}>
+              {h} hours from now
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="form-actions">
+        <button type="submit" className="btn btn-quiet btn-sm" disabled={pending}>
+          {pending ? 'Sending…' : 'Ask the school for access'}
+        </button>
+        <Message state={state} />
+      </div>
+    </form>
+  );
+}
+
+export function EndButton({ run, label }: { run: () => Promise<PlatformResult>; label: string }) {
+  const [state, action, pending] = useActionState<PlatformResult>(run, undefined);
+  return (
+    <form action={action} className="inline-action">
+      <button type="submit" className="btn btn-quiet btn-sm" disabled={pending}>
+        {label}
+      </button>
+      <Message state={state} />
+    </form>
+  );
+}
