@@ -182,3 +182,14 @@
 .preview-banner { background: #FFF4CC; color: #3D2E00; border-bottom: 1px solid #E6C866; font-size: 0.9rem; }
 .preview-banner-inner { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; justify-content: space-between; padding-block: var(--space-2); }
 .preview-banner .btn { background: #fff; color: #3D2E00; border: 1px solid #C9A63A; }
+
+/* Documents index */
+.doc-group { margin-top: var(--space-5); max-width: 720px; }
+.doc-group h2 { font-size: 1.15rem; margin-bottom: var(--space-2); }
+.doc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.doc-list a { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-1) var(--space-3); min-height: 52px; padding: var(--space-2) var(--space-4); background: var(--color-surface); border: 1px solid var(--border); border-radius: var(--radius); text-decoration: none; color: var(--color-text); }
+.doc-list a:hover { border-color: var(--border-strong); }
+.doc-list a:hover .doc-title { color: var(--color-link); text-decoration: underline; }
+.doc-title { font-weight: 600; }
+.doc-meta { font-size: 0.85rem; color: var(--color-text-muted); white-space: nowrap; }
+.doc-desc { margin: var(--space-1) var(--space-4) 0; font-size: 0.9rem; color: var(--color-text-muted); }
