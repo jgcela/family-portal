@@ -141,12 +141,13 @@ export const calculatorDefaults: Readonly<{
   hourlyCost: 28,
 };
 
+/** Slider and input ranges. `step` is the slider step; typed values may be any number in range. */
 export const calculatorLimits = {
-  tasksPerWeek: { min: 0, max: 1000, step: 1, unit: 'tasks / week' },
-  sharePercent: { min: 0, max: 100, step: 5, unit: '%' },
-  minutesPerTask: { min: 0, max: 120, step: 1, unit: 'min' },
+  tasksPerWeek: { min: 0, max: 300, step: 1, unit: 'tasks / week' },
+  sharePercent: { min: 0, max: 100, step: 1, unit: '%' },
+  minutesPerTask: { min: 0, max: 60, step: 1, unit: 'min' },
   weeksPerYear: { min: 1, max: 52, step: 1, unit: 'weeks' },
-  hourlyCost: { min: 0, max: 200, step: 1, unit: 'USD / hour' },
+  hourlyCost: { min: 10, max: 100, step: 1, unit: 'USD / hour' },
 } as const;
 
 /**

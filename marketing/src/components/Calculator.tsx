@@ -60,36 +60,56 @@ export function Calculator() {
           const describedBy = [f.hint ? `${id}-hint` : '', err ? `${id}-err` : '', `${id}-range`].filter(Boolean).join(' ');
           return (
             <div key={f.key} className="calc-field">
-              <label htmlFor={id}>{f.label}</label>
+              <div className="calc-head">
+                <label htmlFor={`${id}-slider`}>{f.label}</label>
+                <div className="unit-input compact" data-invalid={!!err}>
+                  {f.prefix && (
+                    <span className="unit prefix" aria-hidden="true">
+                      {f.unit}
+                    </span>
+                  )}
+                  <input
+                    id={id}
+                    type="number"
+                    inputMode="decimal"
+                    min={lim.min}
+                    max={lim.max}
+                    step="any"
+                    value={raw[f.key]}
+                    aria-label={`${f.label}, exact value`}
+                    aria-invalid={!!err}
+                    aria-describedby={describedBy}
+                    onChange={(e) => onChange(f.key, e.target.value)}
+                  />
+                  {!f.prefix && (
+                    <span className="unit" aria-hidden="true">
+                      {f.unit}
+                    </span>
+                  )}
+                </div>
+              </div>
               {f.hint && (
                 <span className="hint" id={`${id}-hint`}>
                   {f.hint}
                 </span>
               )}
-              <div className="unit-input" data-invalid={!!err}>
-                {f.prefix && (
-                  <span className="unit prefix" aria-hidden="true">
-                    {f.unit}
-                  </span>
-                )}
-                <input
-                  id={id}
-                  type="number"
-                  inputMode="decimal"
-                  min={lim.min}
-                  max={lim.max}
-                  step={lim.step}
-                  value={raw[f.key]}
-                  aria-invalid={!!err}
-                  aria-describedby={describedBy}
-                  onChange={(e) => onChange(f.key, e.target.value)}
-                />
-                {!f.prefix && (
-                  <span className="unit" aria-hidden="true">
-                    {f.unit}
-                  </span>
-                )}
-              </div>
+              <input
+                id={`${id}-slider`}
+                className="slider"
+                type="range"
+                min={lim.min}
+                max={lim.max}
+                step={lim.step}
+                value={last[f.key]}
+                aria-valuetext={`${f.prefix ? f.unit : ''}${last[f.key]} ${f.prefix ? 'per hour' : f.unit}`}
+                aria-describedby={f.hint ? `${id}-hint` : undefined}
+                style={{ ['--fill' as string]: `${((last[f.key] - lim.min) / (lim.max - lim.min)) * 100}%` }}
+                onChange={(e) => onChange(f.key, e.target.value)}
+              />
+              <span className="slider-scale" aria-hidden="true">
+                <span>{f.prefix ? f.unit : ''}{lim.min}</span>
+                <span>{f.prefix ? f.unit : ''}{lim.max}</span>
+              </span>
               <span className="sr-only" id={`${id}-range`}>
                 {`Unit: ${lim.unit}. Allowed range ${lim.min} to ${lim.max}.`}
               </span>
