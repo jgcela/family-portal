@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Última actualización: 12 de noviembre de 2026 (Fase 2).
+Última actualización: 13 de noviembre de 2026 (Fase 3).
 
 ## Fase 1 — Auditoría
 
@@ -20,7 +20,8 @@
 | Resolución de escuela por subdominio y modo ruta | Hecho | Pruebas unitarias + prueba manual con servidor |
 | Dominios propios | Modelado; resolución solo si `verified_at`. Falta flujo de verificación DNS | Pendiente (Fase 5) |
 | Login email + contraseña, 2FA, límite de intentos | Hecho | Login real en navegador (contraseña incorrecta y correcta) |
-| Invitaciones y recuperación de contraseña | Pendiente: necesita proveedor de correo | — |
+| Invitaciones | Hecho por enlace (Fase 3, ver Personal). Envío por correo pendiente | Pruebas + navegador |
+| Recuperación de contraseña | Pendiente: necesita proveedor de correo | — |
 | RBAC con ámbitos, anti‑escalada, separación de funciones | Hecho | 19 pruebas unitarias + 12 de servicios contra BD |
 | Roles personalizados | Servicio hecho; pantalla pendiente (Fase 3) | Probado contra BD |
 | Registro de módulos, reglas de activación y planes | Hecho | 5 pruebas |
@@ -83,13 +84,27 @@ Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `
 | Límite de almacenamiento del plan y límite de 4 MB por archivo (límite de Vercel para envíos al servidor) | Hecho | Pruebas |
 | Documentos para grupos concretos: por ahora solo los abre el personal; las familias, con las cuentas de la Fase 4 | Parcial | Pruebas |
 | Subida directa al almacenamiento para archivos de más de 4 MB | Pendiente | — |
-| Prueba contra R2 real | Pendiente: no hay acceso a R2 desde el entorno de desarrollo; se comprueba en producción | — |
+| Prueba contra R2 real | Hecho en producción por el usuario (13 nov) | Producción |
+| Página Documents en el portal, agrupada por categoría | Hecho | Navegador |
+
+### Personal (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Tabla `invitations` con RLS; solo se guarda el hash del enlace | Hecho | Pruebas |
+| Invitar con nombre, email, cargo, rol y ámbito (todo el colegio, un curso o una audiencia). Se genera un enlace de un solo uso que caduca a los 7 días y se muestra una sola vez | Hecho | Pruebas + navegador |
+| Mismas reglas anti‑escalada que al asignar roles: nadie invita con permisos que no tiene; solo el propietario invita propietarios | Hecho | Pruebas |
+| Aceptar: cuenta nueva (nombre y contraseña de 12+ caracteres) o cuenta existente; el email de la cuenta debe coincidir con el de la invitación | Hecho | Pruebas + navegador (invitar → aceptar → entrar al panel) |
+| Límite de cuentas de personal del plan, contando invitaciones pendientes | Hecho | Pruebas |
+| Lista del equipo: añadir y quitar roles, suspender, reactivar y quitar del colegio. Nadie se suspende o se quita a sí mismo; solo un propietario cambia a otro propietario | Hecho | Pruebas |
+| Envío de la invitación por correo | Pendiente: necesita proveedor de correo (Resend) | — |
+| Editor de roles personalizados | Pendiente | — |
 
 ### Despliegue
 
 - Vercel aplica las migraciones de base de datos solo al publicar en producción (`scripts/vercel-build.mjs`). Las vistas previas de las PR no tocan la base de datos.
 
-Resultado de pruebas: `npm test` → **120 de 120** pasan.
+Resultado de pruebas: `npm test` → **130 de 130** pasan.
 
 ## Lo que todavía no existe (no simulado)
 
