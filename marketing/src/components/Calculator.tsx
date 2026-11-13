@@ -127,7 +127,7 @@ export function Calculator() {
             This hypothetical example assumes {tasksAvoided} {tasksAvoided === '1' ? 'task is' : 'tasks are'} fully
             handled without staff intervention each week over {last.weeksPerYear} school{' '}
             {last.weeksPerYear === 1 ? 'week' : 'weeks'}
-            {last.sharePercent < 100 ? ` (${last.sharePercent}% of ${last.tasksPerWeek} routine tasks)` : ''}. Each
+            {last.sharePercent < 100 && last.tasksPerWeek > 0 ? ` (${last.sharePercent}% of ${last.tasksPerWeek} routine tasks)` : ''}. Each
             avoided task saves {last.minutesPerTask} staff {last.minutesPerTask === 1 ? 'minute' : 'minutes'}, valued at{' '}
             {formatUSD(last.hourlyCost)} per hour.
           </p>
