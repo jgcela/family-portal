@@ -71,11 +71,29 @@ Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `
 | Subir logos como archivo | Pendiente: llega con Documentos (R2) | — |
 | Bloques por audiencia (solo para ciertos cursos) | Pendiente: necesita cuentas de familia (Fase 4) | — |
 
-Resultado de pruebas: `npm test` → **112 de 112** pasan.
+### Documentos (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Tablas `documents` y `document_versions` con RLS y claves compuestas; las versiones no se pueden modificar (ni con SQL) | Hecho | Pruebas |
+| Archivos en un bucket privado de Cloudflare R2. En local, sin claves, se guardan en `.storage/` | Hecho | Pruebas (almacenamiento en memoria) + navegador (local) |
+| Enlace estable `/d/<nombre>`: comprueba el acceso en cada visita y redirige a una URL firmada que caduca a los 5 minutos. La URL del almacenamiento nunca se muestra ni se guarda | Hecho | Pruebas + navegador |
+| Tipos permitidos (PDF, Office, imágenes, texto, CSV) comprobados por el contenido real del archivo, no por lo que dice el navegador. Se rechazan HTML, SVG, ejecutables y archivos renombrados | Hecho | Pruebas |
+| Versiones: subir una nueva mantiene el enlace; se puede volver a una anterior; las antiguas solo las descarga el personal | Hecho | Pruebas + navegador |
+| Límite de almacenamiento del plan y límite de 4 MB por archivo (límite de Vercel para envíos al servidor) | Hecho | Pruebas |
+| Documentos para grupos concretos: por ahora solo los abre el personal; las familias, con las cuentas de la Fase 4 | Parcial | Pruebas |
+| Subida directa al almacenamiento para archivos de más de 4 MB | Pendiente | — |
+| Prueba contra R2 real | Pendiente: no hay acceso a R2 desde el entorno de desarrollo; se comprueba en producción | — |
+
+### Despliegue
+
+- Vercel aplica las migraciones de base de datos solo al publicar en producción (`scripts/vercel-build.mjs`). Las vistas previas de las PR no tocan la base de datos.
+
+Resultado de pruebas: `npm test` → **120 de 120** pasan.
 
 ## Lo que todavía no existe (no simulado)
 
-Documentos, Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 
 ## Bloqueos y riesgos abiertos
 
