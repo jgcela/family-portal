@@ -108,12 +108,12 @@ export const Close = (p: P) => (
 );
 
 export function Mark({ className = 'wordmark-mark' }: { className?: string }) {
-  // Abstract mark: a doorway (the school) with one amber step (the request).
+  // Abstract mark: a doorway (the school) with one step (the request).
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
       <rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor" />
-      <path d="M8 18V10a4 4 0 0 1 8 0v8" fill="none" stroke="#f7f3ec" strokeWidth="2" />
-      <rect x="10.5" y="14" width="3" height="4" rx="0.5" fill="#e2a03f" />
+      <path d="M8 18V10a4 4 0 0 1 8 0v8" fill="none" stroke="#131313" strokeWidth="2" />
+      <rect x="10.5" y="14" width="3" height="4" rx="0.5" fill="#131313" />
     </svg>
   );
 }

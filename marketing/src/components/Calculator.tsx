@@ -138,7 +138,7 @@ export function Calculator() {
           {hasErrors && <p>Results use the last valid value for any field marked in red.</p>}
         </div>
         <div className="calc-actions">
-          <a className="btn btn-amber" href="#demo">
+          <a className="btn btn-accent" href="#demo">
             See how this would work at your school
           </a>
           <button

@@ -28,7 +28,7 @@ Everything editable lives in `src/config/site.ts`:
 | School-life photograph | `schoolPhoto` |
 | Testimonials and school logos | `proof` (render only when filled) |
 
-Colors and fonts are tokens at the top of `src/app/site.css`.
+Colors and fonts are tokens at the top of `src/app/site.css`. The look follows a dark editorial system (near-black canvas, mint `#3cffd0` and ultraviolet `#5200ff` accents, 1px hairlines, no shadows) with open-source fonts: Anton (display, 60px+ only), Space Grotesk (UI and body), Space Mono (uppercase labels and buttons).
 
 ## Before publishing
 

@@ -23,6 +23,9 @@ export function Footer() {
             <a href={`mailto:${brand.salesEmail}`}>Email sales</a>
           </nav>
         </div>
+        <p className="footer-wordmark" aria-hidden="true">
+          {brand.name}
+        </p>
         <div className="footer-meta">
           <p>
             © {brand.year} {brand.name}. {brand.descriptor} for {brand.audience}.
