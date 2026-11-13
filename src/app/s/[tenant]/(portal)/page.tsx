@@ -1,28 +1,12 @@
 import Link from 'next/link';
-import { getPortalView, getSession, getTenantOr404, tenantBase } from '@/server/request';
-import type { HomepageBlock } from '@/server/tenancy/homepage-defaults';
+import { getDisplayView, getSession, getTenantOr404, tenantBase } from '@/server/request';
+import { BLOCK_INFO, type HomepageBlock } from '@/server/tenancy/homepage-defaults';
+import { renderMarkdown } from '@/server/content/markdown';
 import { listPublicOccurrences } from '@/server/services/calendar';
 import { addDays, toDateStr } from '@/server/calendar/time';
 import { EventList } from './calendar/event-list';
 import { AnnouncementList } from './updates/announcement-list';
 import { listPublicAnnouncements } from '@/server/services/content';
-
-// Which module supplies each homepage block. Blocks whose module is not active
-// for the school are skipped, so families never see empty placeholders.
-const BLOCK_SOURCE: Partial<Record<HomepageBlock['type'], string>> = {
-  'action-required': 'action_required',
-  'this-week': 'calendar',
-  'upcoming-events': 'calendar',
-  'school-updates': 'announcements',
-  newsletter: 'messenger',
-  'featured-resources': 'resources',
-  'quick-access': 'quick_links',
-  volunteer: 'volunteer',
-  'your-children': 'student_profiles',
-};
-
-// Blocks that have a working renderer. Others stay hidden until their module ships.
-const RENDERED = new Set<HomepageBlock['type']>(['welcome', 'this-week', 'upcoming-events', 'school-updates']);
 
 type Props = { params: Promise<{ tenant: string }> };
 
@@ -33,12 +17,13 @@ function num(v: unknown, def: number, min: number, max: number) {
 export default async function FamilyHome({ params }: Props) {
   const key = (await params).tenant;
   const tenant = await getTenantOr404(key);
-  const [view, session, base] = await Promise.all([getPortalView(tenant.id), getSession(), tenantBase(key)]);
+  const [view, session, base] = await Promise.all([getDisplayView(tenant.id), getSession(), tenantBase(key)]);
   const active = new Set(view.activeModules.map((m) => m.id));
   const blocks = view.homepage.filter((b) => {
-    if (!b.enabled || !RENDERED.has(b.type)) return false;
-    const source = BLOCK_SOURCE[b.type];
-    return !source || active.has(source);
+    const info = BLOCK_INFO[b.type];
+    if (!b.enabled || !info.rendered) return false;
+    if (b.type === 'custom-content' && !(typeof b.settings.body === 'string' && b.settings.body.trim())) return false;
+    return !info.module || active.has(info.module);
   });
   const content = blocks.filter((b) => b.type !== 'welcome');
   const today = toDateStr(new Date(), tenant.timezone);
@@ -80,6 +65,10 @@ export default async function FamilyHome({ params }: Props) {
         />
       );
     }
+    if (b.type === 'custom-content' && typeof b.settings.body === 'string') {
+      // renderMarkdown disables raw HTML and filters link schemes.
+      return <div className="prose" dangerouslySetInnerHTML={{ __html: renderMarkdown(b.settings.body).html }} />;
+    }
     return null;
   };
   const p = view.profile;
@@ -98,9 +87,9 @@ export default async function FamilyHome({ params }: Props) {
       <div className={content.length ? 'home-grid' : 'home-grid home-grid-single'}>
         <div hidden={!content.length}>
           {content.map((b) => (
-              <section key={b.id} className="card home-block" aria-labelledby={`block-${b.id}`}>
-                <div className="section-title">
-                  <h2 id={`block-${b.id}`}>{b.title}</h2>
+              <section key={b.id} className="card home-block" aria-labelledby={b.title || b.type !== 'custom-content' ? `block-${b.id}` : undefined}>
+                <div className="section-title" hidden={!b.title && b.type === 'custom-content'}>
+                  <h2 id={`block-${b.id}`}>{b.title || BLOCK_INFO[b.type].label}</h2>
                   {(b.type === 'this-week' || b.type === 'upcoming-events') && <Link href={`${base}/calendar`}>Full calendar</Link>}
                   {b.type === 'school-updates' && <Link href={`${base}/updates`}>All updates</Link>}
                 </div>

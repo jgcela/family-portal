@@ -1,7 +1,7 @@
 // Per-request helpers for server components and server actions.
 import 'server-only';
 import { cache } from 'react';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { and, asc, eq } from 'drizzle-orm';
 import { auth } from './auth/auth';
@@ -10,7 +10,8 @@ import { homepageVersions, navigationItems, platformAdmins, schoolProfiles } fro
 import { hasAnywhere, type AuthzContext } from './rbac/authorize';
 import { loadAuthzContext } from './rbac/context';
 import { getModuleState } from './services/modules';
-import { getPublishedTheme } from './services/theme';
+import { getPublishedTheme, getThemeDraftTokens } from './services/theme';
+import { getHomepageDraftBlocks } from './services/homepage';
 import { homepageSchema } from './tenancy/homepage-defaults';
 import { findTenantByKey, isServable } from './tenancy/tenants';
 
@@ -60,6 +61,38 @@ export const getPortalView = cache(async (tenantId: string) => {
     activeModules: modules.active,
     homepage: blocks.success ? blocks.data : [],
     customNav: data.nav,
+  };
+});
+
+/** Cookie holding the tenant id whose drafts the signed-in editor is previewing. */
+export const PREVIEW_COOKIE = 'fp_preview';
+
+/**
+ * What the family portal should render for this request. Normally the
+ * published view; for an editor who turned on preview, their school's draft
+ * theme and homepage instead. Permission is re-checked on every request, so a
+ * stale cookie alone never reveals drafts.
+ */
+export const getDisplayView = cache(async (tenantId: string) => {
+  const view = await getPortalView(tenantId);
+  const none = { ...view, preview: null as null | { theme: boolean; homepage: boolean } };
+  const jar = await cookies();
+  if (jar.get(PREVIEW_COOKIE)?.value !== tenantId) return none;
+  const session = await getSession();
+  if (!session) return none;
+  const ctx = await loadAuthzContext(tenantId, session.user.id);
+  const canTheme = hasAnywhere(ctx, 'branding.manage');
+  const canHome = hasAnywhere(ctx, 'homepage.edit');
+  if (!canTheme && !canHome) return none;
+  const [theme, homepage] = await Promise.all([
+    canTheme ? getThemeDraftTokens(tenantId) : null,
+    canHome ? getHomepageDraftBlocks(tenantId) : null,
+  ]);
+  return {
+    ...view,
+    theme: theme ?? view.theme,
+    homepage: homepage ?? view.homepage,
+    preview: { theme: !!theme, homepage: !!homepage },
   };
 });
 

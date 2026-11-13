@@ -22,6 +22,13 @@ export default async function AdminLayout({ children, params }: Props) {
       ],
     },
     {
+      title: 'Portal design',
+      items: [
+        { href: `${a}/design/theme`, label: 'Theme', show: hasAnywhere(ctx, 'branding.manage') },
+        { href: `${a}/design/homepage`, label: 'Homepage', show: hasAnywhere(ctx, 'homepage.edit') },
+      ],
+    },
+    {
       title: 'People',
       items: [{ href: `${a}/roles`, label: 'Roles & Permissions', show: hasAnywhere(ctx, 'roles.view') }],
     },
