@@ -468,7 +468,7 @@ export async function listPublicDocuments(tenantId: string, viewer: Viewer, db: 
     tenantId,
     (tx) =>
       tx
-        .select({ slug: documents.slug, title: documents.title, category: documents.category, description: documents.description, fileName: documentVersions.fileName, contentType: documentVersions.contentType, sizeBytes: documentVersions.sizeBytes, updatedAt: documentVersions.createdAt })
+        .select({ slug: documents.slug, title: documents.title, category: documents.category, description: documents.description, visibility: documents.visibility, audienceIds: documents.audienceIds, fileName: documentVersions.fileName, contentType: documentVersions.contentType, sizeBytes: documentVersions.sizeBytes, updatedAt: documentVersions.createdAt })
         .from(documents)
         .innerJoin(documentVersions, eq(documentVersions.id, documents.currentVersionId))
         .where(and(eq(documents.status, 'published'), visibleTo(documents, viewer)))

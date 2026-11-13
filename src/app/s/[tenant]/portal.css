@@ -203,3 +203,8 @@
 .grade-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0 var(--space-3); }
 .grade-grid .check { display: flex; align-items: center; gap: var(--space-2); min-height: 36px; }
 .hint { font-size: 0.85rem; color: var(--color-text-muted, #555); }
+.family-page h1 { margin-bottom: var(--space-2); }
+.family-grades-line { margin-bottom: var(--space-5); }
+.family-grid { display: grid; gap: var(--space-5); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.family-grid > .card { margin: 0; }
+@media (min-width: 900px) { .family-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -131,6 +131,8 @@ Queda pendiente de la Fase 3, sin simular:
 | El visitante solo ve lo público; los enlaces directos y los documentos siguen la misma regla. Las suscripciones de calendario (ICS) solo llevan eventos públicos | Hecho | Pruebas |
 | Los documentos que antes eran "solo grupos" pasan a "Familias" de esos grupos (migración 0011) | Hecho | Migración |
 | Cerrar sesión desde el portal; después de entrar, el personal va al panel y las familias al portal | Hecho | Navegador |
+| Página **My family** (`/family`): cursos de la familia, próximos eventos de sus cursos, avisos y documentos para la familia, cambio de contraseña. Enlace en la cabecera; tras iniciar sesión, la familia llega aquí | Hecho | Navegador (390 y 1280 px) |
+| Notas, asistencia y fichas de alumnos | No incluido: viven en el sistema del colegio (FACTS) y no hay integración. No se simula | — |
 | Inicio de sesión único con el sistema del colegio (FACTS u otro) | Pendiente: hay que confirmar que el proveedor ofrece SAML u OpenID Connect a terceros. No se simula | — |
 | Verificar el email de las familias | Pendiente: necesita correo (Resend). Mientras tanto la oficina comprueba cada solicitud | — |
 
