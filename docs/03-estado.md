@@ -32,7 +32,7 @@
 
 Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `npm run build` sin errores.
 
-## Fase 3 — Administración (en curso)
+## Fase 3 — Administración (cerrada el 13 nov 2026)
 
 ### Calendario y eventos (hecho)
 
@@ -106,6 +106,18 @@ Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `
 
 Resultado de pruebas: `npm test` → **137 de 137** pasan.
 
+### Revisión de cierre (13 nov)
+
+- Todas las acciones del servidor del panel comprueban la sesión y vuelven a comprobar permisos en el servicio; ninguna confía en un id de escuela enviado por el navegador.
+- Todo el HTML que se muestra sale del renderizador de Markdown con lista blanca, y el CSS sale de tokens de tema validados. Los administradores no pueden inyectar CSS ni JavaScript.
+- `npm test`: 137 de 137. `next build` sin errores.
+
+Queda pendiente de la Fase 3, sin simular:
+- envío por correo de invitaciones y recuperación de contraseña (Resend; falta la cuenta);
+- subir logos como archivo;
+- subida directa de archivos de más de 4 MB;
+- suscripción periódica a calendarios externos.
+
 ## Lo que todavía no existe (no simulado)
 
 Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
@@ -114,6 +126,6 @@ Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de famil
 
 1. **Privacidad del contenido actual:** alergias del personal y teléfonos personales de voluntarios están públicos para quien tenga el enlace.
 2. **Contraseña de Neon expuesta en el chat:** hay que hacer "Reset password" antes de guardar datos reales.
-3. **Almacenamiento de archivos y correo:** decidido Cloudflare R2 para archivos y Resend para correo; faltan las cuentas.
+3. **Correo:** R2 ya funciona en producción. Para el correo está decidido Resend, pero falta la cuenta.
 4. **Dominio de la plataforma:** para subdominios por escuela hace falta un dominio propio apuntado a Vercel. Mientras tanto, modo ruta (`/s/stmary`).
 5. **Vercel Hobby** no permite uso comercial.
