@@ -1,5 +1,6 @@
 // Calendar services end to end against PostgreSQL: RLS on the new tables,
 // grade-scoped permissions, workflow, imports without duplicates, public reads.
+import { PUBLIC_VIEWER } from '@/server/viewer';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { and, eq } from 'drizzle-orm';
 import { closeDb, platformDb, withTenant } from '@/server/db/client';
@@ -204,7 +205,7 @@ describe('family-facing reads', () => {
     await transitionEvent(a.ownerCtx, hidden.id, 'publish');
     await createEvent(a.ownerCtx, base(calA, { title: 'Draft only', startDate: '2026-10-23' }));
 
-    const occ = await listPublicOccurrences(a.tenant.id, { from: '2026-10-01', to: '2026-11-30' });
+    const occ = await listPublicOccurrences(a.tenant.id, PUBLIC_VIEWER, { from: '2026-10-01', to: '2026-11-30' });
     const titles = occ.map((o) => o.title);
     expect(titles.filter((t) => t === 'Friday Mass')).toHaveLength(4);
     expect(titles).not.toContain('Staff meeting');
@@ -213,7 +214,7 @@ describe('family-facing reads', () => {
     const nov = occ.find((o) => o.title === 'Friday Mass' && o.date === '2026-11-06')!;
     expect(nov.start!.toISOString()).toBe('2026-11-06T15:00:00.000Z');
     // Other schools see none of it.
-    expect(await listPublicOccurrences(b.tenant.id, { from: '2026-10-01', to: '2026-11-30' })).not.toContainEqual(
+    expect(await listPublicOccurrences(b.tenant.id, PUBLIC_VIEWER, { from: '2026-10-01', to: '2026-11-30' })).not.toContainEqual(
       expect.objectContaining({ title: 'Friday Mass' }),
     );
     expect(await getPublicFeed(a.tenant.id, 'staff-only')).toBeNull();
@@ -224,9 +225,9 @@ describe('family-facing reads', () => {
     const all = await createEvent(a.ownerCtx, base(calA, { title: 'Everyone', startDate: '2026-12-02' }));
     await transitionEvent(a.ownerCtx, g5.id, 'publish');
     await transitionEvent(a.ownerCtx, all.id, 'publish');
-    const for6 = await listPublicOccurrences(a.tenant.id, { from: '2026-12-01', to: '2026-12-03' }, { audienceIds: [grade6Aud] });
+    const for6 = await listPublicOccurrences(a.tenant.id, PUBLIC_VIEWER, { from: '2026-12-01', to: '2026-12-03' }, { audienceIds: [grade6Aud] });
     expect(for6.map((o) => o.title)).toEqual(['Everyone']);
-    const for5 = await listPublicOccurrences(a.tenant.id, { from: '2026-12-01', to: '2026-12-03' }, { audienceIds: [grade5Aud] });
+    const for5 = await listPublicOccurrences(a.tenant.id, PUBLIC_VIEWER, { from: '2026-12-01', to: '2026-12-03' }, { audienceIds: [grade5Aud] });
     expect(for5.map((o) => o.title).sort()).toEqual(['Everyone', 'G5 only']);
   });
 });

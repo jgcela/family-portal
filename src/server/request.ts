@@ -14,6 +14,7 @@ import { getPublishedTheme, getThemeDraftTokens } from './services/theme';
 import { getHomepageDraftBlocks } from './services/homepage';
 import { homepageSchema } from './tenancy/homepage-defaults';
 import { findTenantByKey, isServable } from './tenancy/tenants';
+import { loadViewer, type Viewer } from './viewer';
 
 const TENANT_BASE_HEADER = 'x-fp-tenant-base';
 
@@ -34,6 +35,12 @@ export const getSession = cache(async () => {
   // build never tries to prerender it (and never needs a database).
   const h = await headers();
   return auth().api.getSession({ headers: h });
+});
+
+/** The portal viewer for this request (public, family or staff), resolved on the server. */
+export const getViewer = cache(async (tenantId: string): Promise<Viewer> => {
+  const session = await getSession();
+  return loadViewer(tenantId, session?.user.id);
 });
 
 export const getPortalView = cache(async (tenantId: string) => {

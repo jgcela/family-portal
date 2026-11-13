@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getPortalView, getTenantOr404 } from '@/server/request';
+import { getPortalView, getTenantOr404 , getViewer } from '@/server/request';
 import { getPublishedPage } from '@/server/services/content';
 import { renderMarkdown } from '@/server/content/markdown';
 
@@ -10,7 +10,7 @@ async function load(props: Props) {
   const tenant = await getTenantOr404(key);
   const view = await getPortalView(tenant.id);
   if (!view.activeModules.some((m) => m.id === 'pages')) notFound();
-  const row = await getPublishedPage(tenant.id, slug);
+  const row = await getPublishedPage(tenant.id, slug, await getViewer(tenant.id));
   if (!row) notFound();
   return row;
 }

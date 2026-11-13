@@ -36,6 +36,7 @@ const meta = (fd: FormData) => ({
   description: str(fd, 'description'),
   category: str(fd, 'category'),
   audienceIds: ids(fd, 'audienceIds'),
+  visibility: str(fd, 'visibility') || 'public',
 });
 
 export async function createDocumentAction(tenantKey: string, _prev: Result, fd: FormData): Promise<Result> {

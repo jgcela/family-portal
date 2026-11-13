@@ -68,7 +68,7 @@ export default async function EditPage({ params, searchParams }: Props) {
               urlPrefix={base}
               canPublish={can('pages.publish')}
               requireApproval={settings.requireApproval}
-              audiencePicker={<AudiencePicker audiences={auds} selected={page.audienceIds} />}
+              audiencePicker={<AudiencePicker audiences={auds} selected={page.audienceIds} visibility={page.visibility} />}
               defaults={{ title: page.title, slug: page.slug, body: page.body, showToc: page.showToc, sortOrder: page.sortOrder }}
             />
           ) : (

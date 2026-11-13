@@ -9,6 +9,7 @@ import { audiences, calendarImports, calendars, events } from '../db/schema';
 import { audit } from '../audit/log';
 import { assertVerifiedContext } from '../rbac/context';
 import { AuthorizationError, assertCan, can, hasAnywhere, type AuthzContext } from '../rbac/authorize';
+import { assertViewer, visibleTo, type Viewer } from '../viewer';
 import { ValidationError } from './modules';
 import { nextStatus, type Transition } from './workflow';
 import { eventResource, gradeLookup, settingsFor } from './scope';
@@ -111,6 +112,7 @@ export const eventInputSchema = z
       .url({ protocol: /^https?$/, message: 'Link must start with https://' })
       .max(2048)
       .nullish(),
+    visibility: z.enum(['public', 'families', 'staff']).default('public'),
     audienceIds: z.array(z.uuid()).max(50).default([]),
     isImportant: z.boolean().default(false),
   })
@@ -151,6 +153,7 @@ function toColumns(input: z.output<typeof eventInputSchema>) {
     exdates: [...new Set(input.exdates)].sort(),
     registrationUrl: input.registrationUrl || null,
     audienceIds: [...new Set(input.audienceIds)],
+    visibility: input.visibility,
     isImportant: input.isImportant,
   };
 }
@@ -338,12 +341,14 @@ export type PublicOccurrence = Occurrence & {
  */
 export async function listPublicOccurrences(
   tenantId: string,
+  viewer: Viewer,
   range: { from: string; to: string },
   opts: { audienceIds?: string[]; calendarKeys?: string[] } = {},
   db: Db = platformDb(),
 ): Promise<PublicOccurrence[]> {
   if (!DATE.test(range.from) || !DATE.test(range.to) || range.to < range.from) throw new ValidationError('Invalid date range.');
   if (range.from < addDays(range.to, -400)) throw new ValidationError('Date range is too long.');
+  assertViewer(viewer, tenantId);
   return withTenant(
     tenantId,
     async (tx) => {
@@ -355,6 +360,7 @@ export async function listPublicOccurrences(
           and(
             eq(events.status, 'published'),
             eq(calendars.isPublic, true),
+            visibleTo(events, viewer),
             opts.calendarKeys?.length ? inArray(calendars.key, opts.calendarKeys) : undefined,
             opts.audienceIds?.length
               ? or(sql`cardinality(${events.audienceIds}) = 0`, sql`${events.audienceIds} && ${sql.param(opts.audienceIds)}::uuid[]`)
@@ -402,7 +408,8 @@ export async function listPublicOccurrences(
 }
 
 /** One published event from a public calendar (for details and Add to Calendar). */
-export async function getPublicEvent(tenantId: string, eventId: string, db: Db = platformDb()) {
+export async function getPublicEvent(tenantId: string, eventId: string, viewer: Viewer, db: Db = platformDb()) {
+  assertViewer(viewer, tenantId);
   if (!/^[0-9a-f-]{36}$/i.test(eventId)) return null;
   return withTenant(
     tenantId,
@@ -411,7 +418,7 @@ export async function getPublicEvent(tenantId: string, eventId: string, db: Db =
         .select({ e: events, c: calendars })
         .from(events)
         .innerJoin(calendars, eq(calendars.id, events.calendarId))
-        .where(and(eq(events.id, eventId), eq(events.status, 'published'), eq(calendars.isPublic, true)));
+        .where(and(eq(events.id, eventId), eq(events.status, 'published'), eq(calendars.isPublic, true), visibleTo(events, viewer)));
       return row ?? null;
     },
     db,
@@ -431,7 +438,8 @@ export async function getPublicFeed(tenantId: string, calendarKey: string, db: D
       const rows = await tx
         .select()
         .from(events)
-        .where(and(eq(events.calendarId, cal.id), eq(events.status, 'published')))
+        // Subscription feeds are fetched without a session: public items only.
+        .where(and(eq(events.calendarId, cal.id), eq(events.status, 'published'), eq(events.visibility, 'public')))
         .orderBy(asc(events.startDate), asc(events.startsAt))
         .limit(5000);
       return { calendar: cal, events: rows };

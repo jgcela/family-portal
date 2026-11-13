@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPortalView, getTenantOr404, tenantBase } from '@/server/request';
+import { getPortalView, getTenantOr404, tenantBase , getViewer } from '@/server/request';
 import { listPublishedPages } from '@/server/services/content';
 
 export const metadata = { title: 'School info' };
@@ -10,7 +10,7 @@ export default async function PagesIndex({ params }: { params: Promise<{ tenant:
   const tenant = await getTenantOr404(key);
   const view = await getPortalView(tenant.id);
   if (!view.activeModules.some((m) => m.id === 'pages')) notFound();
-  const [rows, base] = await Promise.all([listPublishedPages(tenant.id), tenantBase(key)]);
+  const [rows, base] = await Promise.all([listPublishedPages(tenant.id, await getViewer(tenant.id)), tenantBase(key)]);
   return (
     <div className="container content-page">
       <h1>School info</h1>

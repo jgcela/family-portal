@@ -6,6 +6,7 @@ import { sql } from 'drizzle-orm';
 import { bigint, foreignKey, index, integer, pgTable, text, timestamp, unique, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 import { tenants } from './platform';
+import { moduleVisibility } from './tenant';
 import { contentStatus } from './calendar';
 
 const tenantId = () =>
@@ -23,6 +24,9 @@ export const documents = pgTable(
     description: text('description'),
     category: text('category'),
     audienceIds: uuid('audience_ids').array().notNull().default(sql`'{}'::uuid[]`),
+    // Who can see it once published: public (anyone), families (signed-in families
+    // in the audiences, or all families if none) or staff only.
+    visibility: moduleVisibility('visibility').notNull().default('public'),
     status: contentStatus('status').notNull().default('draft'),
     /** The version families receive. Null until the first upload. */
     currentVersionId: uuid('current_version_id'),

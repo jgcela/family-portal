@@ -4,6 +4,7 @@ import { sql } from 'drizzle-orm';
 import { boolean, foreignKey, index, integer, pgTable, text, timestamp, unique, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 import { tenants } from './platform';
+import { moduleVisibility } from './tenant';
 import { contentStatus } from './calendar';
 
 const tenantId = () =>
@@ -22,6 +23,9 @@ export const announcements = pgTable(
     isUrgent: boolean('is_urgent').notNull().default(false),
     isPinned: boolean('is_pinned').notNull().default(false),
     audienceIds: uuid('audience_ids').array().notNull().default(sql`'{}'::uuid[]`),
+    // Who can see it once published: public (anyone), families (signed-in families
+    // in the audiences, or all families if none) or staff only.
+    visibility: moduleVisibility('visibility').notNull().default('public'),
     status: contentStatus('status').notNull().default('draft'),
     // Published items are visible from publishAt (null = immediately) until expiresAt.
     publishAt: timestamp('publish_at', { withTimezone: true }),
@@ -49,6 +53,9 @@ export const pages = pgTable(
     body: text('body').notNull().default(''),
     showToc: boolean('show_toc').notNull().default(false),
     audienceIds: uuid('audience_ids').array().notNull().default(sql`'{}'::uuid[]`),
+    // Who can see it once published: public (anyone), families (signed-in families
+    // in the audiences, or all families if none) or staff only.
+    visibility: moduleVisibility('visibility').notNull().default('public'),
     status: contentStatus('status').notNull().default('draft'),
     publishedVersionId: uuid('published_version_id'),
     sortOrder: integer('sort_order').notNull().default(0),

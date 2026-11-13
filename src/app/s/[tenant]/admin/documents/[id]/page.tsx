@@ -64,7 +64,7 @@ export default async function DocumentPage({ params, searchParams }: Props) {
       </div>
       {sp.saved && <div className="notice notice-ok">Uploaded.</div>}
       {!live && <div className="notice">Families cannot open this link until the document is published.</div>}
-      {live && doc.audienceIds.length > 0 && <div className="notice">{AUDIENCE_NOTE}</div>}
+      {live && doc.visibility !== 'public' && <div className="notice">{AUDIENCE_NOTE}</div>}
 
       <section className="panel" aria-labelledby="file-title">
         <div className="panel-head">
@@ -139,7 +139,7 @@ export default async function DocumentPage({ params, searchParams }: Props) {
               maxMb={maxMb}
               audiencePicker={
                 <>
-                  <AudiencePicker audiences={auds} selected={doc.audienceIds} />
+                  <AudiencePicker audiences={auds} selected={doc.audienceIds} visibility={doc.visibility} />
                   <p className="hint">{AUDIENCE_NOTE}</p>
                 </>
               }

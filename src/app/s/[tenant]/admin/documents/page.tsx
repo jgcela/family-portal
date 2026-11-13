@@ -68,7 +68,7 @@ export default async function DocumentsAdmin({ params, searchParams }: Props) {
                     <td className="nowrap">{formatInstant(doc.updatedAt, tenant.timezone)}</td>
                     <td>
                       <StatusBadge status={doc.status} />
-                      {doc.audienceIds.length > 0 && <div className="muted">Limited audience</div>}
+                      {doc.visibility !== 'public' && <div className="muted">{doc.visibility === 'staff' ? 'Staff only' : 'Families only'}</div>}
                     </td>
                   </tr>
                 ))}

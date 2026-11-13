@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getPortalView, getTenantOr404, tenantBase } from '@/server/request';
+import { getPortalView, getTenantOr404, tenantBase, getViewer } from '@/server/request';
 import { listPublicDocuments } from '@/server/services/documents';
 import { fileLabel, formatBytes } from '../../admin/documents/shared';
 
@@ -11,7 +11,7 @@ export default async function DocumentsIndex({ params }: { params: Promise<{ ten
   const tenant = await getTenantOr404(key);
   const view = await getPortalView(tenant.id);
   if (!view.activeModules.some((m) => m.id === 'documents')) notFound();
-  const [rows, base] = await Promise.all([listPublicDocuments(tenant.id), tenantBase(key)]);
+  const [rows, base] = await Promise.all([listPublicDocuments(tenant.id, await getViewer(tenant.id)), tenantBase(key)]);
   const groups = new Map<string, typeof rows>();
   for (const r of rows) {
     const k = r.category ?? 'Other';

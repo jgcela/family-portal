@@ -30,7 +30,8 @@ function createAuth() {
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 12,
-      // No public self sign-up: people join a school by invitation only.
+      // No public sign-up endpoint: staff join by invitation, families through
+      // the join page (school code + office approval), both server-side.
       disableSignUp: process.env.AUTH_ALLOW_SIGNUP !== 'true',
     },
     session: {

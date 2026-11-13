@@ -118,6 +118,26 @@ Queda pendiente de la Fase 3, sin simular:
 - subida directa de archivos de más de 4 MB;
 - suscripción periódica a calendarios externos.
 
+## Fase 4 — Portal de familias (en curso)
+
+### Cuentas de familia (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Familias como miembros de tipo `family` con sus cursos (`family_grades`); solicitudes en `family_requests`. RLS en ambas | Hecho | Pruebas |
+| Alta: la familia entra en `/join` con el código del colegio, elige cursos y deja una nota para la oficina. Nada privado es visible hasta que la oficina aprueba | Hecho | Pruebas + navegador (móvil) |
+| Panel People → Families: abrir o cerrar el alta, cambiar el código, aprobar (corrigiendo cursos) o rechazar, cambiar cursos, suspender y quitar | Hecho | Pruebas + navegador |
+| "Quién puede verlo" en avisos, eventos, páginas y documentos: Todos (público), Familias (con sesión; todas o solo las de los cursos marcados) o Solo personal | Hecho | Pruebas: visitante, familia del curso, familia de otro curso y personal |
+| El visitante solo ve lo público; los enlaces directos y los documentos siguen la misma regla. Las suscripciones de calendario (ICS) solo llevan eventos públicos | Hecho | Pruebas |
+| Los documentos que antes eran "solo grupos" pasan a "Familias" de esos grupos (migración 0011) | Hecho | Migración |
+| Cerrar sesión desde el portal; después de entrar, el personal va al panel y las familias al portal | Hecho | Navegador |
+| Inicio de sesión único con el sistema del colegio (FACTS u otro) | Pendiente: hay que confirmar que el proveedor ofrece SAML u OpenID Connect a terceros. No se simula | — |
+| Verificar el email de las familias | Pendiente: necesita correo (Resend). Mientras tanto la oficina comprueba cada solicitud | — |
+
+Riesgo conocido: quien tenga el código puede *pedir* una cuenta con un email que no es suyo. No ve nada privado hasta que la oficina aprueba. Hay un límite de 300 solicitudes pendientes por colegio.
+
+Resultado de pruebas: `npm test` → **143 de 143** pasan.
+
 ## Lo que todavía no existe (no simulado)
 
 Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".

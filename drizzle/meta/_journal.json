@@ -71,6 +71,20 @@
       "when": 1794584711374,
       "tag": "0009_invitations_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794586479949,
+      "tag": "0010_families",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794586488039,
+      "tag": "0011_families_rls",
+      "breakpoints": true
     }
   ]
 }

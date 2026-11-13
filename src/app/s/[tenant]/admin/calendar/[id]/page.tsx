@@ -98,6 +98,7 @@ export default async function EditEventPage({ params, searchParams }: Props) {
                 exdates: ev.exdates.join(', '),
                 registrationUrl: ev.registrationUrl ?? '',
                 audienceIds: ev.audienceIds,
+                visibility: ev.visibility,
                 isImportant: ev.isImportant,
               }}
             />

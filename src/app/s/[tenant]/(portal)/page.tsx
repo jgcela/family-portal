@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getDisplayView, getSession, getTenantOr404, tenantBase } from '@/server/request';
+import { getDisplayView, getSession, getTenantOr404, tenantBase, getViewer } from '@/server/request';
 import { BLOCK_INFO, type HomepageBlock } from '@/server/tenancy/homepage-defaults';
 import { renderMarkdown } from '@/server/content/markdown';
 import { listPublicOccurrences } from '@/server/services/calendar';
@@ -33,8 +33,8 @@ export default async function FamilyHome({ params }: Props) {
     0,
     ...calBlocks.map((b) => (b.type === 'this-week' ? num(b.settings.days, 7, 1, 21) : num(b.settings.withinDays, 60, 7, 180))),
   );
-  const occurrences = calBlocks.length ? await listPublicOccurrences(tenant.id, { from: today, to: addDays(today, horizon) }) : [];
-  const updates = content.some((b) => b.type === 'school-updates') ? await listPublicAnnouncements(tenant.id, { limit: 20 }) : [];
+  const occurrences = calBlocks.length ? await listPublicOccurrences(tenant.id, await getViewer(tenant.id), { from: today, to: addDays(today, horizon) }) : [];
+  const updates = content.some((b) => b.type === 'school-updates') ? await listPublicAnnouncements(tenant.id, await getViewer(tenant.id), { limit: 20 }) : [];
   const renderBlock = (b: HomepageBlock) => {
     if (b.type === 'school-updates') {
       return (
