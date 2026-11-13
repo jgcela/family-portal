@@ -86,7 +86,13 @@ export default async function PortalLayout({ children, params }: Props) {
               </>
             ) : session ? (
               <>
-                <span className="portal-user">{session.user.name}</span>
+                {viewer.kind === 'family' ? (
+                  <Link href={`${base}/family`} className="portal-signin">
+                    My family
+                  </Link>
+                ) : (
+                  <span className="portal-user">{session.user.name}</span>
+                )}
                 <SignOutButton to={base || '/'} />
               </>
             ) : (

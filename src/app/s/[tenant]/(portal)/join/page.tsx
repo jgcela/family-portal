@@ -17,7 +17,7 @@ export default async function JoinPage({ params }: { params: Promise<{ tenant: s
   if (status?.state === 'family') {
     body = (
       <p>
-        Your family account is active. <Link href={base || '/'}>Go to the portal</Link>.
+        Your family account is active. <Link href={`${base}/family`}>Go to My family</Link>.
       </p>
     );
   } else if (status?.state === 'staff') {

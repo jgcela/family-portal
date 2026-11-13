@@ -14,5 +14,5 @@ export default async function AccountRedirect({ params }: { params: Promise<{ te
   const ctx = await loadAuthzContext(tenant.id, session.user.id);
   if (hasAnywhere(ctx, 'dashboard.view')) redirect(`${base}/admin`);
   const viewer = await getViewer(tenant.id);
-  redirect(viewer.kind === 'family' ? base || '/' : `${base}/join`);
+  redirect(viewer.kind === 'family' ? `${base}/family` : `${base}/join`);
 }
