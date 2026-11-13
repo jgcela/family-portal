@@ -1,7 +1,7 @@
 // Loads a user's authorization context for one tenant, through RLS.
 import { and, eq } from 'drizzle-orm';
 import { withTenant, type Db, platformDb } from '../db/client';
-import { membershipRoles, memberships, rolePermissions, roles } from '../db/schema';
+import { membershipRoles, memberships, rolePermissions, roles, tenants } from '../db/schema';
 import { AuthorizationError, type AuthzContext, type Grant } from './authorize';
 
 // Contexts are only trusted if they were produced by loadAuthzContext(). A copy,
@@ -18,6 +18,9 @@ export async function loadAuthzContext(
   userId: string,
   db: Db = platformDb(),
 ): Promise<AuthzContext | null> {
+  // A suspended or archived school has no working dashboard: no context, no access.
+  const [t] = await db.select({ status: tenants.status }).from(tenants).where(eq(tenants.id, tenantId));
+  if (!t || (t.status !== 'active' && t.status !== 'onboarding')) return null;
   return withTenant(
     tenantId,
     async (tx) => {
