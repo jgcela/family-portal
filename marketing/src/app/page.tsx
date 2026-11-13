@@ -181,7 +181,7 @@ export default function Home() {
                   Family assistant <FeatureBadge id="familyAssistant" />
                 </p>
                 <h2 id="assistant-title" className="display h2">
-                  Answers about <em style={{ color: 'var(--amber)' }}>their</em> children, not just the school
+                  Answers about <em>their</em> children, not just the school
                 </h2>
                 <p className="lede">
                   Signed-in families can ask about their own students. What the assistant can answer depends on three
@@ -383,7 +383,7 @@ export default function Home() {
                 </ol>
               )}
               <p style={{ marginTop: 28 }}>
-                <a className="text-link" href="#pricing" style={{ color: '#fff' }}>
+                <a className="text-link" href="#pricing">
                   Compare plans <ArrowRight size={14} />
                 </a>
               </p>

@@ -56,10 +56,10 @@ function Lane({
 
 function Verdict({ needed, title, children }: { needed: boolean; title: string; children: React.ReactNode }) {
   return (
-    <article className="lane">
+    <article className={`lane verdict ${needed ? 'yes' : 'no'}`}>
       <h3 className="lane-label">Staff action required?</h3>
-      <p className={`lane-verdict ${needed ? 'yes' : 'no'}`}>{title}</p>
-      <div className="muted" style={{ display: 'grid', gap: 8, fontSize: 15 }}>
+      <p className="lane-verdict">{title}</p>
+      <div style={{ display: 'grid', gap: 8, fontSize: 15 }}>
         {children}
       </div>
     </article>
