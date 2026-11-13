@@ -157,11 +157,20 @@ Resultado de pruebas: `npm test` → **143 de 143** pasan.
 | Importación de contenido inicial en el asistente | No incluido: la hace el colegio desde su panel (importador de calendario) | — |
 | Cobro real | No incluido: no hay proveedor de pagos. Se registra el estado acordado | — |
 
-Resultado de pruebas: `npm test` → **149 de 149** pasan.
+### Acceso de soporte (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Nadie de la plataforma ve el panel de un colegio sin permiso. Desde la ficha del colegio se pide acceso con motivo, áreas ("Contenido y ajustes" y/o "Personas") y duración (2, 8, 24 o 72 h) | Hecho | Pruebas + navegador |
+| El School Owner aprueba o rechaza en Settings → Support access (aviso en su panel). Puede cortar el acceso cuando quiera; la plataforma también puede cerrarlo | Hecho | Pruebas + navegador (móvil) |
+| La sesión es de solo lectura: solo permisos `*.view`; los datos de personas solo si se pidió "Personas". Las acciones de escritura se rechazan en el servidor. Un aviso fijo indica la sesión y su fin | Hecho | Pruebas + navegador |
+| Petición, decisión, primer uso y cierre quedan en el registro del colegio y en el de la plataforma | Hecho | Pruebas + navegador |
+
+Resultado de pruebas: `npm test` → **152 de 152** pasan.
 
 ## Lo que todavía no existe (no simulado)
 
-Messenger, búsqueda, directorio, voluntariado, notificaciones, sesiones de soporte, métricas de sistema, dominios propios, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+Messenger, búsqueda, directorio, voluntariado, notificaciones, métricas de sistema, dominios propios, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 
 ## Bloqueos y riesgos abiertos
 

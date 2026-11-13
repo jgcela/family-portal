@@ -3,14 +3,17 @@ import { withTenant } from '@/server/db/client';
 import { auditLogs, plans, roles, subscriptions } from '@/server/db/schema';
 import { can } from '@/server/rbac/authorize';
 import { getModuleState } from '@/server/services/modules';
-import { requireStaff } from '@/server/request';
+import { requireStaff, tenantBase } from '@/server/request';
+import { countPendingSupportRequests } from '@/server/services/support';
+import Link from 'next/link';
 
 export const metadata = { title: 'Dashboard' };
 
 type Props = { params: Promise<{ tenant: string }> };
 
 export default async function AdminHome({ params }: Props) {
-  const { tenant, ctx, user } = await requireStaff((await params).tenant);
+  const key = (await params).tenant;
+  const { tenant, ctx, user } = await requireStaff(key);
   const [modules, data] = await Promise.all([
     getModuleState(tenant.id),
     withTenant(tenant.id, async (tx) => {
@@ -26,7 +29,10 @@ export default async function AdminHome({ params }: Props) {
     }),
   ]);
   const roleNames = new Map(data.roleRows.map((r) => [r.id, r.name]));
-  const myRoles = [...new Set(ctx.grants.map((g) => `${roleNames.get(g.roleId)}${g.scopeType === 'school' ? '' : ` (${g.scopeType})`}`))];
+  const myRoles = ctx.support
+    ? ['platform support (read-only)']
+    : [...new Set(ctx.grants.map((g) => `${roleNames.get(g.roleId)}${g.scopeType === 'school' ? '' : ` (${g.scopeType})`}`))];
+  const pendingSupport = !ctx.support && can(ctx, 'support.grant') ? await countPendingSupportRequests(tenant.id) : 0;
 
   return (
     <>
@@ -38,6 +44,12 @@ export default async function AdminHome({ params }: Props) {
           </p>
         </div>
       </div>
+      {pendingSupport > 0 && (
+        <p className="notice" role="status">
+          The platform team asked to look at your dashboard.{' '}
+          <Link href={`${await tenantBase(key)}/admin/support`}>Review the request</Link>
+        </p>
+      )}
       <dl className="stat-grid">
         <div className="stat">
           <dt>Plan</dt>

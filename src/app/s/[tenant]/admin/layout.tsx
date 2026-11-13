@@ -41,6 +41,10 @@ export default async function AdminLayout({ children, params }: Props) {
       title: 'Modules',
       items: [{ href: `${a}/modules`, label: 'Module Manager', show: hasAnywhere(ctx, 'modules.view') }],
     },
+    {
+      title: 'Settings',
+      items: [{ href: `${a}/support`, label: 'Support access', show: !ctx.support && hasAnywhere(ctx, 'support.grant') }],
+    },
   ];
   const initials = (view.profile.shortName ?? view.profile.displayName)
     .split(/\s+/)
@@ -94,6 +98,13 @@ export default async function AdminLayout({ children, params }: Props) {
         </nav>
       </aside>
       <main id="main" className="admin-main">
+        {ctx.support && (
+          <p className="notice support-banner" role="status">
+            <strong>Platform support session.</strong> Read-only access approved by the school, until{' '}
+            {ctx.support.expiresAt.toLocaleString('en-US', { timeZone: tenant.timezone, dateStyle: 'medium', timeStyle: 'short' })}. Every visit is recorded in
+            the school&rsquo;s activity log.
+          </p>
+        )}
         {children}
       </main>
     </div>

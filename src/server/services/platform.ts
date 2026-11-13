@@ -5,7 +5,7 @@
 // content: creating a school, changing its plan or suspending it are platform
 // records; reading its announcements or documents would need a support grant.
 import { randomBytes } from 'node:crypto';
-import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, like, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { platformDb, withTenant, type Db } from '../db/client';
 import {
@@ -57,6 +57,10 @@ const ACTIONS: Record<PlatformAction, PlatformRole[]> = {
 
 export function platformCan(ctx: PlatformContext, action: PlatformAction): boolean {
   return verified.has(ctx) && ACTIONS[action].includes(ctx.role);
+}
+
+export function assertPlatformContext(ctx: PlatformContext) {
+  if (!verified.has(ctx)) throw new AuthorizationError('Unverified platform context.');
 }
 
 function assertPlatform(ctx: PlatformContext, action: PlatformAction) {
@@ -157,7 +161,7 @@ export async function getSchool(ctx: PlatformContext, tenantId: string, db: Db =
     .select({ id: auditLogs.id, action: auditLogs.action, actorKind: auditLogs.actorKind, createdAt: auditLogs.createdAt, metadata: auditLogs.metadata, actor: user.email })
     .from(auditLogs)
     .leftJoin(user, eq(user.id, auditLogs.actorUserId))
-    .where(and(eq(auditLogs.tenantId, tenantId), inArray(auditLogs.actorKind, ['platform', 'system', 'support'])))
+    .where(and(eq(auditLogs.tenantId, tenantId), or(inArray(auditLogs.actorKind, ['platform', 'system', 'support']), like(auditLogs.action, 'support.%'))))
     .orderBy(desc(auditLogs.createdAt))
     .limit(30);
   const [docCount] = await db.select({ n: count() }).from(documents).where(eq(documents.tenantId, tenantId));
@@ -477,7 +481,7 @@ export async function listPlatformActivity(ctx: PlatformContext, limit = 100, db
     .from(auditLogs)
     .leftJoin(user, eq(user.id, auditLogs.actorUserId))
     .leftJoin(tenants, eq(tenants.id, auditLogs.tenantId))
-    .where(inArray(auditLogs.actorKind, ['platform', 'system', 'support']))
+    .where(or(inArray(auditLogs.actorKind, ['platform', 'system', 'support']), like(auditLogs.action, 'support.%')))
     .orderBy(desc(auditLogs.createdAt))
     .limit(Math.min(Math.max(limit, 1), 500));
 }

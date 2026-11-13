@@ -18,6 +18,8 @@ export type AuthzContext = {
   membershipId: string;
   membershipStatus: 'invited' | 'active' | 'suspended';
   grants: Grant[];
+  /** Set for a platform support session: read-only access approved by the school. */
+  support?: { grantId: string; expiresAt: Date; scopes: string[] };
 };
 
 /** What the action is about. Omit for actions that are not about one record. */
