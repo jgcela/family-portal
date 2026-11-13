@@ -3,7 +3,7 @@ import { and, eq, isNotNull, sql } from 'drizzle-orm';
 import { platformDb, type Db } from '../db/client';
 import { tenantDomains, tenants } from '../db/schema';
 import { isValidSlug } from './resolve';
-import { ValidationError } from '../services/modules';
+import { ValidationError } from '../errors';
 
 export type TenantRecord = typeof tenants.$inferSelect;
 

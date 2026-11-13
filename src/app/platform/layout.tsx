@@ -45,7 +45,13 @@ export default async function PlatformLayout({ children }: { children: React.Rea
             <h2>Platform</h2>
             <ul>
               <li>
+                <PlatformNavLink href="/platform/health">System health</PlatformNavLink>
+              </li>
+              <li>
                 <PlatformNavLink href="/platform/plans">Plans &amp; modules</PlatformNavLink>
+              </li>
+              <li>
+                <PlatformNavLink href="/platform/team">Platform team</PlatformNavLink>
               </li>
               <li>
                 <PlatformNavLink href="/platform/activity">Activity log</PlatformNavLink>

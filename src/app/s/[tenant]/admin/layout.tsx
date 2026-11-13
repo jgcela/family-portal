@@ -43,7 +43,10 @@ export default async function AdminLayout({ children, params }: Props) {
     },
     {
       title: 'Settings',
-      items: [{ href: `${a}/support`, label: 'Support access', show: !ctx.support && hasAnywhere(ctx, 'support.grant') }],
+      items: [
+        { href: `${a}/domains`, label: 'Domains', show: !ctx.support && hasAnywhere(ctx, 'domains.manage') },
+        { href: `${a}/support`, label: 'Support access', show: !ctx.support && hasAnywhere(ctx, 'support.grant') },
+      ],
     },
   ];
   const initials = (view.profile.shortName ?? view.profile.displayName)

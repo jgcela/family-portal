@@ -23,8 +23,8 @@ export default async function SchoolPage({ params }: { params: Promise<{ id: str
   const plans = manage ? await listPlans() : [];
   const mine = await listMySupportGrants(ctx, t.id);
   const openGrant = mine.find((g) => g.state === 'pending' || g.state === 'active');
-  const portal = school.domains.find((d) => d.isPrimary && d.verifiedAt)?.hostname;
-  const portalHref = portal ? `https://${portal}` : `/s/${t.slug}`;
+  // Always the platform address: a custom domain may not be connected in Vercel yet.
+  const portalHref = `/s/${t.slug}`;
 
   return (
     <>
@@ -216,7 +216,8 @@ export default async function SchoolPage({ params }: { params: Promise<{ id: str
             {school.domains.map((d) => (
               <li key={d.id}>
                 <code>{d.hostname}</code> · {d.kind === 'subdomain' ? 'platform subdomain' : 'custom domain'}
-                {d.verifiedAt ? '' : ' · not verified'}
+                {d.kind === 'custom' ? (d.verifiedAt ? ' · verified (add it in Vercel → Domains and to AUTH_EXTRA_HOSTS)' : ' · waiting for the school’s DNS record') : ''}
+                {d.isPrimary && d.kind === 'custom' ? ' · main address' : ''}
               </li>
             ))}
           </ul>

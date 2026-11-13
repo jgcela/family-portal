@@ -2,6 +2,9 @@ import { requirePlatformAdmin } from '@/server/request';
 import { listPlans } from '@/server/services/platform';
 import { MODULES } from '@/server/modules/registry';
 import { formatBytes } from '../_components/format';
+import { catalogPlan } from '@/server/billing/catalog';
+
+const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US')}`;
 
 export const metadata = { title: 'Plans & modules' };
 
@@ -14,7 +17,11 @@ export default async function PlansPage() {
       <div className="admin-head">
         <div>
           <h1>Plans &amp; modules</h1>
-          <p>What each plan includes. A school can also get extra modules from its own page. Plans are set up by the platform owner; no payment is processed.</p>
+          <p>
+            Names, prices and features come from the marketing site (<code>marketing/src/config/site.ts</code>) and are
+            synced on each production deploy. A school can also get extra modules from its own page. No payment is
+            processed here.
+          </p>
         </div>
       </div>
       <section className="panel">
@@ -32,6 +39,21 @@ export default async function PlansPage() {
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <th scope="row">Price per year</th>
+                <td />
+                {plans.map((p) => (
+                  <td key={p.id}>{p.priceCentsPerYear != null ? `${catalogPlan(p.id)?.priceIsFrom ? 'From ' : ''}${usd(p.priceCentsPerYear)}` : '—'}</td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">Implementation (once)</th>
+                <td />
+                {plans.map((p) => {
+                  const c = catalogPlan(p.id);
+                  return <td key={p.id}>{c ? usd(c.implementationCents) : '—'}</td>;
+                })}
+              </tr>
               <tr>
                 <th scope="row">Storage</th>
                 <td />

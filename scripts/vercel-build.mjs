@@ -10,6 +10,8 @@ if (process.env.VERCEL_ENV === 'production') {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is missing in the Vercel production environment.');
   console.log('Applying database migrations…');
   run('npx tsx scripts/migrate.ts');
+  console.log('Syncing subscription plans…');
+  run('npx tsx scripts/sync-plans.ts');
 } else {
   console.log(`Skipping migrations (VERCEL_ENV=${process.env.VERCEL_ENV ?? 'unset'}).`);
 }

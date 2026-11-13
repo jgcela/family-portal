@@ -90,7 +90,7 @@ export type GradeStructure = keyof typeof GRADE_STRUCTURES;
 // ---------- Reads ----------
 
 export async function listPlans(db: Db = platformDb()) {
-  return db.select().from(plans).where(eq(plans.isActive, true)).orderBy(asc(plans.name));
+  return db.select().from(plans).where(eq(plans.isActive, true)).orderBy(sql`${plans.priceCentsPerYear} asc nulls last`, asc(plans.name));
 }
 
 /** All schools with platform-level facts only (no school content). */
@@ -161,7 +161,7 @@ export async function getSchool(ctx: PlatformContext, tenantId: string, db: Db =
     .select({ id: auditLogs.id, action: auditLogs.action, actorKind: auditLogs.actorKind, createdAt: auditLogs.createdAt, metadata: auditLogs.metadata, actor: user.email })
     .from(auditLogs)
     .leftJoin(user, eq(user.id, auditLogs.actorUserId))
-    .where(and(eq(auditLogs.tenantId, tenantId), or(inArray(auditLogs.actorKind, ['platform', 'system', 'support']), like(auditLogs.action, 'support.%'))))
+    .where(and(eq(auditLogs.tenantId, tenantId), or(inArray(auditLogs.actorKind, ['platform', 'system', 'support']), like(auditLogs.action, 'support.%'), like(auditLogs.action, 'domain.%'))))
     .orderBy(desc(auditLogs.createdAt))
     .limit(30);
   const [docCount] = await db.select({ n: count() }).from(documents).where(eq(documents.tenantId, tenantId));
