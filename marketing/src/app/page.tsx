@@ -20,6 +20,18 @@ const sisNow =
       ? 'Connections are in pilot with selected schools.'
       : 'Direct connections are planned.';
 
+// Questions families send the front office every week. Shown as a decorative strip.
+const TICKER = [
+  'What time is early dismissal on Friday?',
+  'Is there school on Monday?',
+  'Where is the field trip form?',
+  'Can Maya wear her PE uniform all day?',
+  'Who do I tell if Leo will be late?',
+  'When is hot lunch ordering due?',
+  'Did the office get my absence note?',
+  'Is the book fair this week or next?',
+];
+
 const FAQ: { q: string; a: React.ReactNode }[] = [
   {
     q: 'What does implementation involve?',
@@ -97,6 +109,14 @@ export default function Home() {
     <>
       <Header />
       <main id="main" tabIndex={-1}>
+        <div className="ticker" aria-hidden="true">
+          <div className="ticker-track">
+            {[...TICKER, ...TICKER].map((q, i) => (
+              <span key={i}>{q}</span>
+            ))}
+          </div>
+        </div>
+
         {/* ---------- Hero ---------- */}
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="wrap">
@@ -135,7 +155,7 @@ export default function Home() {
         </section>
 
         {/* ---------- Scenarios ---------- */}
-        <section className="section section-alt" id="how-it-works" aria-labelledby="how-title">
+        <section className="section block block-cream" id="how-it-works" aria-labelledby="how-title">
           <div className="wrap">
             <div className="section-head section-head--split">
               <div style={{ display: 'grid', gap: 20 }}>
@@ -173,7 +193,7 @@ export default function Home() {
         </section>
 
         {/* ---------- Family assistant + systems ---------- */}
-        <section className="section section-ink" id="assistant" aria-labelledby="assistant-title">
+        <section className="section block block-navy" id="assistant" aria-labelledby="assistant-title">
           <div className="wrap">
             <div className="assistant-grid">
               <div style={{ display: 'grid', gap: 24 }}>
@@ -205,7 +225,7 @@ export default function Home() {
                   </li>
                 </ol>
               </div>
-              <div className="assistant-chat ui" aria-label="Family assistant example">
+              <div className="assistant-chat ui on-light" aria-label="Family assistant example">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                   <strong>Ana Alvarez · signed in</strong>
                   <SampleBadge />
@@ -277,7 +297,7 @@ export default function Home() {
         </section>
 
         {/* ---------- Calculator ---------- */}
-        <section className="section section-alt" id="savings" aria-labelledby="savings-title">
+        <section className="section block block-mint" id="savings" aria-labelledby="savings-title">
           <div className="wrap">
             <div className="section-head section-head--split">
               <div style={{ display: 'grid', gap: 20 }}>
@@ -327,7 +347,7 @@ export default function Home() {
 
         {/* ---------- Proof (renders only when approved material is supplied) ---------- */}
         {proof.testimonials.length > 0 && (
-          <section className="section section-alt" aria-label="What schools say">
+          <section className="section block block-cream" aria-label="What schools say">
             <div className="wrap">
               {proof.testimonials.map((t) => (
                 <figure key={t.name}>
@@ -342,7 +362,7 @@ export default function Home() {
         )}
 
         {/* ---------- Book a demo ---------- */}
-        <section className="section section-ink" id="demo" aria-labelledby="demo-book-title">
+        <section className="section block block-lilac" id="demo" aria-labelledby="demo-book-title">
           <div className="wrap book">
             <div>
               <p className="eyebrow">Book a Demo</p>

@@ -123,7 +123,7 @@ export function Calculator() {
         })}
       </form>
 
-      <div className="calc-results">
+      <div className="calc-results block-navy">
         <div className="result-cards" aria-live="polite">
           <div className="result-card">
             <span className="result-value" data-testid="hours-year">

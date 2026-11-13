@@ -28,7 +28,7 @@ Everything editable lives in `src/config/site.ts`:
 | School-life photograph | `schoolPhoto` |
 | Testimonials and school logos | `proof` (render only when filled) |
 
-Colors and fonts are tokens at the top of `src/app/site.css`. The look follows a dark editorial system (near-black canvas, mint `#3cffd0` and ultraviolet `#5200ff` accents, 1px hairlines, no shadows) with open-source fonts: Anton (display, 60px+ only), Space Grotesk (UI and body), Space Mono (uppercase labels and buttons).
+Colors and fonts are tokens at the top of `src/app/site.css`. The look is a light editorial system: white canvas, black ink and black/white pill buttons, with one large pastel color block per story section (cream, navy, mint, lilac; lime for emphasis), separated by white space. No shadows. Inside the navy block, `.block-navy` flips the tokens; `.on-light` resets them for light cards placed there. Open-source fonts: Inter Variable (display and body) and JetBrains Mono (uppercase eyebrows and small labels only).
 
 ## Before publishing
 

@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import '@fontsource/anton/400.css';
-import '@fontsource-variable/space-grotesk';
-import '@fontsource/space-mono/400.css';
-import '@fontsource/space-mono/700.css';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
 import './site.css';
 import { brand, siteUrl } from '@/config/site';
 
@@ -29,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#131313',
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
 };
