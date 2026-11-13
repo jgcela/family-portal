@@ -25,7 +25,7 @@
 | Roles personalizados | Servicio hecho; pantalla pendiente (Fase 3) | Probado contra BD |
 | Registro de módulos, reglas de activación y planes | Hecho | 5 pruebas |
 | Motor de temas con validación de contraste | Hecho | 7 pruebas (contraste y tokens) |
-| Editor visual de tema | Pendiente (Fase 3) | — |
+| Editor visual de tema | Hecho (Fase 3, ver abajo) | Pruebas + navegador |
 | Alta de escuela (`provisionTenant`) y St. Mary como primer tenant | Hecho (`npm run db:seed`) | Probado |
 | Pantallas: portal (portada + contacto), admin (panel, matriz de permisos, módulos), super admin (lista de escuelas) | Hecho, solo lectura | Revisadas en navegador a 1280 px y 390 px |
 
@@ -59,11 +59,23 @@ Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `
 | Flujo de aprobación compartido por eventos, anuncios y páginas | Hecho | Pruebas |
 | Editor con vista previa. Solo Markdown: el HTML, los scripts y los enlaces `javascript:` se muestran como texto o se descartan | Hecho | Pruebas (intentos de inyección) + navegador |
 
-Resultado de pruebas: `npm test` → **103 de 103** pasan.
+### Tema y portada (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Editor de tema: colores, fuentes de una lista cerrada, esquinas, estilo de cabecera y logos (enlace https). Vista previa en vivo y avisos de contraste mientras se edita | Hecho | Navegador |
+| El tema se guarda como borrador; no se puede publicar si el texto no llega a contraste 4.5:1 (WCAG AA). Historial con "usar como borrador" y "descartar borrador" | Hecho | Pruebas |
+| Constructor de portada: mostrar u ocultar, ordenar, añadir y quitar bloques; ajustes por bloque (días, número de elementos); bloque de mensaje propio en Markdown seguro | Hecho | Pruebas + navegador |
+| Validación de la portada en el servidor: ids únicos, un solo banner, ajustes con límites y sin claves desconocidas | Hecho | Pruebas |
+| "Vista previa en el portal": quien puede editar ve el borrador real en el portal con un aviso; las familias siguen viendo lo publicado. El permiso se comprueba en cada visita | Hecho | Navegador (sesión de editor y sesión anónima a la vez) |
+| Subir logos como archivo | Pendiente: llega con Documentos (R2) | — |
+| Bloques por audiencia (solo para ciertos cursos) | Pendiente: necesita cuentas de familia (Fase 4) | — |
+
+Resultado de pruebas: `npm test` → **112 de 112** pasan.
 
 ## Lo que todavía no existe (no simulado)
 
-Documentos, Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, editor de portada, editor de tema, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+Documentos, Messenger, búsqueda, directorio, voluntariado, notificaciones, cuentas de familia, asistente de alta de escuelas, sesiones de soporte, métricas de sistema, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 
 ## Bloqueos y riesgos abiertos
 
