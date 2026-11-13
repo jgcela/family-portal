@@ -23,7 +23,7 @@
 | Invitaciones | Hecho por enlace (Fase 3, ver Personal). Envío por correo pendiente | Pruebas + navegador |
 | Recuperación de contraseña | Pendiente: necesita proveedor de correo | — |
 | RBAC con ámbitos, anti‑escalada, separación de funciones | Hecho | 19 pruebas unitarias + 12 de servicios contra BD |
-| Roles personalizados | Servicio hecho; pantalla pendiente (Fase 3) | Probado contra BD |
+| Roles personalizados | Hecho (Fase 3, ver Personal) | Pruebas + navegador |
 | Registro de módulos, reglas de activación y planes | Hecho | 5 pruebas |
 | Motor de temas con validación de contraste | Hecho | 7 pruebas (contraste y tokens) |
 | Editor visual de tema | Hecho (Fase 3, ver abajo) | Pruebas + navegador |
@@ -98,13 +98,13 @@ Resultado de pruebas: `npm test` → **57 de 57** pasan. `npm run typecheck` y `
 | Límite de cuentas de personal del plan, contando invitaciones pendientes | Hecho | Pruebas |
 | Lista del equipo: añadir y quitar roles, suspender, reactivar y quitar del colegio. Nadie se suspende o se quita a sí mismo; solo un propietario cambia a otro propietario | Hecho | Pruebas |
 | Envío de la invitación por correo | Pendiente: necesita proveedor de correo (Resend) | — |
-| Editor de roles personalizados | Pendiente | — |
+| Roles personalizados: crear desde cero o duplicando uno integrado, editar y borrar (solo si nadie lo tiene). Los roles integrados y el de propietario no se editan. Nadie añade ni quita permisos que no tiene; los permisos solo de propietario no entran en roles personalizados; un rol dado para un curso no puede ganar permisos de todo el colegio | Hecho | 7 pruebas + navegador (1280 y 390 px) |
 
 ### Despliegue
 
 - Vercel aplica las migraciones de base de datos solo al publicar en producción (`scripts/vercel-build.mjs`). Las vistas previas de las PR no tocan la base de datos.
 
-Resultado de pruebas: `npm test` → **130 de 130** pasan.
+Resultado de pruebas: `npm test` → **137 de 137** pasan.
 
 ## Lo que todavía no existe (no simulado)
 

@@ -158,3 +158,19 @@ fieldset.panel { padding: 0; min-width: 0; }
 .chip-x:hover { background: var(--surface-sunken); color: var(--danger); }
 .add-role { max-width: 640px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end; }
 .add-role .form-actions, .add-role .field-error, .add-role .muted { grid-column: 1 / -1; }
+
+/* Roles editor */
+.role-list { list-style: none; margin: 0; padding: 0; }
+.role-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); }
+.role-list li:last-child { border-bottom: 0; }
+.role-list a { font-weight: 600; }
+.role-desc { flex-basis: 100%; font-size: 0.875rem; color: var(--color-text-muted); }
+.role-editor { max-width: 900px; }
+.perm-group { border: 1px solid var(--border); border-radius: 8px; padding: var(--space-2) var(--space-4) var(--space-3); margin: 0; min-width: 0; }
+.perm-group legend { font-weight: 650; padding: 0 var(--space-2); }
+.perm-list { display: grid; gap: 0 var(--space-4); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.perm-list .check { align-items: flex-start; padding: 4px 0; }
+.perm-list .check input { margin-top: 3px; flex: none; }
+.check-off { color: var(--color-text-muted); }
+.perm-tag { display: inline-block; margin-left: 6px; font-size: 0.72rem; padding: 0 6px; border-radius: 999px; border: 1px solid var(--border); color: var(--color-text-muted); white-space: nowrap; }
+.perm-readonly { columns: 2 240px; margin: var(--space-3) 0 0; padding-left: 1.2em; }

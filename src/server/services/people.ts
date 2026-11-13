@@ -1,9 +1,11 @@
-import { and, count, eq } from 'drizzle-orm';
+import { randomBytes } from 'node:crypto';
+import { and, asc, count, eq, isNull, ne } from 'drizzle-orm';
 import { platformDb, withTenant, type Db } from '../db/client';
-import { membershipRoles, memberships, rolePermissions, roles } from '../db/schema';
+import { invitations, membershipRoles, memberships, rolePermissions, roles } from '../db/schema';
 import { audit } from '../audit/log';
 import { assertVerifiedContext } from '../rbac/context';
-import { AuthorizationError, type AuthzContext, type ScopeType } from '../rbac/authorize';
+import { AuthorizationError, can, type AuthzContext, type ScopeType } from '../rbac/authorize';
+import { getPermission } from '../rbac/permissions';
 import { assertCanAssignRole, assertCanRevokeRole, assertCanSetRolePermissions } from '../rbac/escalation';
 import { ValidationError } from './modules';
 
@@ -134,6 +136,178 @@ export async function createCustomRole(
         metadata: { key: input.key, permissions },
       });
       return role!;
+    },
+    db,
+  );
+}
+
+// ---------- Custom roles editor ----------
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A stable internal key from the name, e.g. "Front office" → "front_office_3f9a". */
+export function roleKeyFromName(name: string) {
+  const base = name
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 30);
+  return `${base || 'role'}_${randomBytes(2).toString('hex')}`;
+}
+
+function cleanRoleInput(input: { name: string; description?: string | null; permissions: string[] }) {
+  const name = input.name.trim();
+  if (!name) throw new ValidationError('Role name is required.');
+  if (name.length > 60) throw new ValidationError('Role name must be 60 characters or fewer.');
+  const description = (input.description ?? '').trim();
+  if (description.length > 300) throw new ValidationError('Description must be 300 characters or fewer.');
+  return { name, description: description || null, permissions: [...new Set(input.permissions)] };
+}
+
+type Tx = Parameters<Parameters<typeof withTenant>[1]>[0];
+
+async function assertUniqueName(tx: Tx, name: string, exceptId: string | null) {
+  const same = await tx.select({ id: roles.id, name: roles.name }).from(roles);
+  if (same.some((r) => r.id !== exceptId && r.name.toLowerCase() === name.toLowerCase())) {
+    throw new ValidationError('Another role already has that name.');
+  }
+}
+
+/** Roles for the editor list, with how many people and pending invitations use each. */
+export async function listRolesForEditor(actor: AuthzContext, db: Db = platformDb()) {
+  assertVerifiedContext(actor);
+  if (!can(actor, 'roles.view')) throw new AuthorizationError('Not allowed: roles.view');
+  return withTenant(
+    actor.tenantId,
+    async (tx) => {
+      const rows = await tx.select().from(roles).orderBy(asc(roles.createdAt));
+      const perms = await tx.select().from(rolePermissions);
+      const grants = await tx.select({ roleId: membershipRoles.roleId, n: count() }).from(membershipRoles).groupBy(membershipRoles.roleId);
+      return {
+        roles: rows.map((r) => ({
+          ...r,
+          permissions: perms.filter((p) => p.roleId === r.id).map((p) => p.permission),
+          holders: grants.find((g) => g.roleId === r.id)?.n ?? 0,
+        })),
+      };
+    },
+    db,
+  );
+}
+
+export async function getRoleForEditor(actor: AuthzContext, roleId: string, db: Db = platformDb()) {
+  assertVerifiedContext(actor);
+  if (!can(actor, 'roles.view')) throw new AuthorizationError('Not allowed: roles.view');
+  if (!UUID.test(roleId)) return null;
+  return withTenant(
+    actor.tenantId,
+    async (tx) => {
+      const [r] = await tx.select().from(roles).where(eq(roles.id, roleId));
+      if (!r) return null;
+      return loadRole(tx, actor.tenantId, r.id);
+    },
+    db,
+  );
+}
+
+export async function createRoleFromEditor(
+  actor: AuthzContext,
+  input: { name: string; description?: string | null; permissions: string[] },
+  db: Db = platformDb(),
+) {
+  const v = cleanRoleInput(input);
+  assertVerifiedContext(actor);
+  assertCanSetRolePermissions(actor, null, v.permissions);
+  await withTenant(actor.tenantId, (tx) => assertUniqueName(tx, v.name, null), db);
+  return createCustomRole(actor, { key: roleKeyFromName(v.name), name: v.name, description: v.description ?? undefined, permissions: v.permissions }, db);
+}
+
+/**
+ * Edits a custom role. Changes apply to everyone who holds it. Permissions that
+ * cannot be limited to a grade are refused while the role is granted for a grade
+ * or audience, so an edit can't widen a limited grant to the whole school.
+ */
+export async function updateCustomRole(
+  actor: AuthzContext,
+  roleId: string,
+  input: { name: string; description?: string | null; permissions: string[] },
+  db: Db = platformDb(),
+) {
+  assertVerifiedContext(actor);
+  const v = cleanRoleInput(input);
+  if (!UUID.test(roleId)) throw new ValidationError('Role not found.');
+  return withTenant(
+    actor.tenantId,
+    async (tx) => {
+      const [locked] = await tx.select().from(roles).where(eq(roles.id, roleId)).for('update');
+      if (!locked) throw new ValidationError('Role not found.');
+      const role = await loadRole(tx, actor.tenantId, roleId);
+      assertCanSetRolePermissions(actor, role, v.permissions);
+      // You can't remove permissions you don't hold either: that would let you
+      // reshape a role above your level.
+      const ceiling = new Set(actor.grants.filter((g) => g.scopeType === 'school').map((g) => g.permission));
+      const removedAbove = role.permissions.filter((p) => !v.permissions.includes(p) && !ceiling.has(p));
+      if (removedAbove.length) throw new AuthorizationError(`You cannot change permissions you do not hold: ${removedAbove.join(', ')}`);
+      const limited = await tx
+        .select({ id: membershipRoles.id })
+        .from(membershipRoles)
+        .where(and(eq(membershipRoles.roleId, roleId), ne(membershipRoles.scopeType, 'school')));
+      const limitedInv = await tx
+        .select({ id: invitations.id })
+        .from(invitations)
+        .where(and(eq(invitations.roleId, roleId), ne(invitations.scopeType, 'school'), isNull(invitations.acceptedAt), isNull(invitations.revokedAt)));
+      const nonScopable = v.permissions.filter((p) => !getPermission(p)?.scopable && !role.permissions.includes(p));
+      if ((limited.length || limitedInv.length) && nonScopable.length) {
+        throw new ValidationError(
+          `This role is given to some people for a single grade or audience, so it cannot gain school-wide permissions (${nonScopable.join(', ')}).`,
+        );
+      }
+      await assertUniqueName(tx, v.name, roleId);
+      await tx.update(roles).set({ name: v.name, description: v.description, updatedAt: new Date() }).where(eq(roles.id, roleId));
+      await tx.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
+      if (v.permissions.length) {
+        await tx.insert(rolePermissions).values(v.permissions.map((permission) => ({ tenantId: actor.tenantId, roleId, permission })));
+      }
+      await audit(tx, {
+        tenantId: actor.tenantId,
+        actorUserId: actor.userId,
+        action: 'role.updated',
+        targetType: 'role',
+        targetId: roleId,
+        metadata: {
+          added: v.permissions.filter((p) => !role.permissions.includes(p)),
+          removed: role.permissions.filter((p) => !v.permissions.includes(p)),
+        },
+      });
+    },
+    db,
+  );
+}
+
+/** Deletes a custom role that nobody holds and no pending invitation uses. */
+export async function deleteCustomRole(actor: AuthzContext, roleId: string, db: Db = platformDb()) {
+  assertVerifiedContext(actor);
+  if (!UUID.test(roleId)) throw new ValidationError('Role not found.');
+  return withTenant(
+    actor.tenantId,
+    async (tx) => {
+      const [locked] = await tx.select().from(roles).where(eq(roles.id, roleId)).for('update');
+      if (!locked) throw new ValidationError('Role not found.');
+      const role = await loadRole(tx, actor.tenantId, roleId);
+      assertCanSetRolePermissions(actor, role, []);
+      const [held] = await tx.select({ n: count() }).from(membershipRoles).where(eq(membershipRoles.roleId, roleId));
+      if ((held?.n ?? 0) > 0) throw new ValidationError(`${held!.n} people have this role. Take it away from them first.`);
+      const [inv] = await tx
+        .select({ n: count() })
+        .from(invitations)
+        .where(and(eq(invitations.roleId, roleId), isNull(invitations.acceptedAt), isNull(invitations.revokedAt)));
+      if ((inv?.n ?? 0) > 0) throw new ValidationError('A pending invitation uses this role. Cancel it first.');
+      await tx.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
+      // Accepted/revoked invitations keep a reference; clear it by deleting those old rows.
+      await tx.delete(invitations).where(eq(invitations.roleId, roleId));
+      await tx.delete(roles).where(eq(roles.id, roleId));
+      await audit(tx, { tenantId: actor.tenantId, actorUserId: actor.userId, action: 'role.deleted', targetType: 'role', targetId: roleId, metadata: { key: role.key, name: role.name } });
     },
     db,
   );
