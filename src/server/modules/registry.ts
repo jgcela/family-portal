@@ -113,6 +113,7 @@ export const MODULES: ModuleDefinition[] = [
     configSchema: z.object({ maxUploadMb: z.number().int().min(1).max(50).default(25) }).strict(),
     permissions: ['documents.upload', 'documents.publish', 'documents.delete'],
     dependencies: [],
+    nav: { label: 'Documents', path: '/documents', area: 'primary' },
     dataTables: ['documents', 'document_versions', 'media_assets'],
     widgets: [],
     onDisable: KEEP,
