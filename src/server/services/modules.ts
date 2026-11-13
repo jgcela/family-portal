@@ -7,13 +7,8 @@ import { assertCan, AuthorizationError, type AuthzContext } from '../rbac/author
 import { getModule, MODULES } from '../modules/registry';
 import { activeModules, checkModuleChange, entitledModules } from '../modules/rules';
 
-export class ValidationError extends Error {
-  readonly status = 422;
-  constructor(message: string) {
-    super(message);
-    this.name = 'ValidationError';
-  }
-}
+export { ValidationError } from '../errors';
+import { ValidationError } from '../errors';
 
 export async function getModuleState(tenantId: string, db: Db = platformDb()) {
   return withTenant(

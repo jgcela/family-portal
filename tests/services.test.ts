@@ -52,7 +52,7 @@ describe('provisioning', () => {
     const rows = await withTenant(a.tenant.id, (tx) => tx.select().from(tenantModules));
     expect(rows).toHaveLength(MODULES.length);
     expect(rows.find((r) => r.moduleId === 'home')!.enabled).toBe(true);
-    const gradeRows = await withTenant(a.tenant.id, (tx) => tx.select().from(grades));
+    const gradeRows = await withTenant(a.tenant.id, (tx) => tx.select().from(grades).orderBy(grades.sortOrder));
     expect(gradeRows.map((g) => g.code)).toEqual(['PK3', 'PK4', 'K', '1', '2', '3', '4', '5', '6', '7', '8']);
     expect((await getPublishedTheme(a.tenant.id)).colors.primary).toBe('#16335B');
   });

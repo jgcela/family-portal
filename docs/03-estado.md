@@ -140,7 +140,7 @@ Riesgo conocido: quien tenga el código puede *pedir* una cuenta con un email qu
 
 Resultado de pruebas: `npm test` → **143 de 143** pasan.
 
-## Fase 5 — Operaciones con varios colegios (en curso)
+## Fase 5 — Operaciones con varios colegios (hecha el 13 nov 2026)
 
 ### Super Admin: colegios, planes y primer administrador (hecho)
 
@@ -166,11 +166,23 @@ Resultado de pruebas: `npm test` → **143 de 143** pasan.
 | La sesión es de solo lectura: solo permisos `*.view`; los datos de personas solo si se pidió "Personas". Las acciones de escritura se rechazan en el servidor. Un aviso fijo indica la sesión y su fin | Hecho | Pruebas + navegador |
 | Petición, decisión, primer uso y cierre quedan en el registro del colegio y en el de la plataforma | Hecho | Pruebas + navegador |
 
-Resultado de pruebas: `npm test` → **152 de 152** pasan.
+### Estado del sistema, dominios propios, equipo y planes (hecho)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| System health: colegios por estado, pagos atrasados, pruebas que terminan en 14 días, espacio usado frente al límite del plan, importaciones de calendario con filas ilegibles (30 días), accesos de soporte, dominios pendientes y eventos de seguridad (7 días). Todo sale de la base de datos | Hecho | Pruebas + navegador |
+| Lo que no está conectado se dice: errores de aplicación (no hay servicio de seguimiento; ver Vercel → Logs), tareas en segundo plano (no existen), entrega de correo (sin proveedor) | Hecho | — |
+| Dominios propios: el School Owner añade `portal.colegio.org`, recibe un registro TXT y un CNAME, y "Check DNS now" consulta el DNS real. Solo un dominio verificado resuelve al colegio. Hasta 3 por colegio | Hecho | Pruebas (con DNS simulado) + navegador |
+| Conectar el dominio en Vercel y añadirlo a `AUTH_EXTRA_HOSTS` | Manual: lo hace quien administra Vercel. El panel no puede comprobar Vercel | — |
+| Equipo de plataforma: el owner añade cuentas existentes, cambia roles y quita personas; siempre queda un owner. Quitar a alguien cierra sus accesos de soporte | Hecho | Pruebas + navegador |
+| Planes Essential, Smart y Autonomous con nombres, precios y funciones tomados de la web de marketing (`marketing/src/config/site.ts`). Cada despliegue de producción los sincroniza; los colegios en "Essentials" pasan a Essential y los de "Complete" a Autonomous | Hecho | Pruebas |
+| Espacio por plan (10, 25 y 100 GB) | Decisión de la plataforma: la web de marketing no lo fija. Se cambia en `src/server/billing/catalog.ts` | — |
+
+Resultado de pruebas: `npm test` → **159 de 159** pasan.
 
 ## Lo que todavía no existe (no simulado)
 
-Messenger, búsqueda, directorio, voluntariado, notificaciones, métricas de sistema, dominios propios, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+Messenger, búsqueda, directorio, voluntariado, notificaciones, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 
 ## Bloqueos y riesgos abiertos
 

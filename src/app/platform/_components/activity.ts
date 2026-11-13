@@ -13,4 +13,9 @@ export const ACTION_LABEL: Record<string, string> = {
   'support.revoked': 'Support access ended by the school',
   'support.ended': 'Support access ended by platform',
   'support.session_started': 'Support opened the dashboard',
+  'platform.team_changed': 'Platform team changed',
+  'domain.added': 'Custom domain added',
+  'domain.verified': 'Custom domain verified',
+  'domain.removed': 'Custom domain removed',
+  'domain.primary_set': 'Main address changed',
 };

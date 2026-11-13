@@ -5,12 +5,11 @@
 import { eq } from 'drizzle-orm';
 import { auth } from '../src/server/auth/auth';
 import { closeDb, platformDb } from '../src/server/db/client';
-import { platformAdmins, plans, tenants, user } from '../src/server/db/schema';
-import { MODULES } from '../src/server/modules/registry';
+import { platformAdmins, tenants, user } from '../src/server/db/schema';
+import { syncPlans } from '../src/server/billing/sync';
 import { provisionTenant } from '../src/server/tenancy/provision';
 import { ST_MARY } from '../src/server/tenancy/st-mary';
 
-const CORE = MODULES.filter((m) => m.stage === 'core').map((m) => m.id);
 
 async function ensureOwnerAccount(): Promise<string | undefined> {
   const email = process.env.SEED_OWNER_EMAIL?.trim().toLowerCase();
@@ -38,27 +37,8 @@ async function ensureOwnerAccount(): Promise<string | undefined> {
 
 async function main() {
   const db = platformDb();
-  await db
-    .insert(plans)
-    .values([
-      {
-        id: 'essentials',
-        name: 'Essentials',
-        description: 'Home, calendar, announcements, documents, resources and pages.',
-        includedModules: ['home', 'calendar', 'announcements', 'documents', 'resources', 'quick_links', 'pages', 'action_required', 'search'],
-        storageLimitMb: 2048,
-        staffUserLimit: 15,
-      },
-      {
-        id: 'complete',
-        name: 'Complete',
-        description: 'Every core module, including community, volunteer, directory, forms and newsletter.',
-        includedModules: CORE,
-        storageLimitMb: 10240,
-        staffUserLimit: null,
-      },
-    ])
-    .onConflictDoNothing();
+  // Plans come from the catalog (marketing/src/config/site.ts).
+  await syncPlans(db);
 
   const ownerId = await ensureOwnerAccount();
   if (ownerId) await db.insert(platformAdmins).values({ userId: ownerId, role: 'owner' }).onConflictDoNothing();
@@ -70,7 +50,7 @@ async function main() {
     const root = process.env.PLATFORM_ROOT_DOMAIN;
     await provisionTenant({
       ...ST_MARY,
-      planId: 'complete',
+      planId: 'autonomous',
       ownerUserId: ownerId,
       subdomainHost: root && root !== 'localhost' ? `${ST_MARY.slug}.${root}` : undefined,
     });
