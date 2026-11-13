@@ -1,11 +1,12 @@
 import { Fragment } from 'react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { asc } from 'drizzle-orm';
 import { withTenant } from '@/server/db/client';
 import { rolePermissions, roles } from '@/server/db/schema';
-import { hasAnywhere } from '@/server/rbac/authorize';
+import { can, hasAnywhere } from '@/server/rbac/authorize';
 import { PERMISSIONS } from '@/server/rbac/permissions';
-import { requireStaff } from '@/server/request';
+import { requireStaff, tenantBase } from '@/server/request';
 
 export const metadata = { title: 'Roles & Permissions' };
 
@@ -18,6 +19,8 @@ export default async function RolesPage({ params }: Props) {
     roleRows: await tx.select().from(roles).orderBy(asc(roles.createdAt)),
     perms: await tx.select().from(rolePermissions),
   }));
+  const base = await tenantBase((await params).tenant);
+  const manage = can(ctx, 'roles.manage');
   const has = new Set(perms.map((p) => `${p.roleId}:${p.permission}`));
   const groups = [...new Set(PERMISSIONS.map((p) => p.group))];
 
@@ -28,10 +31,26 @@ export default async function RolesPage({ params }: Props) {
           <h1>Roles & Permissions</h1>
           <p>
             What each role can do. Anything not ticked is denied. Roles can be given for the whole school or limited
-            to a grade or audience.
+            to a grade or audience. Built-in roles are fixed; make a custom role to change what someone can do.
           </p>
         </div>
+        {manage && (
+          <Link className="btn btn-primary" href={`${base}/admin/roles/new`}>
+            New role
+          </Link>
+        )}
       </div>
+      <section className="panel">
+        <ul className="role-list">
+          {roleRows.map((r) => (
+            <li key={r.id}>
+              <Link href={`${base}/admin/roles/${r.id}`}>{r.name}</Link>
+              <span className="muted">{r.isOwnerRole ? 'Owner' : r.isSystem ? 'Built-in' : 'Custom'}</span>
+              {r.description && <span className="role-desc">{r.description}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
       <section className="panel">
         <div className="table-wrap">
           <table className="data matrix">

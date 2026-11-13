@@ -60,4 +60,7 @@ export function assertCanSetRolePermissions(actor: AuthzContext, role: RoleSumma
   const ceiling = schoolWidePermissions(actor);
   const exceeding = permissions.filter((p) => !ceiling.has(p));
   if (exceeding.length > 0) deny(`You cannot grant permissions you do not hold: ${exceeding.join(', ')}`);
+  // Owner-only permissions stay with the owner role; a custom role cannot carry them.
+  const ownerOnly = permissions.filter((p) => getPermission(p)?.ownerOnly);
+  if (ownerOnly.length > 0) deny(`Only the owner role can have: ${ownerOnly.join(', ')}`);
 }
