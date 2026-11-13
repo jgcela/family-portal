@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "vercel-build": "node scripts/vercel-build.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -23,6 +24,7 @@
     "@fontsource-variable/open-sans": "^5.3.0",
     "@fontsource-variable/source-serif-4": "^5.3.1",
     "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "aws4fetch": "^1.0.20",
     "better-auth": "^1.7.22",
     "drizzle-orm": "^0.45.4",
     "ical.js": "^2.2.1",

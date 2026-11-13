@@ -1,6 +1,6 @@
 /* School admin: denser, neutral chrome. Brand colour used sparingly. */
-.admin { display: grid; min-height: 100dvh; grid-template-columns: 1fr; background: var(--surface-sunken); font-size: 0.9375rem; }
-@media (min-width: 960px) { .admin { grid-template-columns: 248px 1fr; } }
+.admin { display: grid; min-height: 100dvh; grid-template-columns: minmax(0, 1fr); background: var(--surface-sunken); font-size: 0.9375rem; }
+@media (min-width: 960px) { .admin { grid-template-columns: 248px minmax(0, 1fr); } }
 
 .admin-side { background: var(--color-surface); border-right: 1px solid var(--border); padding: var(--space-4); }
 .admin-school { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); margin-bottom: var(--space-4); }
@@ -15,6 +15,7 @@
 .admin-nav a:hover { background: var(--surface-sunken); }
 .admin-nav a[aria-current='page'] { background: color-mix(in srgb, var(--color-primary) 10%, transparent); color: var(--color-link); font-weight: 600; }
 @media (max-width: 959px) {
+  .admin { grid-template-rows: auto 1fr; }
   .admin-nav { display: flex; gap: var(--space-2); overflow-x: auto; }
   .admin-nav h2 { display: none; }
   .admin-nav ul { display: flex; }
@@ -138,3 +139,5 @@ fieldset.panel { padding: 0; min-width: 0; }
 .add-block { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: end; }
 .color-grid .field, .form-row-2 .field { align-content: start; }
 .color-input input:not([type='color']) { flex: 1; min-width: 0; }
+.copy-link { display: inline-flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-left: var(--space-2); }
+.copy-link code { font-size: 0.8rem; background: var(--surface-sunken); padding: 2px 6px; border-radius: 4px; word-break: break-all; }

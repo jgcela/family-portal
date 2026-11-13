@@ -109,7 +109,7 @@ export const MODULES: ModuleDefinition[] = [
     description: 'Uploaded files with versions, stable links and private delivery.',
     category: 'core',
     stage: 'core',
-    implemented: false,
+    implemented: true,
     configSchema: z.object({ maxUploadMb: z.number().int().min(1).max(50).default(25) }).strict(),
     permissions: ['documents.upload', 'documents.publish', 'documents.delete'],
     dependencies: [],
