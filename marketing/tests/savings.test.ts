@@ -18,6 +18,7 @@ describe('Potential Savings Calculator', () => {
 
   it('rejects values outside the allowed range', () => {
     expect(validateField('sharePercent', '120')).toMatch(/0 to 100/);
+    expect(validateField('hourlyCost', '5')).toMatch(/10 to 100/);
     expect(validateField('weeksPerYear', '0')).toMatch(/1 to 52/);
     expect(validateField('tasksPerWeek', '')).toBe('Enter a number.');
     expect(validateField('hourlyCost', '28')).toBeNull();
