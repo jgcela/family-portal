@@ -1,7 +1,6 @@
-import Link from 'next/link';
 import { getPortalView, requireStaff, tenantBase } from '@/server/request';
 import { hasAnywhere } from '@/server/rbac/authorize';
-import { AdminNavLink } from './nav-link';
+import { AdminShell } from '@/app/_shell/admin-shell';
 import './admin.css';
 
 type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
@@ -59,60 +58,33 @@ export default async function AdminLayout({ children, params }: Props) {
     .slice(0, 2)
     .toUpperCase();
 
+  const groups = sections
+    .map((s) => ({
+      title: s.title,
+      items: s.items.filter((i) => i.show).map((i) => ({ href: i.href, label: i.label, exact: i.href === a })),
+    }))
+    .filter((g) => g.items.length > 0);
+
   return (
-    <div className="admin">
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <aside className="admin-side">
-        <div className="admin-school">
-          <span className="admin-school-mark" aria-hidden="true">
-            {initials}
-          </span>
-          <div>
-            <div className="admin-school-name">{view.profile.shortName ?? view.profile.displayName}</div>
-            <div className="muted" style={{ fontSize: '0.8rem' }}>
-              {user.name}
-            </div>
-          </div>
-        </div>
-        <nav className="admin-nav" aria-label="Administration">
-          {sections.map((s) => {
-            const items = s.items.filter((i) => i.show);
-            if (!items.length) return null;
-            return (
-              <div key={s.title}>
-                <h2>{s.title}</h2>
-                <ul>
-                  {items.map((i) => (
-                    <li key={i.href}>
-                      <AdminNavLink href={i.href}>{i.label}</AdminNavLink>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-          <div>
-            <h2>Portal</h2>
-            <ul>
-              <li>
-                <Link href={base || '/'}>View family portal</Link>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </aside>
-      <main id="main" className="admin-main">
-        {ctx.support && (
+    <AdminShell
+      mark={{ text: initials }}
+      title={view.profile.shortName ?? view.profile.displayName}
+      subtitle="School admin"
+      groups={groups}
+      navLabel="Administration"
+      userName={user.name}
+      portalHref={base || '/'}
+      banner={
+        ctx.support && (
           <p className="notice support-banner" role="status">
             <strong>Platform support session.</strong> Read-only access approved by the school, until{' '}
             {ctx.support.expiresAt.toLocaleString('en-US', { timeZone: tenant.timezone, dateStyle: 'medium', timeStyle: 'short' })}. Every visit is recorded in
             the school&rsquo;s activity log.
           </p>
-        )}
-        {children}
-      </main>
-    </div>
+        )
+      }
+    >
+      {children}
+    </AdminShell>
   );
 }
