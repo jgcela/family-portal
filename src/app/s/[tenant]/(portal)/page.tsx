@@ -10,7 +10,6 @@ import { listPublicAnnouncements } from '@/server/services/content';
 import { listPublicVolunteer } from '@/server/services/volunteer';
 import { OpportunityCard } from './volunteer/opportunity-card';
 import { linkHref, listMenuLinks } from '@/server/services/links';
-import { listPublicIssues } from '@/server/services/messenger';
 
 type Props = { params: Promise<{ tenant: string }> };
 
@@ -59,28 +58,7 @@ export default async function FamilyHome({ params }: Props) {
   const opportunities = volBlocks.length
     ? await listPublicVolunteer(tenant.id, await getViewer(tenant.id), { limit: Math.max(...volBlocks.map((b) => num(b.settings.limit, 3, 1, 12))) })
     : [];
-  const latestIssue = content.some((b) => b.type === 'newsletter') ? ((await listPublicIssues(tenant.id, await getViewer(tenant.id), { limit: 1 }))[0] ?? null) : null;
   const renderBlock = (b: HomepageBlock) => {
-    if (b.type === 'newsletter') {
-      if (!latestIssue) return <p className="muted">No issues yet.</p>;
-      return (
-        <div>
-          <p className="muted messenger-date">
-            {new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${latestIssue.issueDate}T12:00:00Z`))}
-          </p>
-          <h3 className="messenger-title">
-            <Link href={`${base}/messenger/${latestIssue.id}`}>{latestIssue.title}</Link>
-          </h3>
-          {latestIssue.highlights.length > 0 && (
-            <ul className="messenger-highlights">
-              {latestIssue.highlights.map((h) => (
-                <li key={h}>{h}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      );
-    }
     if (b.type === 'quick-access') {
       return (
         <ul className="quick-links">
@@ -183,7 +161,6 @@ export default async function FamilyHome({ params }: Props) {
                   {(b.type === 'this-week' || b.type === 'upcoming-events') && <Link href={`${base}/calendar`}>Full calendar</Link>}
                   {b.type === 'school-updates' && <Link href={`${base}/updates`}>All updates</Link>}
                   {b.type === 'volunteer' && <Link href={`${base}/volunteer`}>All opportunities</Link>}
-                  {b.type === 'newsletter' && <Link href={`${base}/messenger`}>All issues</Link>}
                 </div>
                 {renderBlock(b)}
               </section>
