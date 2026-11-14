@@ -37,6 +37,14 @@ describe('theme tokens', () => {
     expect(contrastRatio(vars['--color-text']!, bad.colors.background)).toBeGreaterThanOrEqual(4.5);
   });
 
+  it('derives a readable tint and accent-on-primary for any brand colours', () => {
+    const vars = compileTheme({ ...DEFAULT_THEME, colors: { ...DEFAULT_THEME.colors, primary: '#16335B', secondary: '#006D8F', accent: '#FCBC40' } });
+    expect(contrastRatio(vars['--color-on-tint']!, vars['--color-tint']!)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(vars['--color-accent-on-primary']!, '#16335B')).toBeGreaterThanOrEqual(4.5);
+    const pale = compileTheme({ ...DEFAULT_THEME, colors: { ...DEFAULT_THEME.colors, primary: '#4A90D9', accent: '#FFE680' } });
+    expect(contrastRatio(pale['--color-accent-on-primary']!, '#4A90D9')).toBeGreaterThanOrEqual(4.5);
+  });
+
   it('rejects CSS injection, unknown fonts and non-https images', () => {
     const inject = { ...DEFAULT_THEME, colors: { ...DEFAULT_THEME.colors, primary: 'red;}body{display:none' } };
     expect(themeTokensSchema.safeParse(inject).success).toBe(false);

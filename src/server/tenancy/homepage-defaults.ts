@@ -16,6 +16,7 @@ export const HOMEPAGE_BLOCK_TYPES = [
   'custom-content',
   'school-message',
   'calendar-alert',
+  'documents',
 ] as const;
 
 export const homepageBlockSchema = z
@@ -47,7 +48,13 @@ export const DEFAULT_HOMEPAGE: HomepageBlock[] = [
 export type BlockInfo = { label: string; description: string; module: string | null; rendered: boolean };
 
 export const BLOCK_INFO: Record<HomepageBlock['type'], BlockInfo> = {
-  welcome: { label: 'Welcome banner', description: 'Greeting and headline at the top of the page.', module: null, rendered: true },
+  welcome: {
+    label: 'Welcome banner',
+    description: 'Wide band at the top: headline, a short line, a document search box and popular links.',
+    module: null,
+    rendered: true,
+  },
+  documents: { label: 'Family documents', description: 'All published documents, grouped by category, with a filter box.', module: 'documents', rendered: true },
   'this-week': { label: 'This week', description: 'Events from the calendar for the next few days.', module: 'calendar', rendered: true },
   'upcoming-events': { label: 'Upcoming events', description: 'The next events on the calendar.', module: 'calendar', rendered: true },
   'school-updates': { label: 'School updates', description: 'Latest published announcements.', module: 'announcements', rendered: true },
@@ -71,7 +78,15 @@ const int = (min: number, max: number) => z.number().int().min(min).max(max);
 
 /** Settings each rendered block accepts. Unknown keys are rejected. */
 export const BLOCK_SETTINGS: Partial<Record<HomepageBlock['type'], z.ZodType>> = {
-  welcome: z.object({}).strict(),
+  welcome: z
+    .object({
+      eyebrow: z.string().trim().max(80).optional(),
+      intro: z.string().trim().max(200).optional(),
+      search: z.boolean().optional(),
+      popular: z.boolean().optional(),
+    })
+    .strict(),
+  documents: z.object({ intro: z.string().trim().max(200).optional() }).strict(),
   'this-week': z.object({ days: int(1, 21).optional() }).strict(),
   'upcoming-events': z.object({ withinDays: int(7, 180).optional(), limit: int(1, 20).optional() }).strict(),
   'school-updates': z.object({ limit: int(1, 20).optional() }).strict(),

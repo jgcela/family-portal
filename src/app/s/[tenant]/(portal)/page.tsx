@@ -1,8 +1,14 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { getDisplayView, getSession, getTenantOr404, tenantBase, getViewer } from '@/server/request';
 import { BLOCK_INFO, CALENDAR_ALERT_DEFAULTS, type HomepageBlock } from '@/server/tenancy/homepage-defaults';
 import { renderMarkdown } from '@/server/content/markdown';
-import { listPublicOccurrences } from '@/server/services/calendar';
+import { listCalendars, listPublicOccurrences } from '@/server/services/calendar';
+import { listPublicDocuments } from '@/server/services/documents';
+import { WeekAgenda } from './calendar/week-agenda';
+import { DocGroups } from './documents/doc-groups';
+import { toDocItems } from './documents/doc-items';
+import { Icon } from './portal-icons';
 import { addDays, toDateStr } from '@/server/calendar/time';
 import { EventList } from './calendar/event-list';
 import { AnnouncementList } from './updates/announcement-list';
@@ -40,9 +46,15 @@ export default async function FamilyHome({ params }: Props) {
     if (b.type === 'custom-content' && !(typeof b.settings.body === 'string' && b.settings.body.trim())) return false;
     return !info.module || active.has(info.module);
   });
-  const quickLinks = blocks.some((b) => b.type === 'quick-access') ? await listMenuLinks(tenant.id, 'quick', await getViewer(tenant.id)) : [];
+  const quickLinks =
+    blocks.some((b) => b.type === 'quick-access' || (b.type === 'welcome' && b.settings.popular !== false)) && active.has('quick_links')
+      ? await listMenuLinks(tenant.id, 'quick', await getViewer(tenant.id))
+      : [];
   // A Quick access block with nothing to show is left out rather than shown empty.
-  const content = blocks.filter((b) => b.type !== 'welcome' && b.type !== 'calendar-alert' && (b.type !== 'quick-access' || quickLinks.length > 0));
+  const welcome = blocks.find((b) => b.type === 'welcome');
+  const wantPopular = !!welcome && welcome.settings.popular !== false && active.has('quick_links');
+  const docBlocks = blocks.filter((b) => b.type === 'documents');
+  const content = blocks.filter((b) => !['welcome', 'calendar-alert', 'documents'].includes(b.type) && (b.type !== 'quick-access' || quickLinks.length > 0));
   const alertBlocks = blocks.filter((b) => b.type === 'calendar-alert');
   const today = toDateStr(new Date(), tenant.timezone);
   // Calendar blocks share one query over the longest window any of them needs.
@@ -61,7 +73,7 @@ export default async function FamilyHome({ params }: Props) {
   const renderBlock = (b: HomepageBlock) => {
     if (b.type === 'quick-access') {
       return (
-        <ul className="quick-links">
+        <ul className="quick-links chip-row">
           {quickLinks.map((l) => (
             <li key={l.id}>
               <a href={linkHref(l, base)} {...(l.opensInNewTab ? { target: '_blank', rel: 'noopener' } : {})}>
@@ -94,11 +106,13 @@ export default async function FamilyHome({ params }: Props) {
       const days = num(b.settings.days, 7, 1, 21);
       const end = addDays(today, days - 1);
       return (
-        <EventList
+        <WeekAgenda
           items={occurrences.filter((o) => o.date <= end)}
           base={base}
           tz={tenant.timezone}
-          emptyText={`Nothing on the calendar for the next ${days} days.`}
+          today={today}
+          days={days}
+          alertCategories={alertBlocks.map(alertCategory)}
         />
       );
     }
@@ -130,62 +144,145 @@ export default async function FamilyHome({ params }: Props) {
     .filter((x) => x !== null);
   const p = view.profile;
   const firstName = session?.user.name?.split(' ')[0];
+  const docs = docBlocks.length ? toDocItems(await listPublicDocuments(tenant.id, await getViewer(tenant.id))) : [];
+  const subscribeCal = active.has('calendar') ? (await listCalendars(tenant.id)).find((c) => c.isPublic) : undefined;
+  const host = (await headers()).get('host') ?? '';
+  const tel = p.phone ? `tel:${p.phone.replace(/[^\d+]/g, '').replace(/^(\d{10})$/, '+1$1')}` : null;
+  const todayLabel = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(`${today}T12:00:00Z`));
 
   return (
-    <div className="container">
+    <>
       {alerts.map(({ block, o }) => (
-        <div key={block.id} className="calendar-alert" role="status">
-          <p>
-            {block.title && <span className="calendar-alert-label">{block.title} </span>}
-            <strong>
-              {dayRange(o.date, o.endDate)}: {o.title}
-            </strong>
-          </p>
-          <Link href={`${base}/calendar`}>See the calendar</Link>
+        <div key={block.id} className="alert-band" role="status">
+          <div className="container alert-band-inner">
+            <p>
+              <Icon name="calendar" />
+              {block.title && <span className="calendar-alert-label">{block.title} </span>}
+              <strong>
+                {dayRange(o.date, o.endDate)}: {o.title}
+              </strong>
+            </p>
+            <Link href={`${base}/calendar`}>See the calendar</Link>
+          </div>
         </div>
       ))}
-      {blocks.map((b) =>
-        b.type === 'welcome' ? (
-          <section key={b.id} className="home-hero" aria-labelledby="welcome-title">
-            <p className="home-eyebrow">{firstName ? `Welcome back, ${firstName}` : p.displayName}</p>
-            <h1 id="welcome-title">{b.title ?? p.tagline ?? 'Everything your family needs, in one place.'}</h1>
-          </section>
-        ) : null,
-      )}
-      <div className={content.length ? 'home-grid' : 'home-grid home-grid-single'}>
-        <div hidden={!content.length}>
-          {content.map((b) => (
-              <section key={b.id} className="card home-block" aria-labelledby={b.title || b.type !== 'custom-content' ? `block-${b.id}` : undefined}>
-                <div className="section-title" hidden={!b.title && b.type === 'custom-content'}>
-                  <h2 id={`block-${b.id}`}>{b.title || BLOCK_INFO[b.type].label}</h2>
-                  {(b.type === 'this-week' || b.type === 'upcoming-events') && <Link href={`${base}/calendar`}>Full calendar</Link>}
-                  {b.type === 'school-updates' && <Link href={`${base}/updates`}>All updates</Link>}
-                  {b.type === 'volunteer' && <Link href={`${base}/volunteer`}>All opportunities</Link>}
+      {welcome && (
+        <section className="hero-band" aria-labelledby="welcome-title">
+          <div className="container hero-inner">
+            <p className="hero-eyebrow">
+              {typeof welcome.settings.eyebrow === 'string' && welcome.settings.eyebrow ? welcome.settings.eyebrow : firstName ? `Welcome back, ${firstName}` : p.displayName}
+            </p>
+            <h1 id="welcome-title">{welcome.title ?? p.tagline ?? 'Everything your family needs, in one place.'}</h1>
+            {typeof welcome.settings.intro === 'string' && welcome.settings.intro && <p className="hero-intro">{welcome.settings.intro}</p>}
+            {welcome.settings.search !== false && active.has('documents') && (
+              <form className="hero-search" action={`${base}/documents`} method="get" role="search">
+                <label htmlFor="hero-q">Search forms and documents</label>
+                <div className="hero-search-box">
+                  <Icon name="search" />
+                  <input id="hero-q" name="q" type="search" placeholder="Try “medical form” or “handbook”" autoComplete="off" maxLength={100} />
+                  <button type="submit" className="visually-hidden">
+                    Search
+                  </button>
                 </div>
-                {renderBlock(b)}
-              </section>
-            ))}
-        </div>
-        <aside aria-labelledby="office-title">
-          <div className="card contact-card">
-            <div className="accent-rule" aria-hidden="true" />
-            <h2 id="office-title">Need the front office?</h2>
-            {p.officeHours && <p>{p.officeHours}</p>}
-            {p.phone && (
-              <div>
-                <p className="label">Call</p>
-                <a href={`tel:${p.phone.replace(/[^\d+]/g, '').replace(/^(\d{10})$/, '+1$1')}`}>{p.phone}</a>
-              </div>
+              </form>
             )}
-            {p.email && (
-              <div>
-                <p className="label">Email</p>
-                <a href={`mailto:${p.email}`}>{p.email}</a>
+            {wantPopular && quickLinks.length > 0 && (
+              <div className="hero-popular">
+                <span>Popular:</span>
+                <ul className="chip-row">
+                  {quickLinks.map((l) => (
+                    <li key={l.id}>
+                      <a href={linkHref(l, base)} {...(l.opensInNewTab ? { target: '_blank', rel: 'noopener' } : {})}>
+                        {l.label}
+                        {l.opensInNewTab && <span className="visually-hidden"> (opens in a new tab)</span>}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
+        </section>
+      )}
+      <div className={`container home-grid${content.length ? '' : ' home-grid-single'}`}>
+        <div hidden={!content.length} className="home-col">
+          {content.map((b) => (
+            <section key={b.id} className="home-section" aria-labelledby={b.title || b.type !== 'custom-content' ? `block-${b.id}` : undefined}>
+              {b.type === 'this-week' && <p className="section-eyebrow">Today is {todayLabel}</p>}
+              <div className="section-title" hidden={!b.title && b.type === 'custom-content'}>
+                <h2 id={`block-${b.id}`}>{b.title || BLOCK_INFO[b.type].label}</h2>
+              </div>
+              {renderBlock(b)}
+              {(b.type === 'this-week' || b.type === 'upcoming-events') && (
+                <p className="section-more">
+                  <Link href={`${base}/calendar`}>See the full calendar</Link>
+                </p>
+              )}
+              {b.type === 'school-updates' && (
+                <p className="section-more">
+                  <Link href={`${base}/updates`}>All updates</Link>
+                </p>
+              )}
+              {b.type === 'volunteer' && (
+                <p className="section-more">
+                  <Link href={`${base}/volunteer`}>All opportunities</Link>
+                </p>
+              )}
+            </section>
+          ))}
+        </div>
+        <aside className="home-aside" aria-label="Calendar and contact">
+          {subscribeCal && (
+            <div className="side-card side-card-tint">
+              <Icon name="phone" />
+              <h2>Get the calendar on your phone</h2>
+              <p>Subscribe once. New events and changes show up in your own calendar automatically.</p>
+              <a className="btn btn-primary btn-block" href={`${base}/calendar/feed/${subscribeCal.key}.ics?google=1`}>
+                Add to Google Calendar
+              </a>
+              <a className="btn btn-block btn-outline" href={`webcal://${host}${base}/calendar/feed/${subscribeCal.key}.ics`}>
+                Apple or Outlook (iCal)
+              </a>
+            </div>
+          )}
+          {(p.phone || p.email || p.officeHours) && (
+            <div className="side-card" id="contact">
+              <h2>Need the front office?</h2>
+              <ul className="contact-list">
+                {p.phone && (
+                  <li>
+                    <Icon name="call" />
+                    <a href={tel!}>{p.phone}</a>
+                  </li>
+                )}
+                {p.email && (
+                  <li>
+                    <Icon name="mail" />
+                    <a href={`mailto:${p.email}`}>{p.email}</a>
+                  </li>
+                )}
+                {p.officeHours && (
+                  <li>
+                    <Icon name="clock" />
+                    <span>{p.officeHours}</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
         </aside>
       </div>
-    </div>
+      {docBlocks.map((b) => (
+        <section key={b.id} className="tint-band" id="documents" aria-labelledby={`block-${b.id}`}>
+          <div className="container">
+            <div className="section-title">
+              <h2 id={`block-${b.id}`}>{b.title || BLOCK_INFO.documents.label}</h2>
+            </div>
+            {typeof b.settings.intro === 'string' && b.settings.intro && <p className="section-intro">{b.settings.intro}</p>}
+            <DocGroups items={docs} base={base} />
+          </div>
+        </section>
+      ))}
+    </>
   );
 }

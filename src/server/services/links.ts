@@ -18,7 +18,8 @@ export type LinkRow = typeof navigationItems.$inferSelect;
 export const LINK_MENUS = {
   primary: { label: 'Main menu', hint: 'Added after the module links at the top of every page.' },
   header: { label: 'Header button', hint: 'A highlighted button next to "Sign in", such as a FACTS login.' },
-  quick: { label: 'Quick access', hint: 'The list of shortcuts on the homepage.' },
+  quick: { label: 'Quick access', hint: 'Shortcuts on the homepage ("Popular" under the search box, or the Quick access block).' },
+  top: { label: 'Top bar', hint: 'Small links in the thin bar above the header, such as Volunteer or a newsletter.' },
 } as const;
 export type LinkMenu = keyof typeof LINK_MENUS;
 export const MAX_LINKS_PER_MENU = 12;
@@ -37,7 +38,7 @@ export function safePortalPath(raw: string): string | null {
 
 export const linkInputSchema = z
   .object({
-    menu: z.enum(['primary', 'header', 'quick']),
+    menu: z.enum(['primary', 'header', 'quick', 'top']),
     label: z.string().trim().min(1, 'Label is required.').max(60, 'Label is too long (60 characters maximum).'),
     target: z.string().trim().min(1, 'Link is required.').max(2048),
     visibility: z.enum(['public', 'families', 'staff']).default('public'),
