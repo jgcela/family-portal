@@ -208,3 +208,5 @@ fieldset.panel { padding: 0; min-width: 0; }
 .bulk-state.is-ok { color: var(--success); }
 .bulk-state.is-error { color: var(--danger); white-space: normal; }
 @media (max-width: 560px) { .bulk-item { grid-template-columns: 1fr; } }
+
+.cell-url { overflow-wrap: anywhere; max-width: 32ch; }

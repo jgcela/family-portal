@@ -78,9 +78,9 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 3 | Pie con nombre y ciudad | Perfil del colegio | 2 | ☑ |
 | 4 | Enlace "Skip to content" | Layout compartido | 2 | ☑ |
 | 5 | Navegación superior (Messenger, Volunteer, Wishlists, Staff favorites) | Navegación configurable + módulos | 3–4 | ☐ |
-| 6 | Botón FACTS Login | Quick Links | 3–4 | ☐ |
+| 6 | Botón FACTS Login | Quick Links (botón de cabecera) | 3–4 | ◐ (función lista; falta crearlo en producción) |
 | 7 | Buscador "forms, events and policies" | Módulo Search | 4 | ☐ |
-| 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links / Featured Resources | 3–4 | ☐ |
+| 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links (bloque Quick access) | 3–4 | ◐ (función lista; falta crearlos en producción; Wishlists espera su módulo) |
 | 9 | "This week and next" | Bloque This Week (calendario, días configurables) | 3–4 | ☑ |
 | 10 | Calendario mes/lista con leyenda por categorías | Calendar & Events | 3–4 | ☑ |
 | 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (`.ics` generado desde `EVENTS`) | 3 / 6 | ◐ (archivo listo; falta importarlo en producción) |

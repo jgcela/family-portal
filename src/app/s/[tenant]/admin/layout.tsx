@@ -28,6 +28,7 @@ export default async function AdminLayout({ children, params }: Props) {
       items: [
         { href: `${a}/design/theme`, label: 'Theme', show: hasAnywhere(ctx, 'branding.manage') },
         { href: `${a}/design/homepage`, label: 'Homepage', show: hasAnywhere(ctx, 'homepage.edit') },
+        { href: `${a}/links`, label: 'Links', show: hasAnywhere(ctx, 'navigation.manage') },
       ],
     },
     {

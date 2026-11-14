@@ -139,7 +139,7 @@ export const MODULES: ModuleDefinition[] = [
     description: 'Shortcuts such as FACTS, lunch menu or supply list.',
     category: 'core',
     stage: 'core',
-    implemented: false,
+    implemented: true,
     configSchema: empty,
     permissions: ['navigation.manage'],
     dependencies: [],

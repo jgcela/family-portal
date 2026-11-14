@@ -53,7 +53,7 @@ export const BLOCK_INFO: Record<HomepageBlock['type'], BlockInfo> = {
   'custom-content': { label: 'Custom message', description: 'A short text written by the school (Markdown).', module: null, rendered: true },
   'action-required': { label: 'Action required', description: 'Forms and tasks families must complete.', module: 'action_required', rendered: false },
   'your-children': { label: 'Your children', description: 'Per-child information for signed-in families.', module: 'student_profiles', rendered: false },
-  'quick-access': { label: 'Quick access', description: 'Shortcuts to common links.', module: 'quick_links', rendered: false },
+  'quick-access': { label: 'Quick access', description: 'Shortcuts to common links.', module: 'quick_links', rendered: true },
   'featured-resources': { label: 'Featured resources', description: 'Highlighted documents and resources.', module: 'resources', rendered: false },
   newsletter: { label: 'Newsletter', description: 'Latest newsletter issue.', module: 'messenger', rendered: false },
   volunteer: { label: 'Volunteer', description: 'Open volunteer opportunities.', module: 'volunteer', rendered: true },

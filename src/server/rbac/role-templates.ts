@@ -44,6 +44,7 @@ const TEMPLATES: RoleTemplate[] = [
       'media.delete',
       'homepage.edit',
       'homepage.publish',
+      'navigation.manage',
       'notifications.send',
       'modules.view',
     ],

@@ -9,6 +9,7 @@ import { AnnouncementList } from './updates/announcement-list';
 import { listPublicAnnouncements } from '@/server/services/content';
 import { listPublicVolunteer } from '@/server/services/volunteer';
 import { OpportunityCard } from './volunteer/opportunity-card';
+import { linkHref, listMenuLinks } from '@/server/services/links';
 
 type Props = { params: Promise<{ tenant: string }> };
 
@@ -27,7 +28,9 @@ export default async function FamilyHome({ params }: Props) {
     if (b.type === 'custom-content' && !(typeof b.settings.body === 'string' && b.settings.body.trim())) return false;
     return !info.module || active.has(info.module);
   });
-  const content = blocks.filter((b) => b.type !== 'welcome');
+  const quickLinks = blocks.some((b) => b.type === 'quick-access') ? await listMenuLinks(tenant.id, 'quick', await getViewer(tenant.id)) : [];
+  // A Quick access block with nothing to show is left out rather than shown empty.
+  const content = blocks.filter((b) => b.type !== 'welcome' && (b.type !== 'quick-access' || quickLinks.length > 0));
   const today = toDateStr(new Date(), tenant.timezone);
   // Calendar blocks share one query over the longest window any of them needs.
   const calBlocks = content.filter((b) => b.type === 'this-week' || b.type === 'upcoming-events');
@@ -42,6 +45,20 @@ export default async function FamilyHome({ params }: Props) {
     ? await listPublicVolunteer(tenant.id, await getViewer(tenant.id), { limit: Math.max(...volBlocks.map((b) => num(b.settings.limit, 3, 1, 12))) })
     : [];
   const renderBlock = (b: HomepageBlock) => {
+    if (b.type === 'quick-access') {
+      return (
+        <ul className="quick-links">
+          {quickLinks.map((l) => (
+            <li key={l.id}>
+              <a href={linkHref(l, base)} {...(l.opensInNewTab ? { target: '_blank', rel: 'noopener' } : {})}>
+                {l.label}
+                {l.opensInNewTab && <span className="visually-hidden"> (opens in a new tab)</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      );
+    }
     if (b.type === 'volunteer') {
       const list = opportunities.slice(0, num(b.settings.limit, 3, 1, 12));
       return list.length ? (

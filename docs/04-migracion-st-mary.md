@@ -99,7 +99,7 @@ En Admin → **Documents** → **Upload several**, sube una tanda por categoría
 
 ### Lo que no es un PDF
 
-- **Curriculum Standards** es un enlace externo (denvercatholicschools.com). Irá en Quick links cuando exista ese módulo.
+- **Curriculum Standards** es un enlace externo (denvercatholicschools.com). Va en Quick access (paso 5).
 - **Manual en HTML** (`handbook.html`, `preschool-handbook.html`): el PDF cubre el mismo contenido. Pasarlo a una página con índice es opcional.
 
 ## 4. Voluntariado (12 oportunidades)
@@ -113,6 +113,26 @@ Archivo: `st-mary-volunteer.json` (carpeta `fase6` de los archivos del proyecto)
 
 Por defecto solo las ven las familias con sesión iniciada. Los visitantes ven un aviso para iniciar sesión.
 
-## 5. Lo que falta (aún no se puede migrar)
+## 5. Botón FACTS y accesos rápidos
 
-Quick links (botón FACTS, "Popular"), Teacher wishlists (18 listas), Staff favorites, archivo del School Messenger (13 boletines) y el aviso automático "No school". Esos módulos todavía no existen en la plataforma.
+Hazlo después de subir los PDF, porque varios enlaces apuntan a ellos.
+
+1. Admin → **Modules** → activa **Quick Links**.
+2. Admin → **Links** → **New link**, una vez por fila:
+
+| Dónde | Label | Link | Nueva pestaña |
+|---|---|---|---|
+| Header button | FACTS Login | `https://sis.factsmgt.com/accounts/Account/Login` | Sí |
+| Quick access | Student Handbook | `/d/` + link name del manual | No |
+| Quick access | Health forms | `/documents` | No |
+| Quick access | Supply list | `/d/` + link name de "School Supply List by Grade" | No |
+| Quick access | Lunch menu | `/d/` + link name de "School Eatery 2026–27" | No |
+| Quick access | Curriculum Standards | `https://www.denvercatholicschools.com/why-catholic-education/curriculum` | Sí |
+
+El "link name" de cada documento está en Admin → **Documents** → abre el documento → campo **Link name** (por ejemplo `student-handbook-2026-27`). El link queda `/d/student-handbook-2026-27`.
+
+El enlace "Teacher wishlists" del portal antiguo se añadirá cuando exista ese módulo.
+
+## 6. Lo que falta (aún no se puede migrar)
+
+Teacher wishlists (18 listas), Staff favorites, archivo del School Messenger (13 boletines) y el aviso automático "No school". Esos módulos todavía no existen en la plataforma.
