@@ -16,7 +16,11 @@
 .panel-head h2 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 650; }
 .panel-body { padding: var(--space-4); }
 
-.table-wrap { overflow-x: auto; }
+.table-wrap { overflow-x: auto; position: relative; max-width: 100%; }
+/* Long content (file inputs, links) must not widen a form or a panel on phones. */
+.form > *, .field > *, .form-row > *, .panel-head > * { min-width: 0; }
+.field input[type='file'] { max-width: 100%; }
+.panel-head code, .panel-body code { overflow-wrap: anywhere; }
 table.data { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
 table.data th, table.data td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; }
 table.data thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); font-weight: 600; background: var(--surface-sunken); position: sticky; top: 0; }

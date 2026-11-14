@@ -94,7 +94,7 @@
 .agenda-title:hover { text-decoration: underline; color: var(--color-link); }
 .agenda-item.is-important .agenda-title::after { content: ' ●'; color: var(--color-accent); font-size: 0.7em; vertical-align: middle; }
 .agenda-meta { font-size: 0.875rem; color: var(--color-text-muted); }
-.cat-tag { display: inline-block; margin-left: var(--space-2); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; background: var(--surface-sunken); color: var(--color-text-muted); }
+.cat-tag { display: inline-block; margin-left: var(--space-2); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; background: var(--surface-sunken); color: var(--color-text); }
 
 /* Calendar page */
 .cal-page { padding-block: var(--space-6) var(--space-8); }
