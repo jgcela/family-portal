@@ -133,6 +133,19 @@ El "link name" de cada documento está en Admin → **Documents** → abre el do
 
 El enlace "Teacher wishlists" del portal antiguo se añadirá cuando exista ese módulo.
 
-## 6. Lo que falta (aún no se puede migrar)
+## 6. Teacher wishlists y Staff favorites
 
-Teacher wishlists (18 listas), Staff favorites, archivo del School Messenger (13 boletines) y el aviso automático "No school". Esos módulos todavía no existen en la plataforma.
+Archivo: `st-mary-community.json` (carpeta `fase6`). Trae 18 listas de Amazon y 65 fichas del personal.
+
+1. Admin → **Modules** → activa **Community**.
+2. Admin → **Community** → **Import from file** → elige el archivo → **Import**. Debería decir "83 added".
+3. Añade en Admin → **Links** un acceso rápido "Teacher wishlists" con el link `/community#wishlists`.
+
+Cambios respecto al portal antiguo:
+- Las fichas del personal solo las ven las familias con sesión iniciada. Antes las veía cualquiera con el enlace.
+- **No se han copiado las alergias ni los cumpleaños.** El portal antiguo los mostraba en abierto y no consta que el personal aceptara publicarlos. Si el colegio lo confirma, se pueden añadir a mano en cada ficha.
+- Hay tres nombres repetidos en dos equipos (Mrs. Guzman, Mrs. Roberts, Mrs. Weir) con cargos distintos. Se importan las dos fichas; revisa si son la misma persona y borra la que sobre.
+
+## 7. Lo que falta (aún no se puede migrar)
+
+Archivo del School Messenger (13 boletines) y el aviso automático "No school". Esos módulos todavía no existen en la plataforma.

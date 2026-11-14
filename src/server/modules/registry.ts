@@ -179,10 +179,10 @@ export const MODULES: ModuleDefinition[] = [
   {
     id: 'community',
     name: 'Community',
-    description: 'Community hub: groups, staff favorites, wishlists, parish links.',
+    description: 'Teacher wishlists and staff favorite things.',
     category: 'community',
     stage: 'core',
-    implemented: false,
+    implemented: true,
     configSchema: empty,
     permissions: ['community.create', 'community.publish'],
     dependencies: [],

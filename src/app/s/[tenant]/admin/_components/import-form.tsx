@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 
 type Result = { error?: string; ok?: string } | undefined;
 
-export function ImportForm({ run, canPublish }: { run: (prev: Result, fd: FormData) => Promise<Result>; canPublish: boolean }) {
+export function ImportForm({ run, canPublish, submitLabel = 'Import as drafts' }: { run: (prev: Result, fd: FormData) => Promise<Result>; canPublish: boolean; submitLabel?: string }) {
   const [state, action, pending] = useActionState(run, undefined);
   return (
     <form action={action} className="form" style={{ maxWidth: 560 }}>
@@ -25,7 +25,7 @@ export function ImportForm({ run, canPublish }: { run: (prev: Result, fd: FormDa
       </div>
       <div className="form-actions">
         <button className="btn btn-primary" type="submit" name="then" value="" disabled={pending}>
-          Import as drafts
+          {submitLabel}
         </button>
         {canPublish && (
           <button className="btn btn-accent" type="submit" name="then" value="publish" disabled={pending}>

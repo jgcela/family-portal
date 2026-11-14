@@ -241,3 +241,16 @@
   color: var(--color-link);
 }
 .quick-links a:hover { background: var(--color-background); }
+
+/* Community: wishlists and staff favorites */
+.community-jump { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-block: var(--space-3) var(--space-5); }
+.community-section { scroll-margin-top: var(--space-5); }
+.community-section + .community-section { margin-top: var(--space-7); }
+.community-section > h2 { font-size: 1.5rem; margin-bottom: var(--space-2); }
+.community-section > .muted { margin-bottom: var(--space-4); }
+.community-group { font-size: 1.1rem; margin-bottom: var(--space-3); }
+.community-name { font-size: 1.05rem; margin: 0; }
+.fav-list { display: grid; gap: var(--space-1); margin: 0; font-size: 0.9rem; }
+.fav-list div { display: grid; grid-template-columns: minmax(7em, 40%) 1fr; gap: var(--space-2); }
+.fav-list dt { color: var(--color-text-muted); }
+.fav-list dd { margin: 0; overflow-wrap: anywhere; }
