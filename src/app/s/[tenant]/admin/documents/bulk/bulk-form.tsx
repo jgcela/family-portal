@@ -131,7 +131,7 @@ export function BulkUploadForm(p: {
                 {it.state === 'error' && it.message}
               </span>
               <span className="bulk-meta">
-                {it.file.name} · {(it.file.size / 1048576).toFixed(1)} MB
+                {it.file.name} · {it.file.size < 1048576 ? `${Math.max(1, Math.round(it.file.size / 1024))} KB` : `${(it.file.size / 1048576).toFixed(1)} MB`}
               </span>
             </li>
           ))}

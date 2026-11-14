@@ -83,10 +83,10 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links / Featured Resources | 3–4 | ☐ |
 | 9 | "This week and next" | Bloque This Week (calendario, días configurables) | 3–4 | ☑ |
 | 10 | Calendario mes/lista con leyenda por categorías | Calendar & Events | 3–4 | ☑ |
-| 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (ICS de Google o script desde `EVENTS`) | 3 / 6 | ◐ (importador listo; falta migrar los datos) |
+| 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (`.ics` generado desde `EVENTS`) | 3 / 6 | ◐ (archivo listo; falta importarlo en producción) |
 | 12 | Suscripción ICS / Google Calendar | Feed ICS por calendario | 3 | ☑ |
-| 13 | PDF del calendario completo | Documents | 3 / 6 | ☐ |
-| 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ☐ |
+| 13 | PDF del calendario completo | Documents | 3 / 6 | ◐ (subida lista; falta subir el archivo) |
+| 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ◐ (subida de varios y de más de 4 MB lista; falta subir los archivos) |
 | 15 | Manual HTML con índice, buscador y PDF | Pages (página larga con índice) + Documents | 3 / 6 | ◐ (páginas con índice listas; falta migrar el texto y el PDF) |
 | 16 | Manual de Preschool (HTML + PDF) | Pages + Documents (audiencia Preschool) | 3 / 6 | ☐ |
 | 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ☐ |
