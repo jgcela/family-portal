@@ -90,7 +90,7 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 15 | Manual HTML con índice, buscador y PDF | Pages (página larga con índice) + Documents | 3 / 6 | ◐ (páginas con índice listas; falta migrar el texto y el PDF) |
 | 16 | Manual de Preschool (HTML + PDF) | Pages + Documents (audiencia Preschool) | 3 / 6 | ☐ |
 | 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ☐ |
-| 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ☐ |
+| 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
 | 19 | Teacher wishlists | Community | 4 / 6 | ☐ |
 | 20 | Staff favorites | Community / Directory | 4 / 6 | ☐ |
 | 21 | Supply list por curso | Pages (audiencia por curso) | 4 / 6 | ◐ (función lista; falta migrar el contenido) |

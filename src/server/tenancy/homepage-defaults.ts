@@ -56,7 +56,7 @@ export const BLOCK_INFO: Record<HomepageBlock['type'], BlockInfo> = {
   'quick-access': { label: 'Quick access', description: 'Shortcuts to common links.', module: 'quick_links', rendered: false },
   'featured-resources': { label: 'Featured resources', description: 'Highlighted documents and resources.', module: 'resources', rendered: false },
   newsletter: { label: 'Newsletter', description: 'Latest newsletter issue.', module: 'messenger', rendered: false },
-  volunteer: { label: 'Volunteer', description: 'Open volunteer opportunities.', module: 'volunteer', rendered: false },
+  volunteer: { label: 'Volunteer', description: 'Open volunteer opportunities.', module: 'volunteer', rendered: true },
   'school-message': { label: "Principal's message", description: 'A message from school leadership.', module: null, rendered: false },
 };
 
@@ -68,6 +68,7 @@ export const BLOCK_SETTINGS: Partial<Record<HomepageBlock['type'], z.ZodType>> =
   'this-week': z.object({ days: int(1, 21).optional() }).strict(),
   'upcoming-events': z.object({ withinDays: int(7, 180).optional(), limit: int(1, 20).optional() }).strict(),
   'school-updates': z.object({ limit: int(1, 20).optional() }).strict(),
+  volunteer: z.object({ limit: int(1, 12).optional() }).strict(),
   'custom-content': z.object({ body: z.string().max(5000).default('') }).strict(),
 };
 

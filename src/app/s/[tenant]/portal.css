@@ -208,3 +208,19 @@
 .family-grid { display: grid; gap: var(--space-5); grid-template-columns: minmax(0, 1fr); align-items: start; }
 .family-grid > .card { margin: 0; }
 @media (min-width: 900px) { .family-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Volunteer */
+.vol-group + .vol-group { margin-top: var(--space-6); }
+.vol-group h2 { font-size: 1.25rem; margin-bottom: var(--space-3); }
+.vol-grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.vol-card { background: var(--color-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-4); display: grid; gap: var(--space-3); align-content: start; scroll-margin-top: var(--space-5); }
+.vol-card h3 { font-size: 1.1rem; margin: 0; }
+.vol-head .muted { margin: 2px 0 0; font-size: 0.9rem; }
+.vol-kind { display: inline-block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-link); margin-bottom: 2px; }
+.vol-facts { display: grid; gap: 2px; margin: 0; font-size: 0.9rem; }
+.vol-facts div { display: grid; grid-template-columns: 4.5em 1fr; gap: var(--space-2); }
+.vol-facts dt { color: var(--color-text-muted); }
+.vol-facts dd { margin: 0; }
+.vol-card .prose { font-size: 0.95rem; }
+.home-block .vol-grid { grid-template-columns: 1fr; gap: var(--space-3); }
+.home-block .vol-card { padding: var(--space-3); }

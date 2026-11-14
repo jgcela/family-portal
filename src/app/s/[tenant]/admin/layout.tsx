@@ -20,6 +20,7 @@ export default async function AdminLayout({ children, params }: Props) {
         { href: `${a}/calendar`, label: 'Calendar & Events', show: hasAnywhere(ctx, 'events.view') },
         { href: `${a}/pages`, label: 'School pages', show: hasAnywhere(ctx, 'pages.view') },
         { href: `${a}/documents`, label: 'Documents', show: hasAnywhere(ctx, 'documents.view') },
+        { href: `${a}/volunteer`, label: 'Volunteer', show: hasAnywhere(ctx, 'volunteer.view') },
       ],
     },
     {

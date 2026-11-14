@@ -102,6 +102,17 @@ En Admin → **Documents** → **Upload several**, sube una tanda por categoría
 - **Curriculum Standards** es un enlace externo (denvercatholicschools.com). Irá en Quick links cuando exista ese módulo.
 - **Manual en HTML** (`handbook.html`, `preschool-handbook.html`): el PDF cubre el mismo contenido. Pasarlo a una página con índice es opcional.
 
-## 4. Lo que falta (aún no se puede migrar)
+## 4. Voluntariado (12 oportunidades)
 
-Quick links (botón FACTS, "Popular"), Volunteer (12 oportunidades), Teacher wishlists (18 listas), Staff favorites, archivo del School Messenger (13 boletines) y el aviso automático "No school". Esos módulos todavía no existen en la plataforma.
+Archivo: `st-mary-volunteer.json` (carpeta `fase6` de los archivos del proyecto). No está en el repositorio porque lleva emails y teléfonos personales de voluntarios.
+
+1. Admin → **Modules** → activa **Volunteer**.
+2. Admin → **Volunteer** → **Import**.
+3. Elige el archivo. Marca "Publish now" si quieres que se vean ya.
+4. **Import**. Debería decir "12 added". Si lo importas otra vez, salta las que ya existen por título.
+
+Por defecto solo las ven las familias con sesión iniciada. Los visitantes ven un aviso para iniciar sesión.
+
+## 5. Lo que falta (aún no se puede migrar)
+
+Quick links (botón FACTS, "Popular"), Teacher wishlists (18 listas), Staff favorites, archivo del School Messenger (13 boletines) y el aviso automático "No school". Esos módulos todavía no existen en la plataforma.

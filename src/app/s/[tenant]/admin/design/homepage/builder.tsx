@@ -20,6 +20,7 @@ const NUMBER_SETTINGS: Partial<Record<HomepageBlock['type'], NumField[]>> = {
     { key: 'limit', label: 'Most events shown', min: 1, max: 20, def: 5 },
   ],
   'school-updates': [{ key: 'limit', label: 'Most updates shown', min: 1, max: 20, def: 4 }],
+  volunteer: [{ key: 'limit', label: 'Most opportunities shown', min: 1, max: 12, def: 3 }],
 };
 
 const ADDABLE = HOMEPAGE_BLOCK_TYPES.filter((t) => BLOCK_INFO[t].rendered);

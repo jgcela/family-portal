@@ -7,6 +7,8 @@ import { addDays, toDateStr } from '@/server/calendar/time';
 import { EventList } from './calendar/event-list';
 import { AnnouncementList } from './updates/announcement-list';
 import { listPublicAnnouncements } from '@/server/services/content';
+import { listPublicVolunteer } from '@/server/services/volunteer';
+import { OpportunityCard } from './volunteer/opportunity-card';
 
 type Props = { params: Promise<{ tenant: string }> };
 
@@ -35,7 +37,23 @@ export default async function FamilyHome({ params }: Props) {
   );
   const occurrences = calBlocks.length ? await listPublicOccurrences(tenant.id, await getViewer(tenant.id), { from: today, to: addDays(today, horizon) }) : [];
   const updates = content.some((b) => b.type === 'school-updates') ? await listPublicAnnouncements(tenant.id, await getViewer(tenant.id), { limit: 20 }) : [];
+  const volBlocks = content.filter((b) => b.type === 'volunteer');
+  const opportunities = volBlocks.length
+    ? await listPublicVolunteer(tenant.id, await getViewer(tenant.id), { limit: Math.max(...volBlocks.map((b) => num(b.settings.limit, 3, 1, 12))) })
+    : [];
   const renderBlock = (b: HomepageBlock) => {
+    if (b.type === 'volunteer') {
+      const list = opportunities.slice(0, num(b.settings.limit, 3, 1, 12));
+      return list.length ? (
+        <div className="vol-grid">
+          {list.map((o) => (
+            <OpportunityCard key={o.id} o={o} compact href={`${base}/volunteer#v-${o.id}`} />
+          ))}
+        </div>
+      ) : (
+        <p className="muted">No volunteer opportunities right now.</p>
+      );
+    }
     if (b.type === 'school-updates') {
       return (
         <AnnouncementList items={updates.slice(0, num(b.settings.limit, 4, 1, 20))} base={base} tz={tenant.timezone} emptyText="No updates right now." />
@@ -92,6 +110,7 @@ export default async function FamilyHome({ params }: Props) {
                   <h2 id={`block-${b.id}`}>{b.title || BLOCK_INFO[b.type].label}</h2>
                   {(b.type === 'this-week' || b.type === 'upcoming-events') && <Link href={`${base}/calendar`}>Full calendar</Link>}
                   {b.type === 'school-updates' && <Link href={`${base}/updates`}>All updates</Link>}
+                  {b.type === 'volunteer' && <Link href={`${base}/volunteer`}>All opportunities</Link>}
                 </div>
                 {renderBlock(b)}
               </section>
