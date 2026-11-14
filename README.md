@@ -66,7 +66,9 @@ Las pruebas crean una base `family_portal_test` en un PostgreSQL local (no tocan
 
 1. En Vercel: **Add New → Project**, importa `jgcela/family-portal`.
 2. En **Settings → Environment Variables** añade `DATABASE_URL` (la conexión *pooled* de Neon), `BETTER_AUTH_SECRET`, `PLATFORM_NAME`, `PLATFORM_ROOT_DOMAIN` y `AUTH_EXTRA_HOSTS` con el dominio `*.vercel.app` que te asigne Vercel.
-3. Antes del primer despliegue ejecuta `npm run db:migrate` y `npm run db:seed` contra Neon desde tu Mac.
+3. Cada despliegue aplica solo las migraciones pendientes. Solo la primera vez hay que ejecutar `npm run db:seed` contra Neon desde tu Mac.
+
+Operación diaria de la plataforma: [`docs/06-operacion-plataforma.md`](docs/06-operacion-plataforma.md). Guía para los administradores de cada colegio: [`docs/05-school-admin-guide.md`](docs/05-school-admin-guide.md).
 4. Sin dominio propio, St. Mary queda en `https://tu-app.vercel.app/s/stmary`.
 
 Vercel Hobby es solo para uso no comercial.

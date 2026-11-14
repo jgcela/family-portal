@@ -180,7 +180,7 @@ Resultado de pruebas: `npm test` → **143 de 143** pasan.
 
 Resultado de pruebas: `npm test` → **165 de 165** pasan (14 nov).
 
-## Fase 6 — Migración de St. Mary (en curso)
+## Fase 6 — Migración de St. Mary (código hecho el 14 nov 2026; faltan los pasos manuales)
 
 Guía paso a paso: [`04-migracion-st-mary.md`](04-migracion-st-mary.md).
 
@@ -193,16 +193,41 @@ Guía paso a paso: [`04-migracion-st-mary.md`](04-migracion-st-mary.md).
 | Documents → Upload several: varios archivos a la vez, título sacado del nombre del archivo (editable), una categoría y audiencia por tanda | Hecho | Navegador |
 | Regla CORS del bucket de R2 para que el navegador pueda subir | Manual en Cloudflare (ver la guía) | — |
 | Subir los 22 PDF del Drive | Lo hace el colegio con "Upload several" (ver la guía): los archivos son demasiado grandes para pasarlos por el chat | — |
-| Quick links, Volunteer, Wishlists, Staff favorites, Messenger | Pendiente: los módulos no existen todavía | — |
-| Tabla de redirecciones de las URLs antiguas | Pendiente | — |
+| Quick links (botón FACTS en la cabecera, menú y Quick access) | Hecho (PR #21) | Pruebas + navegador |
+| Volunteer: 12 oportunidades importadas desde un archivo fuera del repositorio (lleva contactos personales). Por defecto solo para familias con sesión | Hecho (PR #21) | Pruebas + navegador |
+| Community: 18 wishlists y 65 fichas del personal. Las fichas solo para familias con sesión, **sin alergias ni cumpleaños** | Hecho (PR #21). Falta que el colegio confirme la decisión de privacidad | Pruebas + navegador |
+| Bloque "Calendar alert" (aviso "No school" 14 días antes) | Hecho (PR #21) | Pruebas + navegador |
+| School Messenger (archivo de boletines) | Hecho en PR #23 y **retirado por decisión del colegio** en PR #24. La tabla `newsletter_issues` queda vacía en producción; el código se recupera del commit `d583d9d` | — |
+| Redirecciones de las URLs antiguas (`.htaccess`, 302 hasta comprobarlas) | Hecho (PR #23). Se instala a mano en el hosting antiguo | Revisión de reglas |
+
+## Fase 7 — Validación (14 nov 2026)
+
+| Comprobación | Resultado | Cómo |
+|---|---|---|
+| Pruebas automáticas | **177 de 177** pasan | `npm test` |
+| Tipos y compilación de producción | Sin errores | `tsc`, `npm run build` |
+| Aislamiento entre colegios, permisos, solo lectura del soporte, enlaces `javascript:`, HTML y scripts en Markdown | Cubierto por las pruebas de cada módulo | `npm test` |
+| Cabecera Content-Security-Policy nueva: bloquea scripts de otros sitios, `<object>`, `<base>`, formularios hacia fuera y que otra web meta el portal en un marco | Sin bloqueos en 96 cargas de página | Navegador (build de producción) |
+| Accesibilidad (axe-core, fallos graves y críticos) en 48 páginas: portal, login, panel del colegio y plataforma | 0 fallos después de corregir el contraste de las etiquetas de categoría y la tabla de permisos (ahora se puede recorrer con teclado) | Navegador, 1280 px |
+| Móvil (390 px): ninguna página más ancha que la pantalla | 0 después de corregir formularios con archivo, la tabla de permisos y el enlace de suscripción | Navegador, 48 páginas |
+| Dependencias en producción | 4 avisos moderados, todos en `esbuild` dentro de `drizzle-kit` (herramienta de migraciones, no atiende peticiones de usuarios) | `npm audit --omit=dev` |
+
+Lo que esta validación **no** cubre:
+- Páginas con sesión de familia (se probaron con cuenta de personal y sin sesión).
+- Lectores de pantalla reales y navegación completa con teclado: axe solo detecta parte de los problemas.
+- Safari e iPhone reales: se probó con Chromium.
+- Pruebas de carga.
 
 ## Lo que todavía no existe (no simulado)
 
-Messenger, búsqueda, directorio, voluntariado, notificaciones, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+- **Recuperar contraseña:** no hay correo conectado, así que nadie puede restablecer su contraseña desde los paneles.
+- **Activar el inicio de sesión en dos pasos:** el login lo pide a quien lo tenga, pero no hay pantalla para activarlo.
+- Messenger (retirado), búsqueda, directorio, notificaciones, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
+- Login con FACTS (SSO).
 
 ## Bloqueos y riesgos abiertos
 
-1. **Privacidad del contenido actual:** alergias del personal y teléfonos personales de voluntarios están públicos para quien tenga el enlace.
+1. **Privacidad del contenido actual:** en el portal antiguo, alergias del personal y teléfonos personales de voluntarios siguen públicos para quien tenga el enlace hasta que se instalen las redirecciones.
 2. **Contraseña de Neon expuesta en el chat:** hay que hacer "Reset password" antes de guardar datos reales.
 3. **Correo:** R2 ya funciona en producción. Para el correo está decidido Resend, pero falta la cuenta.
 4. **Dominio de la plataforma:** para subdominios por escuela hace falta un dominio propio apuntado a Vercel. Mientras tanto, modo ruta (`/s/stmary`).

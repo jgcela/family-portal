@@ -94,7 +94,7 @@
 .agenda-title:hover { text-decoration: underline; color: var(--color-link); }
 .agenda-item.is-important .agenda-title::after { content: ' ●'; color: var(--color-accent); font-size: 0.7em; vertical-align: middle; }
 .agenda-meta { font-size: 0.875rem; color: var(--color-text-muted); }
-.cat-tag { display: inline-block; margin-left: var(--space-2); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; background: var(--surface-sunken); color: var(--color-text-muted); }
+.cat-tag { display: inline-block; margin-left: var(--space-2); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; background: var(--surface-sunken); color: var(--color-text); }
 
 /* Calendar page */
 .cal-page { padding-block: var(--space-6) var(--space-8); }
@@ -112,7 +112,7 @@
 .subscribe-panel ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
 .subscribe-panel li { display: grid; gap: 2px; }
 .cal-filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: end; margin-bottom: var(--space-5); }
-.cal-filters select { min-height: 44px; padding: 0 var(--space-3); border-radius: calc(var(--radius) * 0.7); border: 1px solid var(--border-strong); background: var(--color-surface); color: var(--color-text); font: inherit; }
+.cal-filters select { min-height: 44px; }
 .month-nav { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
 .month-nav h2 { min-width: 9ch; text-align: center; }
 .month-nav .btn { padding: 0 var(--space-4); font-size: 1.2rem; }
@@ -271,15 +271,3 @@
 .calendar-alert p { flex: 1 1 240px; margin: 0; }
 .calendar-alert a { font-weight: 600; min-height: 44px; display: inline-flex; align-items: center; }
 .calendar-alert-label { color: var(--color-text-muted); }
-
-/* School Messenger archive */
-.messenger-search { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-block: var(--space-4); }
-.messenger-search input { flex: 1 1 220px; min-height: 44px; }
-.messenger-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
-.messenger-date { font-size: 0.85rem; margin: 0; display: flex; gap: var(--space-2); align-items: center; }
-.messenger-latest { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 999px; background: var(--color-accent); color: var(--color-on-accent); }
-.messenger-title { font-size: 1.2rem; margin: 0; }
-.messenger-highlights { margin: 0; padding-left: 1.2em; font-size: 0.9rem; color: var(--color-text-muted); }
-.issue-frame { display: block; width: 100%; min-height: 400px; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; margin-top: var(--space-4); }
-.messenger-pager { display: flex; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-5); }
-.messenger-pager a { min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; }

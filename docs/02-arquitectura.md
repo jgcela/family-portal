@@ -45,7 +45,7 @@ En un host de escuela, las rutas `/s/...` y `/platform` devuelven 404: la escuel
 - `tenant_id` sale siempre de la resolución en el servidor (host o dominio). Los contextos de autorización solo valen si los creó `loadAuthzContext()`; una copia o un objeto con otro `tenantId` se rechaza.
 - `platformDb()` (rol dueño, sin RLS) queda limitado a operaciones de plataforma: login, resolver el host, alta de escuelas, super admin y migraciones.
 
-**Riesgo residual [Seguro]:** si alguien consiguiera ejecutar SQL arbitrario (inyección), podría hacer `RESET ROLE` dentro de la transacción. Drizzle parametriza todas las consultas y no hay SQL construido con texto del usuario. Para cerrarlo del todo, la aplicación debería conectarse con un usuario de base de datos que **sea** `app_tenant` y usar otro para las operaciones de plataforma. Está anotado para la Fase 7.
+**Riesgo residual [Seguro]:** si alguien consiguiera ejecutar SQL arbitrario (inyección), podría hacer `RESET ROLE` dentro de la transacción. Drizzle parametriza todas las consultas y no hay SQL construido con texto del usuario. Un usuario de base de datos separado no lo cierra del todo: la misma inyección podría cambiar `app.tenant_id` con `set_config`. Por eso no se hizo en la Fase 7. La defensa real es que no exista SQL construido con texto: no hay ningún `sql.raw` en `src/` (revisado el 14 nov 2026).
 
 ### Registros de plataforma y registros de escuela
 
@@ -90,7 +90,7 @@ Planes y suscripciones están modelados (`plans`, `subscriptions`, módulos incl
 - Sesiones en base de datos, cookies `Secure` en producción, 2FA (TOTP) disponible.
 - Contraseña mínima de 12 caracteres; **sin registro público** (solo por invitación, Fase 3).
 - Límite de intentos de login guardado en BD (funciona aunque Vercel tenga varias instancias).
-- Cabeceras: `nosniff`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, HSTS.
+- Cabeceras: `nosniff`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`, HSTS y, desde la Fase 7, `Content-Security-Policy` (scripts solo del propio sitio; `'unsafe-inline'` sigue permitido porque Next.js lo necesita sin nonces).
 - Redirecciones tras login limitadas a rutas del propio portal.
 - Registro de auditoría en la misma transacción que el cambio.
 

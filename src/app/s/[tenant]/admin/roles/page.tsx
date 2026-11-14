@@ -52,7 +52,7 @@ export default async function RolesPage({ params }: Props) {
         </ul>
       </section>
       <section className="panel">
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Permissions by role (scrolls sideways)">
           <table className="data matrix">
             <caption className="visually-hidden">Permissions by role</caption>
             <thead>

@@ -77,7 +77,7 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 2 | Teléfono, email y horario de oficina | Perfil del colegio (tarjeta "Need the front office?") | 2 | ☑ |
 | 3 | Pie con nombre y ciudad | Perfil del colegio | 2 | ☑ |
 | 4 | Enlace "Skip to content" | Layout compartido | 2 | ☑ |
-| 5 | Navegación superior (Messenger, Volunteer, Wishlists, Staff favorites) | Navegación configurable + módulos | 3–4 | ☑ (Messenger, Volunteer y Community en el menú) |
+| 5 | Navegación superior (Messenger, Volunteer, Wishlists, Staff favorites) | Navegación configurable + módulos | 3–4 | ☑ (Volunteer y Community en el menú; Messenger aplazado) |
 | 6 | Botón FACTS Login | Quick Links (botón de cabecera) | 3–4 | ◐ (función lista; falta crearlo en producción) |
 | 7 | Buscador "forms, events and policies" | Módulo Search | 4 | ☐ |
 | 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links (bloque Quick access) | 3–4 | ◐ (función lista; falta crearlos en producción; Wishlists espera su módulo) |
@@ -89,9 +89,9 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ◐ (subida de varios y de más de 4 MB lista; falta subir los archivos) |
 | 15 | Manual HTML con índice, buscador y PDF | Pages (página larga con índice) + Documents | 3 / 6 | ◐ (páginas con índice listas; falta migrar el texto y el PDF) |
 | 16 | Manual de Preschool (HTML + PDF) | Pages + Documents (audiencia Preschool) | 3 / 6 | ☐ |
-| 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
-| 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
-| 19 | Teacher wishlists | Community | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
+| 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ☐ (aplazado por decisión del colegio, 2026-11-14; el archivo sigue en el portal antiguo) |
+| 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ☐ (aplazado por decisión del colegio, 2026-11-14; el archivo sigue en el portal antiguo) |
+| 19 | Teacher wishlists | Community | 4 / 6 | ☐ (aplazado por decisión del colegio, 2026-11-14; el archivo sigue en el portal antiguo) |
 | 20 | Staff favorites | Community | 4 / 6 | ◐ (solo familias, sin alergias ni cumpleaños; falta importar en producción) |
 | 21 | Supply list por curso | Pages (audiencia por curso) | 4 / 6 | ◐ (función lista; falta migrar el contenido) |
 | 22 | Fechas límite de salud (vacunas, físico, medicación, Tdap 7th) | Action Required | 3 / 6 | ☐ |

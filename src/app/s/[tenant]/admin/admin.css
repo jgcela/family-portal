@@ -16,7 +16,11 @@
 .panel-head h2 { font-family: var(--font-body); font-size: 0.95rem; font-weight: 650; }
 .panel-body { padding: var(--space-4); }
 
-.table-wrap { overflow-x: auto; }
+.table-wrap { overflow-x: auto; position: relative; max-width: 100%; }
+/* Long content (file inputs, links) must not widen a form or a panel on phones. */
+.form > *, .field > *, .form-row > *, .panel-head > * { min-width: 0; }
+.field input[type='file'] { max-width: 100%; }
+.panel-head code, .panel-body code { overflow-wrap: anywhere; }
 table.data { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
 table.data th, table.data td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); vertical-align: top; }
 table.data thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); font-weight: 600; background: var(--surface-sunken); position: sticky; top: 0; }
@@ -32,10 +36,11 @@ table.matrix td.cell, table.matrix th.cell { text-align: center; width: 1%; whit
 .form { display: grid; gap: var(--space-4); max-width: 760px; }
 .form-row { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
 @media (min-width: 640px) { .form-row { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); } }
-.field select, .field textarea, .field input[type='color'] {
+.field textarea, .field input[type='color'] {
   min-height: 44px; padding: var(--space-2) var(--space-3); border-radius: calc(var(--radius) * 0.7);
   border: 1px solid var(--border-strong); background: var(--color-surface); color: var(--color-text); font: inherit;
 }
+.field select { border-radius: calc(var(--radius) * 0.7); }
 .field textarea { min-height: 112px; resize: vertical; }
 .field input[type='color'] { padding: 4px; width: 64px; }
 .field .hint { font-size: 0.8rem; color: var(--color-text-muted); }

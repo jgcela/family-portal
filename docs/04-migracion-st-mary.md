@@ -147,17 +147,9 @@ Cambios respecto al portal antiguo:
 - **No se han copiado las alergias ni los cumpleaños.** El portal antiguo los mostraba en abierto y no consta que el personal aceptara publicarlos. Si el colegio lo confirma, se pueden añadir a mano en cada ficha.
 - Hay tres nombres repetidos en dos equipos (Mrs. Guzman, Mrs. Roberts, Mrs. Weir) con cargos distintos. Se importan las dos fichas; revisa si son la misma persona y borra la que sobre.
 
-## 7. Archivo del School Messenger (13 boletines)
+## 7. School Messenger (aplazado)
 
-Archivo: `st-mary-messenger.json` (carpeta `fase6`). Trae los 13 boletines del 16 de agosto al 9 de noviembre de 2026, con título, resumen y fechas destacadas.
-
-1. Admin → **Modules** → activa **Messenger / Newsletter** (necesita Announcements activo).
-2. Admin → **School Messenger** → **Import from file** → elige el archivo → **Import**. Los boletines se suben de uno en uno; al final debería decir "13 added, 0 updated".
-3. Opcional: en Admin → **Homepage** añade el bloque **Newsletter** para mostrar el último boletín en la portada.
-
-Cada boletín se muestra tal cual se envió, dentro de un marco que no puede ejecutar código. Al importar se quitan los scripts, el pie de Flocknote y las imágenes de seguimiento. Los enlaces del boletín siguen pasando por el contador de clics de Flocknote, igual que en el email.
-
-Boletines nuevos: Admin → **School Messenger** → **Add issue**: fecha, título y el email guardado como `.html`.
+El archivo de boletines no se migra por ahora (decisión del 2026-11-14). El Messenger sigue en el portal antiguo y las redirecciones no lo tocan. La tabla `newsletter_issues` queda en la base de datos, vacía y sin uso, para no borrar nada en producción.
 
 ## 8. Redirecciones desde el portal antiguo
 
@@ -165,7 +157,7 @@ Archivo: `st-mary-redirects.htaccess` (carpeta `fase6`). Hace que los enlaces an
 
 1. Entra en el hosting de `stmarycommunication.javiercela.me` y abre el archivo `.htaccess` de la carpeta principal.
 2. Pega el contenido del archivo **al principio** y guarda.
-3. Prueba los enlaces antiguos: el portal, el Messenger (incluido uno con `?date=`), Volunteer, Wishlists y Staff favorites.
+3. Prueba los enlaces antiguos: el portal, Volunteer, Wishlists y Staff favorites.
 4. Cuando todo funcione, cambia `302` por `301` en todas las líneas.
 
 Los PDF antiguos llevan a la página de Documents, no a cada documento, porque los enlaces nuevos dependen del título que les pongas al subirlos.
