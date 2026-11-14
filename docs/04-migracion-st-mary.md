@@ -33,7 +33,8 @@ Archivo: `st-mary-calendario-2026-27.ics` (se genera con `npx tsx scripts/st-mar
 1. Admin → **Calendar & Events** → **Import**.
 2. Elige el archivo, deja "Import into: School Calendar" y la zona `America/Denver`. **Check file**.
 3. Revisa el resumen: deberían salir 132 eventos nuevos. Si sale "Possible duplicate", es un evento que ya creaste a mano con el mismo título y fecha: déjalo sin marcar.
-4. **Import and publish**.
+4. Marca **Published right away** y pulsa **Import events**.
+5. Aviso "No school" (el portal antiguo lo mostraba 14 días antes de cada día sin clase): Admin → **Homepage** → en "Add a block" elige **Calendar alert** → **Add** → **Save and publish**. Por defecto avisa de los eventos con categoría "No school" que empiecen en los próximos 14 días; ambas cosas se cambian en el bloque.
 
 Importar el mismo archivo otra vez no duplica nada: actualiza lo que cambió.
 
@@ -148,4 +149,4 @@ Cambios respecto al portal antiguo:
 
 ## 7. Lo que falta (aún no se puede migrar)
 
-Archivo del School Messenger (13 boletines) y el aviso automático "No school". Esos módulos todavía no existen en la plataforma.
+Archivo del School Messenger (13 boletines). Ese módulo todavía no existe en la plataforma.

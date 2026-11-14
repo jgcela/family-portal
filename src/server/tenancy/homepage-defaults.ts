@@ -15,6 +15,7 @@ export const HOMEPAGE_BLOCK_TYPES = [
   'volunteer',
   'custom-content',
   'school-message',
+  'calendar-alert',
 ] as const;
 
 export const homepageBlockSchema = z
@@ -58,6 +59,12 @@ export const BLOCK_INFO: Record<HomepageBlock['type'], BlockInfo> = {
   newsletter: { label: 'Newsletter', description: 'Latest newsletter issue.', module: 'messenger', rendered: false },
   volunteer: { label: 'Volunteer', description: 'Open volunteer opportunities.', module: 'volunteer', rendered: true },
   'school-message': { label: "Principal's message", description: 'A message from school leadership.', module: null, rendered: false },
+  'calendar-alert': {
+    label: 'Calendar alert',
+    description: 'A banner when an event of one category is coming up, such as "No school".',
+    module: 'calendar',
+    rendered: true,
+  },
 };
 
 const int = (min: number, max: number) => z.number().int().min(min).max(max);
@@ -70,7 +77,11 @@ export const BLOCK_SETTINGS: Partial<Record<HomepageBlock['type'], z.ZodType>> =
   'school-updates': z.object({ limit: int(1, 20).optional() }).strict(),
   volunteer: z.object({ limit: int(1, 12).optional() }).strict(),
   'custom-content': z.object({ body: z.string().max(5000).default('') }).strict(),
+  'calendar-alert': z.object({ category: z.string().trim().max(60).optional(), days: int(1, 60).optional() }).strict(),
 };
+
+/** Defaults of the calendar alert: the old St. Mary portal warned 14 days before each day without school. */
+export const CALENDAR_ALERT_DEFAULTS = { category: 'No school', days: 14 };
 
 /**
  * Validates a full layout for saving: schema, unique ids, at most one welcome

@@ -95,7 +95,7 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 20 | Staff favorites | Community | 4 / 6 | ◐ (solo familias, sin alergias ni cumpleaños; falta importar en producción) |
 | 21 | Supply list por curso | Pages (audiencia por curso) | 4 / 6 | ◐ (función lista; falta migrar el contenido) |
 | 22 | Fechas límite de salud (vacunas, físico, medicación, Tdap 7th) | Action Required | 3 / 6 | ☐ |
-| 23 | Aviso automático "No school" 14 días antes | Bloque Action Required / alerta | 4 | ☐ |
+| 23 | Aviso automático "No school" 14 días antes | Bloque Calendar alert de la portada | 4 | ◐ (bloque listo; falta añadirlo en producción) |
 
 ## Lo que se conserva tal cual
 

@@ -21,6 +21,7 @@ const NUMBER_SETTINGS: Partial<Record<HomepageBlock['type'], NumField[]>> = {
   ],
   'school-updates': [{ key: 'limit', label: 'Most updates shown', min: 1, max: 20, def: 4 }],
   volunteer: [{ key: 'limit', label: 'Most opportunities shown', min: 1, max: 12, def: 3 }],
+  'calendar-alert': [{ key: 'days', label: 'Days before the event', min: 1, max: 60, def: 14 }],
 };
 
 const ADDABLE = HOMEPAGE_BLOCK_TYPES.filter((t) => BLOCK_INFO[t].rendered);
@@ -136,7 +137,7 @@ export function HomepageBuilder({ initial, activeModules, moduleNames, canPublis
                       id={`title-${b.id}`}
                       value={b.title ?? ''}
                       maxLength={80}
-                      placeholder={b.type === 'welcome' ? 'Uses the school tagline when empty' : b.type === 'custom-content' ? 'Optional' : info.label}
+                      placeholder={b.type === 'welcome' ? 'Uses the school tagline when empty' : b.type === 'custom-content' || b.type === 'calendar-alert' ? 'Optional' : info.label}
                       onChange={(e) => patch(i, { title: e.target.value || undefined })}
                     />
                   </div>
@@ -156,6 +157,19 @@ export function HomepageBuilder({ initial, activeModules, moduleNames, canPublis
                       </span>
                     </div>
                   ))}
+                  {b.type === 'calendar-alert' && (
+                    <div className="field">
+                      <label htmlFor={`category-${b.id}`}>Event category</label>
+                      <input
+                        id={`category-${b.id}`}
+                        maxLength={60}
+                        value={typeof b.settings.category === 'string' ? b.settings.category : ''}
+                        placeholder="No school"
+                        onChange={(e) => setting(i, 'category', e.target.value || undefined)}
+                      />
+                      <span className="hint">Shown for the next event with this category (as written on the event). Empty means &ldquo;No school&rdquo;.</span>
+                    </div>
+                  )}
                   {b.type === 'custom-content' && (
                     <div className="field" style={{ gridColumn: '1 / -1' }}>
                       <label htmlFor={`body-${b.id}`}>Message</label>
@@ -200,7 +214,7 @@ export function HomepageBuilder({ initial, activeModules, moduleNames, canPublis
                 enabled: true,
                 audienceKeys: [],
                 settings: adding === 'custom-content' ? { body: '' } : {},
-                ...(adding === 'welcome' || adding === 'custom-content' ? {} : { title: BLOCK_INFO[adding].label }),
+                ...(adding === 'welcome' || adding === 'custom-content' || adding === 'calendar-alert' ? {} : { title: BLOCK_INFO[adding].label }),
               };
               return adding === 'welcome' ? [block, ...bs] : [...bs, block];
             })
