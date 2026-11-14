@@ -16,6 +16,8 @@ export type ExportEvent = {
   rrule: string | null;
   exdates: string[];
   updatedAt: Date;
+  category?: string | null;
+  important?: boolean;
 };
 
 function esc(s: string): string {
@@ -90,6 +92,8 @@ export function buildIcs(opts: { name: string; domain: string; events: ExportEve
     if (e.description) lines.push(`DESCRIPTION:${esc(e.description)}`);
     if (e.location) lines.push(`LOCATION:${esc(e.location)}`);
     if (e.url) lines.push(`URL:${e.url}`);
+    if (e.category) lines.push(`CATEGORIES:${esc(e.category)}`);
+    if (e.important) lines.push('PRIORITY:1');
     lines.push('END:VEVENT');
   }
   lines.push('END:VCALENDAR');

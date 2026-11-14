@@ -21,6 +21,8 @@ export type ParsedEvent = {
   rrule: string | null;
   exdates: string[];
   cancelled: boolean;
+  /** Marked important in the source (ICS PRIORITY 1–4 or an "Important" category; CSV column). */
+  important?: boolean;
 };
 
 export type ParseError = { row: number; message: string };
@@ -138,7 +140,16 @@ export function parseIcs(text: string, defaultTz: string): ParseResult {
         .getAllProperties('exdate')
         .flatMap((p) => p.getValues() as unknown as ICALTime[])
         .map((t) => (t.isDate ? icalDateStr(t) : toDateStr(timeToInstant(t, null, ev.timezone).date, ev.timezone)));
-      const categories = ve.getAllProperties('categories').flatMap((p) => p.getValues() as string[]);
+      const allCategories = ve
+        .getAllProperties('categories')
+        .flatMap((p) => p.getValues() as string[])
+        .map((c) => String(c).trim())
+        .filter(Boolean);
+      // "Important" is a flag, not a category.
+      const flagged = allCategories.some((c) => c.toLowerCase() === 'important');
+      const categories = allCategories.filter((c) => c.toLowerCase() !== 'important');
+      const priority = Number(ve.getFirstPropertyValue('priority') ?? 0);
+      const important = flagged || (priority >= 1 && priority <= 4);
 
       events.push({
         row,
@@ -153,6 +164,7 @@ export function parseIcs(text: string, defaultTz: string): ParseResult {
         rrule: rruleProp ? String(rruleProp.toString()) : null,
         exdates,
         cancelled: String(ve.getFirstPropertyValue('status') ?? '').toUpperCase() === 'CANCELLED',
+        important,
       });
     } catch (err) {
       errors.push({ row, message: err instanceof Error ? err.message : 'Could not read this event.' });
@@ -181,6 +193,7 @@ export const CSV_FIELDS = [
   'category',
   'uid',
   'url',
+  'important',
 ] as const;
 export type CsvField = (typeof CSV_FIELDS)[number];
 export type CsvMapping = Partial<Record<CsvField, string>>;
@@ -197,6 +210,7 @@ const SYNONYMS: Record<CsvField, string[]> = {
   category: ['category', 'type', 'categories'],
   uid: ['uid', 'id', 'event id', 'external id'],
   url: ['url', 'link', 'registration link', 'website'],
+  important: ['important', 'priority', 'highlight'],
 };
 
 export function guessCsvMapping(headers: string[]): CsvMapping {
@@ -303,6 +317,7 @@ export function parseCsv(text: string, mapping: CsvMapping, tz: string): ParseRe
       rrule: null,
       exdates: [],
       cancelled: false,
+      important: /^(true|yes|y|1|x|important|high)$/i.test(get(r, 'important')),
     });
   });
   return { events, errors, calendarName: null };

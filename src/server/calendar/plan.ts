@@ -51,6 +51,8 @@ export function eventHash(e: ParsedEvent): string {
     [...e.exdates].sort().join(','),
     e.cancelled ? 'X' : '',
   ];
+  // Appended only when set, so hashes of events imported before this flag existed stay the same.
+  if (e.important) parts.push('I');
   return createHash('sha256').update(parts.join('\u001f')).digest('hex').slice(0, 32);
 }
 
