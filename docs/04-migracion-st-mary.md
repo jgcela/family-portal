@@ -108,7 +108,7 @@ Archivo: `st-mary-volunteer.json` (carpeta `fase6` de los archivos del proyecto)
 
 1. Admin → **Modules** → activa **Volunteer**.
 2. Admin → **Volunteer** → **Import**.
-3. Elige el archivo y pulsa **Import and publish** (o **Import** para dejarlas en borrador).
+3. Elige el archivo y pulsa **Import and publish** (o **Import as drafts** para dejarlas en borrador).
 4. Debería decir "12 added". Si lo importas otra vez, salta las que ya existen por título.
 
 Por defecto solo las ven las familias con sesión iniciada. Los visitantes ven un aviso para iniciar sesión.
