@@ -77,7 +77,7 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 2 | Teléfono, email y horario de oficina | Perfil del colegio (tarjeta "Need the front office?") | 2 | ☑ |
 | 3 | Pie con nombre y ciudad | Perfil del colegio | 2 | ☑ |
 | 4 | Enlace "Skip to content" | Layout compartido | 2 | ☑ |
-| 5 | Navegación superior (Messenger, Volunteer, Wishlists, Staff favorites) | Navegación configurable + módulos | 3–4 | ☐ |
+| 5 | Navegación superior (Messenger, Volunteer, Wishlists, Staff favorites) | Navegación configurable + módulos | 3–4 | ☑ (Messenger, Volunteer y Community en el menú) |
 | 6 | Botón FACTS Login | Quick Links (botón de cabecera) | 3–4 | ◐ (función lista; falta crearlo en producción) |
 | 7 | Buscador "forms, events and policies" | Módulo Search | 4 | ☐ |
 | 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links (bloque Quick access) | 3–4 | ◐ (función lista; falta crearlos en producción; Wishlists espera su módulo) |
@@ -89,7 +89,7 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ◐ (subida de varios y de más de 4 MB lista; falta subir los archivos) |
 | 15 | Manual HTML con índice, buscador y PDF | Pages (página larga con índice) + Documents | 3 / 6 | ◐ (páginas con índice listas; falta migrar el texto y el PDF) |
 | 16 | Manual de Preschool (HTML + PDF) | Pages + Documents (audiencia Preschool) | 3 / 6 | ☐ |
-| 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ☐ |
+| 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
 | 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
 | 19 | Teacher wishlists | Community | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
 | 20 | Staff favorites | Community | 4 / 6 | ◐ (solo familias, sin alergias ni cumpleaños; falta importar en producción) |
@@ -101,4 +101,4 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 
 - Los textos y el tono ("Everything your family needs, in one place.", "We're here for your family.").
 - Las categorías de documentos y de eventos.
-- Las URLs actuales seguirán funcionando hasta que se apaguen de forma explícita: la migración (Fase 6) incluirá una tabla de redirecciones.
+- Las URLs actuales seguirán funcionando hasta que se apaguen de forma explícita. Las redirecciones están en `docs/legacy/st-mary-redirects.htaccess`.

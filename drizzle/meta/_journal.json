@@ -113,6 +113,20 @@
       "when": 1794617268800,
       "tag": "0015_community_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794619826255,
+      "tag": "0016_messenger",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794619827127,
+      "tag": "0017_messenger_rls",
+      "breakpoints": true
     }
   ]
 }

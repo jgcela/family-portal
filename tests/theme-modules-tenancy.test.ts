@@ -89,11 +89,11 @@ describe('module rules', () => {
   });
 
   it('entitlements follow the subscription; canceled keeps only required modules', () => {
-    const sub = { status: 'active' as const, includedModules: ['calendar'], extraModules: ['messenger'] };
-    expect([...entitledModules(sub)].sort()).toEqual(['calendar', 'home', 'messenger']);
+    const sub = { status: 'active' as const, includedModules: ['calendar'], extraModules: ['forms'] };
+    expect([...entitledModules(sub)].sort()).toEqual(['calendar', 'forms', 'home']);
     expect([...entitledModules({ ...sub, status: 'canceled' })]).toEqual(['home']);
     // Enabled + entitled + implemented = active; unimplemented modules never are.
-    expect(activeModules(new Set(['calendar', 'messenger']), entitledModules(sub)).map((m) => m.id)).toEqual(['home', 'calendar']);
+    expect(activeModules(new Set(['calendar', 'forms']), entitledModules(sub)).map((m) => m.id)).toEqual(['home', 'calendar']);
     expect(activeModules(new Set(['calendar']), entitledModules({ ...sub, status: 'canceled' })).map((m) => m.id)).toEqual(['home']);
   });
 

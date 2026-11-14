@@ -7,3 +7,4 @@ export * from './documents';
 export * from './invitations';
 export * from './families';
 export * from './community';
+export * from './messenger';

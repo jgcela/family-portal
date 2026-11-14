@@ -1,0 +1,31 @@
+# Redirects from the old St. Mary portal (stmarycommunication.javiercela.me)
+# to the new one. Add these lines at the top of the .htaccess file in the
+# website's main folder on the old hosting.
+#
+# They use 302 (temporary) on purpose: if a line is wrong, browsers do not
+# remember it. After checking every link, change "302" to "301".
+#
+# If the school gets its own domain, replace the address below with it
+# (for example https://portal.stmarylittleton.com) and drop the "/s/stmary".
+
+RewriteEngine On
+
+# Main pages (current and previous portal)
+RewriteRule ^Portal_202627/?$                                  https://family-portal-brown.vercel.app/s/stmary [R=302,L]
+RewriteRule ^Portal_202627/portal_202627\.html$                https://family-portal-brown.vercel.app/s/stmary [R=302,L]
+RewriteRule ^portal/0531525gfk2026\.html$                      https://family-portal-brown.vercel.app/s/stmary [R=302,L]
+
+# School Messenger (an issue link keeps its ?date=YYYY-MM-DD and opens that issue)
+RewriteRule ^Portal_202627/messenger-archive_202627\.html$     https://family-portal-brown.vercel.app/s/stmary/messenger [R=302,L]
+RewriteRule ^Portal_202627/messenger_202627\.html$             https://family-portal-brown.vercel.app/s/stmary/messenger [R=302,L,QSA]
+
+# Volunteer, wishlists, staff favorites
+RewriteRule ^Portal_202627/volunteer-opportunities_202627\.html$ https://family-portal-brown.vercel.app/s/stmary/volunteer [R=302,L]
+RewriteRule ^Portal_202627/teacher-wishlists_202627\.html$     https://family-portal-brown.vercel.app/s/stmary/community#wishlists [R=302,L,NE]
+RewriteRule ^Portal_202627/staff-favorites_202627\.html$       https://family-portal-brown.vercel.app/s/stmary/community#favorites [R=302,L,NE]
+
+# Handbooks and supply list: the documents page (the PDFs have their own links there)
+RewriteRule ^Portal_202627/(handbook|handbook_202627|preschool-handbook|supply-list|supply-list_202627)\.html$ https://family-portal-brown.vercel.app/s/stmary/documents [R=302,L]
+
+# Any PDF of the old portal: the documents page
+RewriteRule ^(Portal_202627|portal)/(assets|assest)/.*\.pdf$   https://family-portal-brown.vercel.app/s/stmary/documents [R=302,L,NC]
