@@ -20,6 +20,8 @@ export default async function AdminLayout({ children, params }: Props) {
         { href: `${a}/calendar`, label: 'Calendar & Events', show: hasAnywhere(ctx, 'events.view') },
         { href: `${a}/pages`, label: 'School pages', show: hasAnywhere(ctx, 'pages.view') },
         { href: `${a}/documents`, label: 'Documents', show: hasAnywhere(ctx, 'documents.view') },
+        { href: `${a}/volunteer`, label: 'Volunteer', show: hasAnywhere(ctx, 'volunteer.view') },
+        { href: `${a}/community`, label: 'Community', show: hasAnywhere(ctx, 'community.view') },
       ],
     },
     {
@@ -27,6 +29,7 @@ export default async function AdminLayout({ children, params }: Props) {
       items: [
         { href: `${a}/design/theme`, label: 'Theme', show: hasAnywhere(ctx, 'branding.manage') },
         { href: `${a}/design/homepage`, label: 'Homepage', show: hasAnywhere(ctx, 'homepage.edit') },
+        { href: `${a}/links`, label: 'Links', show: hasAnywhere(ctx, 'navigation.manage') },
       ],
     },
     {

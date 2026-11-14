@@ -44,6 +44,7 @@ const TEMPLATES: RoleTemplate[] = [
       'media.delete',
       'homepage.edit',
       'homepage.publish',
+      'navigation.manage',
       'notifications.send',
       'modules.view',
     ],
@@ -74,7 +75,7 @@ const TEMPLATES: RoleTemplate[] = [
     key: 'volunteer_coordinator',
     name: 'Volunteer Coordinator',
     description: 'Manages volunteer opportunities and related community content.',
-    permissions: ['dashboard.view', ...actions(['volunteer'], ALL_CONTENT_ACTIONS), 'media.upload'],
+    permissions: ['dashboard.view', ...actions(['volunteer', 'community'], ALL_CONTENT_ACTIONS), 'media.upload'],
   },
   {
     key: 'reviewer',

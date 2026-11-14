@@ -5,6 +5,7 @@ import { exitPreviewAction } from '../preview-actions';
 import { loadAuthzContext } from '@/server/rbac/context';
 import { hasAnywhere } from '@/server/rbac/authorize';
 import { listPublicAnnouncements } from '@/server/services/content';
+import { linkHref, linkVisibleTo, listMenuLinks } from '@/server/services/links';
 import { SignOutButton } from './account/sign-out';
 import '../portal.css';
 
@@ -27,9 +28,10 @@ export default async function PortalLayout({ children, params }: Props) {
       .filter((m) => m.nav?.area === 'primary')
       .map((m) => ({ label: m.nav!.label, href: `${base}${m.nav!.path === '/' ? '' : m.nav!.path}` || '/' })),
     ...view.customNav
-      .filter((n) => n.visibility === 'public' || viewer.kind === 'staff' || (viewer.kind === 'family' && n.visibility === 'families'))
-      .map((n) => ({ label: n.label, href: n.kind === 'url' ? n.target : `${base}${n.target}` })),
+      .filter((n) => n.menu === 'primary' && linkVisibleTo(n.visibility, viewer))
+      .map((n) => ({ label: n.label, href: linkHref(n, base), newTab: n.opensInNewTab })),
   ];
+  const headerButtons = view.activeModules.some((m) => m.id === 'quick_links') ? await listMenuLinks(tenant.id, 'header', viewer) : [];
   const logo = view.theme.header === 'solid' ? view.theme.logo.onDark ?? view.theme.logo.primary : view.theme.logo.primary;
 
   return (
@@ -71,12 +73,31 @@ export default async function PortalLayout({ children, params }: Props) {
             <ul>
               {nav.map((n) => (
                 <li key={n.href + n.label}>
-                  <Link href={n.href}>{n.label}</Link>
+                  {'newTab' in n && n.newTab ? (
+                    <a href={n.href} target="_blank" rel="noopener">
+                      {n.label}
+                      <span className="visually-hidden"> (opens in a new tab)</span>
+                    </a>
+                  ) : (
+                    <Link href={n.href}>{n.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>
           </nav>
           <div className="portal-account">
+            {headerButtons.map((b) =>
+              b.opensInNewTab ? (
+                <a key={b.id} href={linkHref(b, base)} className="btn btn-accent portal-header-link" target="_blank" rel="noopener">
+                  {b.label}
+                  <span className="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              ) : (
+                <a key={b.id} href={linkHref(b, base)} className="btn btn-accent portal-header-link">
+                  {b.label}
+                </a>
+              ),
+            )}
             {isStaff ? (
               <>
                 <Link href={`${base}/admin`} className="btn btn-accent">

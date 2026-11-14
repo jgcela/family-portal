@@ -9,18 +9,20 @@ import { audit } from '../audit/log';
 import { assertVerifiedContext } from '../rbac/context';
 import { AuthorizationError, assertCan, can, hasAnywhere, type AuthzContext } from '../rbac/authorize';
 import { detectFileKind, sanitizeFileName, storageSafeName } from '../storage/files';
-import { getPrivateStorage, type ObjectStorage } from '../storage/storage';
+import { getPrivateStorage, TooLargeError, type ObjectStorage } from '../storage/storage';
 import { assertViewer, canSee, visibleTo, type Viewer } from '../viewer';
 import { ValidationError } from './modules';
 import { nextStatus, type Transition } from './workflow';
 import { eventResource, gradeLookup, settingsFor } from './scope';
+import { MAX_DIRECT_UPLOAD_BYTES, verifyUploadToken } from './uploads';
 
 /** Server actions on Vercel accept about 4.5 MB per request; keep a margin. */
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 export type DocumentRow = typeof documents.$inferSelect;
 export type DocumentVersionRow = typeof documentVersions.$inferSelect;
-export type UploadedFile = { name: string; bytes: Uint8Array };
+/** Either the bytes (small files sent with the form) or a direct-upload token (see uploads.ts). */
+export type UploadedFile = { name: string; bytes: Uint8Array } | { name: string; token: string };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SLUG = /^[a-z0-9][a-z0-9-]{0,79}$/;
@@ -83,13 +85,21 @@ export async function storageUsage(tx: Tx, tenantId: string) {
   return { usedBytes: Number(used?.bytes ?? 0), limitBytes: plan ? plan.mb * 1024 * 1024 : 0 };
 }
 
-type Checked = { fileName: string; contentType: string; sizeBytes: number; sha256: string; bytes: Uint8Array };
+type Checked = { fileName: string; contentType: string; sizeBytes: number; sha256: string; bytes: Uint8Array; storedKey?: string };
+
+/** A direct-upload token used a second time. The object belongs to the first version, so it is never deleted. */
+class UploadReusedError extends ValidationError {
+  constructor() {
+    super('This upload was already used. Choose the file again.');
+  }
+}
+
+const tooBig = (bytes: number, limit: number) =>
+  new ValidationError(`The file is ${(bytes / 1048576).toFixed(1)} MB. The limit is ${limit / 1048576} MB.`);
 
 /** Validates a file before anything is stored. */
-export function checkFile(file: UploadedFile): Checked {
-  if (file.bytes.byteLength > MAX_UPLOAD_BYTES) {
-    throw new ValidationError(`The file is ${(file.bytes.byteLength / 1048576).toFixed(1)} MB. The limit is ${MAX_UPLOAD_BYTES / 1048576} MB.`);
-  }
+export function checkFile(file: { name: string; bytes: Uint8Array }, limit = MAX_UPLOAD_BYTES): Checked {
+  if (file.bytes.byteLength > limit) throw tooBig(file.bytes.byteLength, limit);
   const k = detectFileKind(file.name, file.bytes);
   if (!k.ok) throw new ValidationError(k.error);
   return {
@@ -99,6 +109,31 @@ export function checkFile(file: UploadedFile): Checked {
     sha256: createHash('sha256').update(file.bytes).digest('hex'),
     bytes: file.bytes,
   };
+}
+
+/**
+ * A directly uploaded file: reads it back from storage and runs the same
+ * checks as a file sent with the form. Anything that fails is deleted.
+ */
+async function checkDirectUpload(ctx: AuthzContext, file: { name: string; token: string }, storage: ObjectStorage): Promise<Checked> {
+  const key = verifyUploadToken(ctx, file.token);
+  let bytes: Uint8Array | null;
+  try {
+    bytes = await storage.get(key, MAX_DIRECT_UPLOAD_BYTES);
+  } catch (err) {
+    if (err instanceof TooLargeError) {
+      await storage.delete(key).catch(() => undefined);
+      throw tooBig(err.bytes, MAX_DIRECT_UPLOAD_BYTES);
+    }
+    throw err;
+  }
+  if (!bytes) throw new ValidationError('The file did not reach storage. Try the upload again.');
+  try {
+    return { ...checkFile({ name: file.name, bytes }, MAX_DIRECT_UPLOAD_BYTES), storedKey: key };
+  } catch (err) {
+    await storage.delete(key).catch(() => undefined);
+    throw err;
+  }
 }
 
 /**
@@ -112,17 +147,22 @@ async function storeThen<T>(
   storage: ObjectStorage,
   write: (key: string) => Promise<T>,
 ): Promise<T> {
-  const key = `t/${ctx.tenantId}/documents/${docId}/${randomUUID()}/${storageSafeName(file.fileName)}`;
-  await storage.put(key, file.bytes, file.contentType);
+  const key = file.storedKey ?? `t/${ctx.tenantId}/documents/${docId}/${randomUUID()}/${storageSafeName(file.fileName)}`;
+  if (!file.storedKey) await storage.put(key, file.bytes, file.contentType);
   try {
     return await write(key);
   } catch (err) {
-    await storage.delete(key).catch(() => undefined);
+    if (!(err instanceof UploadReusedError)) await storage.delete(key).catch(() => undefined);
     throw err;
   }
 }
 
 async function insertVersion(tx: Tx, ctx: AuthzContext, docId: string, key: string, file: Checked) {
+  if (file.storedKey) {
+    // One direct upload, one version: a token cannot be used twice.
+    const [used] = await tx.select({ id: documentVersions.id }).from(documentVersions).where(eq(documentVersions.storageKey, key));
+    if (used) throw new UploadReusedError();
+  }
   const usage = await storageUsage(tx, ctx.tenantId);
   if (usage.usedBytes + file.sizeBytes > usage.limitBytes) {
     throw new ValidationError(
@@ -158,7 +198,7 @@ export async function createDocument(
 ) {
   assertVerifiedContext(ctx);
   const cols = columns(input);
-  const checked = checkFile(file);
+  const inline = 'bytes' in file ? checkFile(file) : null;
   const db = opts.db ?? platformDb();
   // Permission checks before touching storage.
   await withTenant(
@@ -172,6 +212,7 @@ export async function createDocument(
     db,
   );
   const storage = opts.storage ?? getPrivateStorage();
+  const checked = inline ?? (await checkDirectUpload(ctx, file as { name: string; token: string }, storage));
   const id = randomUUID();
   return storeThen(ctx, id, checked, storage, (key) =>
     withTenant(
@@ -229,7 +270,7 @@ export async function uploadDocumentVersion(
   opts: { db?: Db; storage?: ObjectStorage } = {},
 ) {
   assertVerifiedContext(ctx);
-  const checked = checkFile(file);
+  const inline = 'bytes' in file ? checkFile(file) : null;
   const db = opts.db ?? platformDb();
   const assertAllowed = async (tx: Tx) => {
     const cur = await load(tx, id);
@@ -241,6 +282,7 @@ export async function uploadDocumentVersion(
   };
   await withTenant(ctx.tenantId, assertAllowed, db);
   const storage = opts.storage ?? getPrivateStorage();
+  const checked = inline ?? (await checkDirectUpload(ctx, file as { name: string; token: string }, storage));
   return storeThen(ctx, id, checked, storage, (key) =>
     withTenant(
       ctx.tenantId,

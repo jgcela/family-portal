@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { requireStaff, tenantBase } from '@/server/request';
 import { AuthorizationError, can as canOn, hasAnywhere } from '@/server/rbac/authorize';
 import { ValidationError } from '@/server/services/modules';
-import { getDocumentForStaff, listDocumentCategories, MAX_UPLOAD_BYTES } from '@/server/services/documents';
+import { getDocumentForStaff, listDocumentCategories } from '@/server/services/documents';
+import { DIRECT_UPLOAD_ABOVE_BYTES, MAX_DIRECT_UPLOAD_BYTES } from '@/server/services/uploads';
 import { listAudiences } from '@/server/services/calendar';
 import { availableTransitions } from '@/server/services/workflow';
 import { StatusBadge } from '../../calendar/shared';
@@ -18,6 +19,7 @@ import {
   transitionDocumentAction,
   updateDocumentAction,
   uploadVersionAction,
+  startUploadAction,
 } from '../actions';
 import { fileLabel, formatBytes } from '../shared';
 import { AUDIENCE_NOTE } from '../note';
@@ -46,7 +48,8 @@ export default async function DocumentPage({ params, searchParams }: Props) {
   const canEdit = can('documents.edit') && doc.status !== 'archived' && (!live || can('documents.publish'));
   const canUpload = canEdit && can('documents.upload');
   const link = `${base}/d/${doc.slug}`;
-  const maxMb = MAX_UPLOAD_BYTES / 1048576;
+  const maxMb = MAX_DIRECT_UPLOAD_BYTES / 1048576;
+  const startUpload = startUploadAction.bind(null, key);
 
   return (
     <ModuleGate tenantId={tenant.id} base={base} moduleId="documents" name="Documents">
@@ -117,7 +120,12 @@ export default async function DocumentPage({ params, searchParams }: Props) {
         </div>
         {canUpload && (
           <div className="panel-body">
-            <UploadVersionForm run={uploadVersionAction.bind(null, key, doc.id)} maxMb={maxMb} />
+            <UploadVersionForm
+              run={uploadVersionAction.bind(null, key, doc.id)}
+              maxMb={maxMb}
+              inlineMaxBytes={DIRECT_UPLOAD_ABOVE_BYTES}
+              startUpload={startUpload}
+            />
           </div>
         )}
       </section>
@@ -137,6 +145,8 @@ export default async function DocumentPage({ params, searchParams }: Props) {
               canPublish={false}
               requireApproval={settings.requireApproval}
               maxMb={maxMb}
+              inlineMaxBytes={DIRECT_UPLOAD_ABOVE_BYTES}
+              startUpload={startUpload}
               audiencePicker={
                 <>
                   <AudiencePicker audiences={auds} selected={doc.audienceIds} visibility={doc.visibility} />

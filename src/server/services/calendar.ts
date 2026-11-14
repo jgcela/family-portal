@@ -612,6 +612,7 @@ export async function commitImport(ctx: AuthzContext, importId: string, input: u
           rrule: ev.rrule,
           exdates: ev.exdates,
           registrationUrl: ev.url,
+          isImportant: ev.important ?? false,
           externalHash: item.hash,
           importId: imp.id,
           updatedByUserId: ctx.userId,

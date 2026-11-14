@@ -88,12 +88,16 @@ describe('homepage validation', () => {
 
     const longBody = validateHomepage([custom('x'.repeat(5001))]);
     expect(longBody.ok).toBe(false);
+
+    expect(validateHomepage([{ id: 'a', type: 'calendar-alert', enabled: true, settings: { category: 'No school', days: 14 } }]).ok).toBe(true);
+    expect(validateHomepage([{ id: 'a', type: 'calendar-alert', enabled: true, settings: { days: 90 } }]).ok).toBe(false);
+    expect(validateHomepage([{ id: 'a', type: 'calendar-alert', enabled: true, settings: { color: 'red' } }]).ok).toBe(false);
   });
 
   it('keeps settings of blocks that are not editable yet, within a size limit', () => {
-    const ok = validateHomepage([{ id: 'q', type: 'quick-access', enabled: true, settings: { links: ['a'] } }]);
+    const ok = validateHomepage([{ id: 'q', type: 'featured-resources', enabled: true, settings: { links: ['a'] } }]);
     expect(ok.ok && ok.blocks[0]!.settings).toEqual({ links: ['a'] });
-    const big = validateHomepage([{ id: 'q', type: 'quick-access', enabled: true, settings: { blob: 'x'.repeat(3000) } }]);
+    const big = validateHomepage([{ id: 'q', type: 'featured-resources', enabled: true, settings: { blob: 'x'.repeat(3000) } }]);
     expect(big.ok).toBe(false);
   });
 });

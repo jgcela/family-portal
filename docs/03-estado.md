@@ -178,7 +178,23 @@ Resultado de pruebas: `npm test` → **143 de 143** pasan.
 | Planes Essential, Smart y Autonomous con nombres, precios y funciones tomados de la web de marketing (`marketing/src/config/site.ts`). Cada despliegue de producción los sincroniza; los colegios en "Essentials" pasan a Essential y los de "Complete" a Autonomous | Hecho | Pruebas |
 | Espacio por plan (10, 25 y 100 GB) | Decisión de la plataforma: la web de marketing no lo fija. Se cambia en `src/server/billing/catalog.ts` | — |
 
-Resultado de pruebas: `npm test` → **159 de 159** pasan.
+Resultado de pruebas: `npm test` → **165 de 165** pasan (14 nov).
+
+## Fase 6 — Migración de St. Mary (en curso)
+
+Guía paso a paso: [`04-migracion-st-mary.md`](04-migracion-st-mary.md).
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Los 132 eventos 2026‑27 del portal antiguo, copiados tal cual a `data/st-mary/events-2026-27.json`. `scripts/st-mary-calendar.cts` los convierte en un `.ics` que el colegio importa desde Calendar → Import | Hecho | Pruebas (132 eventos, sin errores, segunda importación sin cambios) + navegador |
+| El importador conserva "Important" (ICS `PRIORITY` 1–4 o categoría "Important"; columna "Important" en CSV) | Hecho | Pruebas |
+| Las vacaciones de varios días ocupan su rango (p. ej. Christmas Break 21 dic – 4 ene), con la fecha final del aviso "No school" del portal antiguo | Hecho | Pruebas |
+| Subida directa a R2 para archivos de más de 3 MB, hasta 25 MB. El servidor vuelve a leer el archivo, comprueba tipo y tamaño y borra lo que no pasa. Cada permiso de subida sirve una sola vez, para un colegio y una persona | Hecho | Pruebas + navegador (PDF de 5 MB) |
+| Documents → Upload several: varios archivos a la vez, título sacado del nombre del archivo (editable), una categoría y audiencia por tanda | Hecho | Navegador |
+| Regla CORS del bucket de R2 para que el navegador pueda subir | Manual en Cloudflare (ver la guía) | — |
+| Subir los 22 PDF del Drive | Lo hace el colegio con "Upload several" (ver la guía): los archivos son demasiado grandes para pasarlos por el chat | — |
+| Quick links, Volunteer, Wishlists, Staff favorites, Messenger | Pendiente: los módulos no existen todavía | — |
+| Tabla de redirecciones de las URLs antiguas | Pendiente | — |
 
 ## Lo que todavía no existe (no simulado)
 

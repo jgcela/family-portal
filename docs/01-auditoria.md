@@ -78,24 +78,24 @@ Estado: ☐ pendiente · ◐ parcial · ☑ hecho (en la plataforma nueva).
 | 3 | Pie con nombre y ciudad | Perfil del colegio | 2 | ☑ |
 | 4 | Enlace "Skip to content" | Layout compartido | 2 | ☑ |
 | 5 | Navegación superior (Messenger, Volunteer, Wishlists, Staff favorites) | Navegación configurable + módulos | 3–4 | ☐ |
-| 6 | Botón FACTS Login | Quick Links | 3–4 | ☐ |
+| 6 | Botón FACTS Login | Quick Links (botón de cabecera) | 3–4 | ◐ (función lista; falta crearlo en producción) |
 | 7 | Buscador "forms, events and policies" | Módulo Search | 4 | ☐ |
-| 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links / Featured Resources | 3–4 | ☐ |
+| 8 | "Popular": Handbook, Health forms, Supply list, Lunch menu, Wishlists | Quick Links (bloque Quick access) | 3–4 | ◐ (función lista; falta crearlos en producción; Wishlists espera su módulo) |
 | 9 | "This week and next" | Bloque This Week (calendario, días configurables) | 3–4 | ☑ |
 | 10 | Calendario mes/lista con leyenda por categorías | Calendar & Events | 3–4 | ☑ |
-| 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (ICS de Google o script desde `EVENTS`) | 3 / 6 | ◐ (importador listo; falta migrar los datos) |
+| 11 | 132 eventos 2026‑27 (`EVENTS`) y calendario público de Google | Importación (`.ics` generado desde `EVENTS`) | 3 / 6 | ◐ (archivo listo; falta importarlo en producción) |
 | 12 | Suscripción ICS / Google Calendar | Feed ICS por calendario | 3 | ☑ |
-| 13 | PDF del calendario completo | Documents | 3 / 6 | ☐ |
-| 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ☐ |
+| 13 | PDF del calendario completo | Documents | 3 / 6 | ◐ (subida lista; falta subir el archivo) |
+| 14 | 23 documentos en 6 categorías (`DOCS`) | Documents + Resources | 3 / 6 | ◐ (subida de varios y de más de 4 MB lista; falta subir los archivos) |
 | 15 | Manual HTML con índice, buscador y PDF | Pages (página larga con índice) + Documents | 3 / 6 | ◐ (páginas con índice listas; falta migrar el texto y el PDF) |
 | 16 | Manual de Preschool (HTML + PDF) | Pages + Documents (audiencia Preschool) | 3 / 6 | ☐ |
 | 17 | Archivo del School Messenger: 13 boletines HTML de Flocknote + `manifest.js` | Módulo Messenger | 4 / 6 | ☐ |
-| 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ☐ |
-| 19 | Teacher wishlists | Community | 4 / 6 | ☐ |
-| 20 | Staff favorites | Community / Directory | 4 / 6 | ☐ |
+| 18 | Volunteer opportunities | Módulo Volunteer | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
+| 19 | Teacher wishlists | Community | 4 / 6 | ◐ (módulo e importación listos; falta importar en producción) |
+| 20 | Staff favorites | Community | 4 / 6 | ◐ (solo familias, sin alergias ni cumpleaños; falta importar en producción) |
 | 21 | Supply list por curso | Pages (audiencia por curso) | 4 / 6 | ◐ (función lista; falta migrar el contenido) |
 | 22 | Fechas límite de salud (vacunas, físico, medicación, Tdap 7th) | Action Required | 3 / 6 | ☐ |
-| 23 | Aviso automático "No school" 14 días antes | Bloque Action Required / alerta | 4 | ☐ |
+| 23 | Aviso automático "No school" 14 días antes | Bloque Calendar alert de la portada | 4 | ◐ (bloque listo; falta añadirlo en producción) |
 
 ## Lo que se conserva tal cual
 

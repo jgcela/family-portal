@@ -25,6 +25,7 @@ const FIELD_LABELS: Record<string, string> = {
   category: 'Category',
   uid: 'Unique ID',
   url: 'Link',
+  important: 'Important (yes/no)',
 };
 
 const ACTION_LABEL = { new: 'New', update: 'Will update', unchanged: 'No change', duplicate: 'Possible duplicate', cancel: 'Cancelled in source' };
