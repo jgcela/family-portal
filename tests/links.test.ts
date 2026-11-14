@@ -54,6 +54,9 @@ describe('school links', () => {
     const ext = await createLink(a.ownerCtx, { menu: 'header', label: 'FACTS Login', target: 'https://sis.factsmgt.com/accounts/Account/Login', opensInNewTab: true });
     expect(ext.kind).toBe('url');
     expect(linkHref(ext, '/s/x')).toBe('https://sis.factsmgt.com/accounts/Account/Login');
+    const top = await createLink(a.ownerCtx, { menu: 'top', label: 'Volunteer', target: '/volunteer' });
+    expect(top.menu).toBe('top');
+    expect((await listMenuLinks(a.tenant.id, 'top', PUBLIC_VIEWER)).map((l) => l.label)).toEqual(['Volunteer']);
     const local = await createLink(a.ownerCtx, { menu: 'quick', label: 'Handbook', target: '/d/handbook' });
     expect(local.kind).toBe('page');
     expect(linkHref(local, '/s/x')).toBe('/s/x/d/handbook');

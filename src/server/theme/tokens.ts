@@ -144,7 +144,12 @@ export function compileTheme(input: ThemeTokens): Record<string, string> {
     '--color-on-primary': readableOn(c.primary),
     '--color-secondary': c.secondary,
     '--color-on-secondary': readableOn(c.secondary),
+    // Pale bands (documents, sidebar cards) and the date tiles of the agenda.
+    '--color-tint': mixHex(c.secondary, '#FFFFFF', 0.84),
+    '--color-on-tint': adjustForContrast(c.primary, mixHex(c.secondary, '#FFFFFF', 0.84), 4.5),
     '--color-accent': c.accent,
+    // Accent used as text on the primary colour (eyebrows on dark bands): only when readable.
+    '--color-accent-on-primary': readableOrFallback(adjustForContrast(c.accent, c.primary, 4.5), c.primary),
     '--color-on-accent': readableOn(c.accent),
     '--color-background': c.background,
     '--color-surface': c.surface,
@@ -162,6 +167,11 @@ export function themeToCss(tokens: ThemeTokens, selector = ':root'): string {
   return `${selector}{${Object.entries(vars)
     .map(([k, v]) => `${k}:${v}`)
     .join(';')}}`;
+}
+
+/** The colour if it reads on the background, otherwise plain black or white. */
+function readableOrFallback(color: string, background: string): string {
+  return contrastRatio(color, background) >= 4.5 ? color : readableOn(background);
 }
 
 function mixHex(a: string, b: string, amount: number): string {

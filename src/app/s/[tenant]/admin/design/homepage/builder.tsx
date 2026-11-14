@@ -170,6 +170,50 @@ export function HomepageBuilder({ initial, activeModules, moduleNames, canPublis
                       <span className="hint">Shown for the next event with this category (as written on the event). Empty means &ldquo;No school&rdquo;.</span>
                     </div>
                   )}
+                  {b.type === 'welcome' && (
+                    <>
+                      <div className="field">
+                        <label htmlFor={`eyebrow-${b.id}`}>Small line above the headline</label>
+                        <input
+                          id={`eyebrow-${b.id}`}
+                          maxLength={80}
+                          value={typeof b.settings.eyebrow === 'string' ? b.settings.eyebrow : ''}
+                          placeholder="Uses the school name when empty"
+                          onChange={(e) => setting(i, 'eyebrow', e.target.value || undefined)}
+                        />
+                      </div>
+                      <div className="field" style={{ gridColumn: '1 / -1' }}>
+                        <label htmlFor={`intro-${b.id}`}>Line under the headline</label>
+                        <input
+                          id={`intro-${b.id}`}
+                          maxLength={200}
+                          value={typeof b.settings.intro === 'string' ? b.settings.intro : ''}
+                          placeholder="Optional"
+                          onChange={(e) => setting(i, 'intro', e.target.value || undefined)}
+                        />
+                      </div>
+                      <label className="check">
+                        <input type="checkbox" checked={b.settings.search !== false} onChange={(e) => setting(i, 'search', e.target.checked ? undefined : false)} />
+                        Document search box (needs Documents)
+                      </label>
+                      <label className="check">
+                        <input type="checkbox" checked={b.settings.popular !== false} onChange={(e) => setting(i, 'popular', e.target.checked ? undefined : false)} />
+                        &ldquo;Popular&rdquo; links from Quick access (needs Quick Links)
+                      </label>
+                    </>
+                  )}
+                  {b.type === 'documents' && (
+                    <div className="field" style={{ gridColumn: '1 / -1' }}>
+                      <label htmlFor={`intro-${b.id}`}>Line under the heading</label>
+                      <input
+                        id={`intro-${b.id}`}
+                        maxLength={200}
+                        value={typeof b.settings.intro === 'string' ? b.settings.intro : ''}
+                        placeholder="Optional"
+                        onChange={(e) => setting(i, 'intro', e.target.value || undefined)}
+                      />
+                    </div>
+                  )}
                   {b.type === 'custom-content' && (
                     <div className="field" style={{ gridColumn: '1 / -1' }}>
                       <label htmlFor={`body-${b.id}`}>Message</label>

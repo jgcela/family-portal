@@ -7,6 +7,7 @@ import { hasAnywhere } from '@/server/rbac/authorize';
 import { listPublicAnnouncements } from '@/server/services/content';
 import { linkHref, linkVisibleTo, listMenuLinks } from '@/server/services/links';
 import { SignOutButton } from './account/sign-out';
+import { Icon } from './portal-icons';
 import '../portal.css';
 
 type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
@@ -23,15 +24,19 @@ export default async function PortalLayout({ children, params }: Props) {
     ? (await listPublicAnnouncements(tenant.id, await getViewer(tenant.id), { limit: 3 })).filter((x) => x.isUrgent)
     : [];
 
+  const hasLinks = view.activeModules.some((m) => m.id === 'quick_links');
+  const [headerButtons, topLinks] = hasLinks ? await Promise.all([listMenuLinks(tenant.id, 'header', viewer), listMenuLinks(tenant.id, 'top', viewer)]) : [[], []];
+  // A page already linked from the top bar is not repeated in the main menu.
+  const inTopBar = new Set(topLinks.filter((l) => l.kind === 'page').map((l) => l.target.split(/[?#]/)[0]));
   const nav = [
     ...view.activeModules
-      .filter((m) => m.nav?.area === 'primary')
+      .filter((m) => m.nav?.area === 'primary' && !inTopBar.has(m.nav.path))
       .map((m) => ({ label: m.nav!.label, href: `${base}${m.nav!.path === '/' ? '' : m.nav!.path}` || '/' })),
     ...view.customNav
       .filter((n) => n.menu === 'primary' && linkVisibleTo(n.visibility, viewer))
       .map((n) => ({ label: n.label, href: linkHref(n, base), newTab: n.opensInNewTab })),
   ];
-  const headerButtons = view.activeModules.some((m) => m.id === 'quick_links') ? await listMenuLinks(tenant.id, 'header', viewer) : [];
+  const tel = p.phone ? `tel:${p.phone.replace(/[^\d+]/g, '').replace(/^(\d{10})$/, '+1$1')}` : null;
   const logo = view.theme.header === 'solid' ? view.theme.logo.onDark ?? view.theme.logo.primary : view.theme.logo.primary;
 
   return (
@@ -58,6 +63,20 @@ export default async function PortalLayout({ children, params }: Props) {
             </form>
           </div>
         </div>
+      )}
+      {topLinks.length > 0 && (
+        <nav className="top-bar" aria-label="More">
+          <ul className="container top-bar-inner">
+            {topLinks.map((l) => (
+              <li key={l.id}>
+                <a href={linkHref(l, base)} {...(l.opensInNewTab ? { target: '_blank', rel: 'noopener' } : {})}>
+                  {l.label}
+                  {l.opensInNewTab && <span className="visually-hidden"> (opens in a new tab)</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       )}
       <header className="portal-header">
         <div className="container portal-header-inner">
@@ -90,6 +109,7 @@ export default async function PortalLayout({ children, params }: Props) {
               b.opensInNewTab ? (
                 <a key={b.id} href={linkHref(b, base)} className="btn btn-accent portal-header-link" target="_blank" rel="noopener">
                   {b.label}
+                  <Icon name="external" size={18} />
                   <span className="visually-hidden"> (opens in a new tab)</span>
                 </a>
               ) : (
@@ -137,20 +157,43 @@ export default async function PortalLayout({ children, params }: Props) {
       )}
       <main id="main">{children}</main>
       <footer className="portal-footer">
-        <div className="container portal-footer-inner">
-          <div>
-            <p className="portal-footer-name">{p.displayName}</p>
-            {p.addressLine1 && (
-              <p>
-                {p.addressLine1}, {p.city}, {p.region} {p.postalCode}
-              </p>
+        <div className="container">
+          {(p.phone || p.email || p.officeHours) && (
+            <>
+              <p className="footer-eyebrow">Need help?</p>
+              <p className="footer-title">We&rsquo;re here for your family.</p>
+              <ul className="footer-cards">
+                {p.phone && (
+                  <li>
+                    <span className="footer-card-label">Call the office</span>
+                    <a href={tel!}>{p.phone}</a>
+                  </li>
+                )}
+                {p.email && (
+                  <li>
+                    <span className="footer-card-label">Email</span>
+                    <a href={`mailto:${p.email}`}>{p.email}</a>
+                  </li>
+                )}
+                {p.officeHours && (
+                  <li>
+                    <span className="footer-card-label">Office hours</span>
+                    <strong>{p.officeHours}</strong>
+                  </li>
+                )}
+              </ul>
+            </>
+          )}
+          <p className="footer-legal">
+            {p.displayName}
+            {p.city && ` · ${p.city}${p.region ? `, ${p.region}` : ''}`}
+            {p.websiteUrl && (
+              <>
+                {' · '}
+                <a href={p.websiteUrl}>School website</a>
+              </>
             )}
-          </div>
-          <div className="portal-footer-contact">
-            {p.phone && <a href={`tel:${p.phone.replace(/[^\d+]/g, '').replace(/^(\d{10})$/, '+1$1')}`}>{p.phone}</a>}
-            {p.email && <a href={`mailto:${p.email}`}>{p.email}</a>}
-            {p.websiteUrl && <a href={p.websiteUrl}>School website</a>}
-          </div>
+          </p>
         </div>
       </footer>
     </div>

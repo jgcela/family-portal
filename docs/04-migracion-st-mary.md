@@ -161,3 +161,39 @@ Archivo: `st-mary-redirects.htaccess` (carpeta `fase6`). Hace que los enlaces an
 4. Cuando todo funcione, cambia `302` por `301` en todas las líneas.
 
 Los PDF antiguos llevan a la página de Documents, no a cada documento, porque los enlaces nuevos dependen del título que les pongas al subirlos.
+
+## 9. Aspecto del portal antiguo
+
+El portal nuevo puede verse como el antiguo, pero el colegio tiene que configurarlo. Nada de esto está fijado en el código, así que otro colegio puede elegir otra cosa.
+
+1. **Tema** (Admin → **Theme**): comprueba que estén puestos estos valores y pulsa **Save and publish**.
+   - Colores: primary `#16335B`, secondary `#006D8F`, accent `#FCBC40`, text `#333333`.
+   - Fuentes: títulos en **Inter**, texto en **Open Sans**.
+   - Cabecera: **solid**.
+2. **Barra superior** (Admin → **Links** → **New link**): crea un enlace por fila, en **Top bar**.
+
+| Label | Link |
+|---|---|
+| Volunteer | `/volunteer` |
+| Teacher wishlists | `/community#wishlists` |
+| Staff favorites | `/community#favorites` |
+| School Messenger (opcional) | La dirección del archivo de Flocknote, en pestaña nueva |
+
+   Los enlaces de la barra superior ya no se repiten en el menú principal.
+3. **Portada** (Admin → **Homepage**), de arriba abajo:
+   - **Calendar alert**: Add, sin cambios ("No school", 14 días).
+   - **Welcome banner**:
+     - Headline: `Everything your family needs, in one place.`
+     - Small line: `Parent portal · School year 2026–27`
+     - Line under the headline: `Find a form, check what's on this week, or add the school calendar to your phone.`
+     - Deja marcadas las dos casillas.
+   - **This week**: Heading `This week and next`, Days `14`.
+   - **Family documents**: Add, y en "Line under the heading" pon `Forms, handbooks and flyers for 2026–27, grouped by what you need to do.`
+   - Quita o desactiva los bloques que no estaban en el portal antiguo, como School Updates o Quick Access. Los enlaces "Popular" del buscador salen de Quick access, así que no hace falta el bloque.
+   - Pulsa **Preview draft on the portal**, revisa y pulsa **Save and publish**.
+
+Diferencias que quedan respecto al original:
+- El buscador busca solo en documentos, no en eventos.
+- El orden de las categorías de documentos es alfabético.
+- No hay apartado "Most used" con las tarjetas destacadas.
+- El calendario completo está en su propia página (**Calendar**), no al final de la portada.

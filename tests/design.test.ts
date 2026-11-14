@@ -94,6 +94,17 @@ describe('homepage validation', () => {
     expect(validateHomepage([{ id: 'a', type: 'calendar-alert', enabled: true, settings: { color: 'red' } }]).ok).toBe(false);
   });
 
+  it('accepts the welcome band options and the documents block, and nothing else', () => {
+    const ok = validateHomepage([
+      { id: 'w', type: 'welcome', enabled: true, settings: { eyebrow: 'Parent portal', intro: 'Find a form.', search: true, popular: false } },
+      { id: 'd', type: 'documents', enabled: true, settings: { intro: 'Forms and handbooks.' } },
+    ]);
+    expect(ok.ok).toBe(true);
+    expect(validateHomepage([{ id: 'w', type: 'welcome', enabled: true, settings: { eyebrow: 'x'.repeat(81) } }]).ok).toBe(false);
+    expect(validateHomepage([{ id: 'w', type: 'welcome', enabled: true, settings: { css: 'body{}' } }]).ok).toBe(false);
+    expect(validateHomepage([{ id: 'd', type: 'documents', enabled: true, settings: { html: '<b>' } }]).ok).toBe(false);
+  });
+
   it('keeps settings of blocks that are not editable yet, within a size limit', () => {
     const ok = validateHomepage([{ id: 'q', type: 'featured-resources', enabled: true, settings: { links: ['a'] } }]);
     expect(ok.ok && ok.blocks[0]!.settings).toEqual({ links: ['a'] });
