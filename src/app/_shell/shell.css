@@ -203,10 +203,10 @@
 /* Fields. */
 .shell .field label, .shell fieldset.field legend { font-weight: 600; font-size: 0.875rem; }
 .shell .field input:not([type='checkbox']):not([type='radio']):not([type='color']),
-.shell .field select,
 .shell .field textarea {
   border-radius: 10px; border-color: var(--hair-strong); background: var(--canvas);
 }
+.shell select:not([multiple]):not([size]) { border-radius: 10px; border-color: var(--hair-strong); background-color: var(--canvas); }
 .shell .field input:hover, .shell .field select:hover, .shell .field textarea:hover { border-color: #a8a8a8; }
 .shell .check input { accent-color: var(--ink); }
 

@@ -112,7 +112,7 @@
 .subscribe-panel ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
 .subscribe-panel li { display: grid; gap: 2px; }
 .cal-filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: end; margin-bottom: var(--space-5); }
-.cal-filters select { min-height: 44px; padding: 0 var(--space-3); border-radius: calc(var(--radius) * 0.7); border: 1px solid var(--border-strong); background: var(--color-surface); color: var(--color-text); font: inherit; }
+.cal-filters select { min-height: 44px; }
 .month-nav { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
 .month-nav h2 { min-width: 9ch; text-align: center; }
 .month-nav .btn { padding: 0 var(--space-4); font-size: 1.2rem; }

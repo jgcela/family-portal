@@ -32,10 +32,11 @@ table.matrix td.cell, table.matrix th.cell { text-align: center; width: 1%; whit
 .form { display: grid; gap: var(--space-4); max-width: 760px; }
 .form-row { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
 @media (min-width: 640px) { .form-row { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); } }
-.field select, .field textarea, .field input[type='color'] {
+.field textarea, .field input[type='color'] {
   min-height: 44px; padding: var(--space-2) var(--space-3); border-radius: calc(var(--radius) * 0.7);
   border: 1px solid var(--border-strong); background: var(--color-surface); color: var(--color-text); font: inherit;
 }
+.field select { border-radius: calc(var(--radius) * 0.7); }
 .field textarea { min-height: 112px; resize: vertical; }
 .field input[type='color'] { padding: 4px; width: 64px; }
 .field .hint { font-size: 0.8rem; color: var(--color-text-muted); }
