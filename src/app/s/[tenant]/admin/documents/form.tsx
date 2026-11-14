@@ -1,6 +1,7 @@
 'use client';
 import { useActionState, useState } from 'react';
 import { ACCEPT_ATTR, ALLOWED_DESCRIPTION } from '@/server/storage/files';
+import { withDirectUpload, type StartUpload } from './direct-upload';
 
 type Result = { error?: string; ok?: string } | undefined;
 type Props = {
@@ -13,6 +14,15 @@ type Props = {
   canPublish: boolean;
   requireApproval: boolean;
   maxMb: number;
+  /** Files above this size go straight to storage (see direct-upload.ts). */
+  inlineMaxBytes: number;
+  startUpload: StartUpload;
+};
+
+type Run = (prev: Result, fd: FormData) => Promise<Result>;
+const viaStorage = (run: Run, inlineMax: number, start: StartUpload): Run => async (prev, fd) => {
+  const err = await withDirectUpload(fd, 'file', inlineMax, start);
+  return err ? { error: err } : run(prev, fd);
 };
 
 const toSlug = (s: string) =>
@@ -26,7 +36,7 @@ const toSlug = (s: string) =>
     .slice(0, 80);
 
 export function DocumentForm(p: Props) {
-  const [state, action, pending] = useActionState(p.run, undefined);
+  const [state, action, pending] = useActionState(viaStorage(p.run, p.inlineMaxBytes, p.startUpload), undefined);
   const d = p.defaults;
   const [title, setTitle] = useState(d.title);
   const [slug, setSlug] = useState(d.slug);
@@ -129,8 +139,18 @@ export function DocumentForm(p: Props) {
   );
 }
 
-export function UploadVersionForm({ run, maxMb }: { run: (prev: Result, fd: FormData) => Promise<Result>; maxMb: number }) {
-  const [state, action, pending] = useActionState(run, undefined);
+export function UploadVersionForm({
+  run,
+  maxMb,
+  inlineMaxBytes,
+  startUpload,
+}: {
+  run: Run;
+  maxMb: number;
+  inlineMaxBytes: number;
+  startUpload: StartUpload;
+}) {
+  const [state, action, pending] = useActionState(viaStorage(run, inlineMaxBytes, startUpload), undefined);
   const [tooBig, setTooBig] = useState(false);
   return (
     <form action={action} className="form" style={{ maxWidth: 560 }}>

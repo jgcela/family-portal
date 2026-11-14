@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation';
 import { requireStaff, tenantBase } from '@/server/request';
 import { hasAnywhere } from '@/server/rbac/authorize';
 import { getContentSettings, listAudiences } from '@/server/services/calendar';
-import { listDocumentCategories, MAX_UPLOAD_BYTES } from '@/server/services/documents';
+import { listDocumentCategories } from '@/server/services/documents';
 import { ModuleGate } from '../../announcements/shared';
 import { AudiencePicker } from '../../_components/audience-picker';
 import { DocumentForm } from '../form';
-import { createDocumentAction } from '../actions';
+import { createDocumentAction, startUploadAction } from '../actions';
+import { DIRECT_UPLOAD_ABOVE_BYTES, MAX_DIRECT_UPLOAD_BYTES } from '@/server/services/uploads';
 import { AUDIENCE_NOTE } from '../note';
 
 export const metadata = { title: 'Upload document' };
@@ -38,7 +39,9 @@ export default async function NewDocument({ params }: { params: Promise<{ tenant
             linkPrefix={base}
             canPublish={hasAnywhere(ctx, 'documents.publish')}
             requireApproval={settings.requireApproval}
-            maxMb={MAX_UPLOAD_BYTES / 1048576}
+            maxMb={MAX_DIRECT_UPLOAD_BYTES / 1048576}
+            inlineMaxBytes={DIRECT_UPLOAD_ABOVE_BYTES}
+            startUpload={startUploadAction.bind(null, key)}
             audiencePicker={
               <>
                 <AudiencePicker audiences={auds} selected={[]} visibility="public" />

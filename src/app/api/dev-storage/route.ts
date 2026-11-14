@@ -2,10 +2,15 @@
 // Links are HMAC-signed and expire, like R2 signed URLs. Disabled in production.
 import { contentDisposition, getPrivateStorage, LocalStorage } from '@/server/storage/storage';
 
-export async function GET(req: Request) {
-  if (process.env.NODE_ENV === 'production') return new Response('Not found', { status: 404 });
+function local(): LocalStorage | null {
+  if (process.env.NODE_ENV === 'production') return null;
   const storage = getPrivateStorage();
-  if (!(storage instanceof LocalStorage)) return new Response('Not found', { status: 404 });
+  return storage instanceof LocalStorage ? storage : null;
+}
+
+export async function GET(req: Request) {
+  const storage = local();
+  if (!storage) return new Response('Not found', { status: 404 });
   const ok = storage.verify(new URL(req.url).searchParams);
   if (!ok) return new Response('Link expired or invalid', { status: 403 });
   try {
@@ -22,4 +27,15 @@ export async function GET(req: Request) {
   } catch {
     return new Response('Not found', { status: 404 });
   }
+}
+
+/** Direct uploads, standing in for R2's signed PUT URLs. */
+export async function PUT(req: Request) {
+  const storage = local();
+  if (!storage) return new Response('Not found', { status: 404 });
+  const key = storage.verifyPut(new URL(req.url).searchParams);
+  if (!key) return new Response('Link expired or invalid', { status: 403 });
+  const body = new Uint8Array(await req.arrayBuffer());
+  await storage.put(key, body);
+  return new Response(null, { status: 200 });
 }

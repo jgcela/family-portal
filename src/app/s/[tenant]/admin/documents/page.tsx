@@ -30,9 +30,14 @@ export default async function DocumentsAdmin({ params, searchParams }: Props) {
           </p>
         </div>
         {hasAnywhere(ctx, 'documents.create') && hasAnywhere(ctx, 'documents.upload') && (
-          <Link className="btn btn-primary btn-sm" href={`${base}/admin/documents/new`}>
-            Upload document
-          </Link>
+          <div className="btn-row">
+            <Link className="btn btn-quiet btn-sm" href={`${base}/admin/documents/bulk`}>
+              Upload several
+            </Link>
+            <Link className="btn btn-primary btn-sm" href={`${base}/admin/documents/new`}>
+              Upload document
+            </Link>
+          </div>
         )}
       </div>
       {sp.deleted && <div className="notice notice-ok">Document and its files deleted.</div>}

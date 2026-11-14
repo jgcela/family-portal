@@ -12,7 +12,18 @@ export interface ObjectStorage {
   readonly kind: 'r2' | 'local' | 'memory';
   put(key: string, body: Uint8Array, contentType: string): Promise<void>;
   signedGetUrl(key: string, opts: SignedUrlOptions): Promise<string>;
+  /** Short-lived URL the browser PUTs a file to directly (for files too big for a server request). */
+  signedPutUrl(key: string, expiresIn?: number): Promise<string>;
+  /** The object's bytes, or null if missing. Throws TooLargeError above maxBytes. */
+  get(key: string, maxBytes: number): Promise<Uint8Array | null>;
   delete(key: string): Promise<void>;
+}
+
+export class TooLargeError extends Error {
+  constructor(readonly bytes: number) {
+    super('The file is too large.');
+    this.name = 'TooLargeError';
+  }
 }
 
 export class StorageNotConfiguredError extends Error {
@@ -62,6 +73,25 @@ export class R2Storage implements ObjectStorage {
     const signed = await this.client.sign(u.toString(), { method: 'GET', aws: { signQuery: true } });
     return signed.url;
   }
+  async signedPutUrl(key: string, expiresIn = 600) {
+    const u = new URL(this.url(key));
+    u.searchParams.set('X-Amz-Expires', String(expiresIn));
+    const signed = await this.client.sign(u.toString(), { method: 'PUT', aws: { signQuery: true } });
+    return signed.url;
+  }
+  async get(key: string, maxBytes: number) {
+    const res = await this.client.fetch(this.url(key), { method: 'GET' });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`Read from storage failed (${res.status})`);
+    const len = Number(res.headers.get('content-length') ?? 0);
+    if (len > maxBytes) {
+      await res.body?.cancel();
+      throw new TooLargeError(len);
+    }
+    const body = new Uint8Array(await res.arrayBuffer());
+    if (body.byteLength > maxBytes) throw new TooLargeError(body.byteLength);
+    return body;
+  }
   async delete(key: string) {
     const res = await this.client.fetch(this.url(key), { method: 'DELETE' });
     if (!res.ok && res.status !== 404) throw new Error(`Delete from storage failed (${res.status})`);
@@ -101,6 +131,31 @@ export class LocalStorage implements ObjectStorage {
     });
     return `/api/dev-storage?${q}`;
   }
+  async signedPutUrl(key: string, expiresIn = 600) {
+    this.file(key);
+    const exp = Math.floor(Date.now() / 1000) + expiresIn;
+    const q = new URLSearchParams({ key, exp: String(exp), sig: this.sign(`put:${key}`, exp, '', '', false) });
+    return `/api/dev-storage?${q}`;
+  }
+  verifyPut(q: URLSearchParams): string | null {
+    const key = q.get('key') ?? '';
+    const exp = Number(q.get('exp'));
+    if (!key || !Number.isFinite(exp) || exp < Date.now() / 1000) return null;
+    const want = Buffer.from(this.sign(`put:${key}`, exp, '', '', false));
+    const got = Buffer.from(q.get('sig') ?? '');
+    if (want.length !== got.length || !timingSafeEqual(want, got)) return null;
+    return key;
+  }
+  async get(key: string, maxBytes: number) {
+    try {
+      const b = await readFile(this.file(key));
+      if (b.byteLength > maxBytes) throw new TooLargeError(b.byteLength);
+      return new Uint8Array(b);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null;
+      throw err;
+    }
+  }
   verify(q: URLSearchParams): { key: string; name: string; type: string; inline: boolean } | null {
     const key = q.get('key') ?? '';
     const exp = Number(q.get('exp'));
@@ -130,6 +185,15 @@ export class MemoryStorage implements ObjectStorage {
   async signedGetUrl(key: string, opts: SignedUrlOptions) {
     if (!this.objects.has(key)) throw new Error('No such object');
     return `memory://${key}?name=${encodeURIComponent(opts.fileName)}&exp=${opts.expiresIn ?? DEFAULT_EXPIRY}`;
+  }
+  async signedPutUrl(key: string) {
+    return `memory://${key}?put=1`;
+  }
+  async get(key: string, maxBytes: number) {
+    const o = this.objects.get(key);
+    if (!o) return null;
+    if (o.body.byteLength > maxBytes) throw new TooLargeError(o.body.byteLength);
+    return o.body;
   }
   async delete(key: string) {
     this.objects.delete(key);
