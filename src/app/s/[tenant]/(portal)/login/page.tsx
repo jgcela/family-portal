@@ -2,6 +2,7 @@ import { getPortalView, getTenantOr404, tenantBase } from '@/server/request';
 import Link from 'next/link';
 import { LoginForm } from '@/app/login/login-form';
 import { getJoinPageInfo } from '@/server/services/families';
+import { safeNext } from '@/lib/safe-next';
 
 type Props = { params: Promise<{ tenant: string }>; searchParams: Promise<{ next?: string; error?: string }> };
 
@@ -12,7 +13,7 @@ export default async function TenantLogin({ params, searchParams }: Props) {
   const tenant = await getTenantOr404(key);
   const [view, base, sp, join] = await Promise.all([getPortalView(tenant.id), tenantBase(key), searchParams, getJoinPageInfo(tenant.id)]);
   // Only allow redirects back into this portal.
-  const next = sp.next && sp.next.startsWith(`${base}/`) && !sp.next.startsWith('//') ? sp.next : `${base}/account`;
+  const next = safeNext(sp.next, base, `${base}/account`);
   return (
     <div className="auth-wrap">
       <div className="auth-card card">

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { brand, demo } from '@/config/site';
 
 type Errors = Partial<Record<'name' | 'email' | 'school', string>>;
-type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'ok' } | { kind: 'error'; message: string } | { kind: 'mail' };
+type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'error'; message: string } | { kind: 'mail' };
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -64,8 +64,9 @@ export function DemoForm() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(String(res.status));
-      setStatus({ kind: 'ok' });
       form.reset();
+      // The thank-you page is the conversion analytics counts.
+      window.location.assign('/thank-you');
     } catch {
       setStatus({
         kind: 'error',
@@ -73,21 +74,6 @@ export function DemoForm() {
       });
     }
   };
-
-  if (status.kind === 'ok') {
-    return (
-      <div className="form-card">
-        <div className="form-status ok" role="status">
-          <strong>Request received.</strong> We’ll reply to your work email to set a time.
-        </div>
-        {demo.bookingUrl && (
-          <a className="btn btn-primary" href={demo.bookingUrl}>
-            Pick a time now
-          </a>
-        )}
-      </div>
-    );
-  }
 
   const field = (name: keyof Errors, label: string, type: string, autoComplete: string) => (
     <div className="field">

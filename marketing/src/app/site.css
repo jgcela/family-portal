@@ -531,9 +531,24 @@ button {
   }
 }
 
+/* Phone header: "Book a Demo" stays in view next to the menu button. */
+.header-cta {
+  display: none;
+}
+
 @media (max-width: 860px) {
   .main-nav {
     display: none;
+  }
+
+  .header-cta {
+    display: inline-flex;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .header-cta + .menu-toggle {
+    margin-left: 0;
   }
 
   .menu-toggle {
@@ -2789,6 +2804,39 @@ button {
   background: var(--slate-2);
 }
 
+.footer-meta address {
+  font-style: normal;
+}
+
+@media (max-width: 420px) {
+  .menu-label {
+    display: none;
+  }
+
+  .menu-toggle {
+    padding: 0 12px;
+  }
+
+  .header-row {
+    gap: 8px;
+  }
+
+  .header-row .wordmark {
+    gap: 6px;
+  }
+
+  .header-row .wordmark-name {
+    font-size: 16px;
+    letter-spacing: 0.03em;
+  }
+
+  .header-cta {
+    flex-shrink: 0;
+    padding-inline: 12px;
+    font-size: 14px;
+  }
+}
+
 .footer-meta {
   margin-top: 32px;
   padding-top: 24px;
@@ -3057,4 +3105,45 @@ button {
 
 .slider {
   min-width: 0;
+}
+
+/* ---------- Simple pages (legal, thank-you, 404) ---------- */
+
+.simple-page {
+  padding-block: clamp(40px, 7vw, 96px);
+}
+
+.simple-wrap {
+  max-width: 760px;
+}
+
+.simple-body {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.simple-body h2 {
+  margin-top: 16px;
+}
+
+.simple-body ul {
+  display: grid;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.simple-body a:not(.btn) {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.simple-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
 }

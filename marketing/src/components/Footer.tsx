@@ -1,4 +1,4 @@
-import { brand, nav, schoolPhoto } from '@/config/site';
+import { brand, legal, legalName, nav, schoolPhoto } from '@/config/site';
 import { Mark } from './Icons';
 
 export function Footer() {
@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="wrap">
         <div className="footer-row">
-          <a className="wordmark" href="#top" aria-label={`${brand.name} home`}>
+          <a className="wordmark" href="/" aria-label={`${brand.name} home`}>
             <Mark />
             <span className="wordmark-name">{brand.name}</span>
             <span className="wordmark-desc">{brand.descriptor}</span>
@@ -17,10 +17,12 @@ export function Footer() {
                 {n.label}
               </a>
             ))}
-            <a href="#savings">Savings Calculator</a>
-            <a href="#faq">FAQ</a>
-            <a href="#demo">Book a Demo</a>
+            <a href="/#savings">Savings Calculator</a>
+            <a href="/#faq">FAQ</a>
+            <a href="/#demo">Book a Demo</a>
             <a href={`mailto:${brand.salesEmail}`}>Email sales</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
           </nav>
         </div>
         <p className="footer-wordmark" aria-hidden="true">
@@ -28,8 +30,13 @@ export function Footer() {
         </p>
         <div className="footer-meta">
           <p>
-            © {brand.year} {brand.name}. {brand.descriptor} for {brand.audience}.
+            © {brand.year} {legalName()}. {brand.descriptor} for {brand.audience}.
           </p>
+          {legal.address.length > 0 && (
+            <address>
+              {legalName()}, {legal.address.join(', ')} · <a href={`mailto:${brand.salesEmail}`}>{brand.salesEmail}</a>
+            </address>
+          )}
           <p>
             Product demos use fictional students and sample school content.
             {schoolPhoto ? ` Photo: ${schoolPhoto.credit}.` : ''}

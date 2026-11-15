@@ -33,7 +33,7 @@ const imageUrl = z
   .string()
   .trim()
   .max(2048)
-  .refine((v) => v.startsWith('/') || /^https:\/\//.test(v), 'Image must be an https URL or uploaded asset');
+  .refine((v) => /^(\/(?![/\\])|https:\/\/)/.test(v), 'Image must be an https URL or uploaded asset');
 
 export const themeTokensSchema = z
   .object({
