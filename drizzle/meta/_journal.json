@@ -169,6 +169,20 @@
       "when": 1794754632551,
       "tag": "0023_operations_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794757680025,
+      "tag": "0024_directory",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794757695914,
+      "tag": "0025_directory_rls",
+      "breakpoints": true
     }
   ]
 }

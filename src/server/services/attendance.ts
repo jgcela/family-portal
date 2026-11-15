@@ -18,7 +18,8 @@ import { audit } from '../audit/log';
 import { type AuthzContext } from '../rbac/authorize';
 import { addDays, daysBetween, toDateStr } from '../calendar/time';
 import { ValidationError } from './modules';
-import { activeModuleIds, assertFamily, assertId, assertStaff, canOnGrade, deny, guardianLink, studentName, type FamilyViewer } from './ops-common';
+import { activeModuleIds, assertFamily, assertId, assertStaff, canOnGrade, deny, type FamilyViewer } from './ops-common';
+import { childFor } from './directory';
 import { createInboxItem } from './inbox';
 import type { Viewer } from '../viewer';
 
@@ -65,7 +66,8 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export const noticeSchema = z
   .object({
-    studentId: z.string().uuid('Choose your child.'),
+    /** A child key from the student directory ("facts:…", "manual:…", or a manual-list id). */
+    studentId: z.string().min(1, 'Choose your child.').max(80),
     type: z.enum(['absent', 'late', 'early_dismissal']),
     dateFrom: z.string().regex(DATE, 'Choose a date.'),
     dateTo: z.string().regex(DATE).or(z.literal('')).optional(),
@@ -101,14 +103,18 @@ export async function submitNotice(tenantId: string, viewer: Viewer, input: unkn
   if (!mods.has('attendance_notices')) throw new ValidationError('The school is not taking attendance notices here yet. Please call the office.');
   const d = noticeSchema.parse(input);
   validateDates(d, await schoolToday(tenantId, now, db));
+  // Resolve the child first, outside the transaction: it may call the school's SIS.
+  // A retry with the same key returns the first notice even if the SIS is slow now.
+  const [earlier] = await withTenant(tenantId, (tx) => tx.select().from(attendanceNotices).where(and(eq(attendanceNotices.userId, v.userId), eq(attendanceNotices.idempotencyKey, d.idempotencyKey))), db);
+  if (earlier) return { notice: earlier, duplicate: true };
+  const child = await childFor(tenantId, v, d.studentId, 'submit_attendance', db);
+  if (!child) throw new ValidationError('You can\'t send attendance notices for this child. Please contact the office.');
   return withTenant(
     tenantId,
     async (tx) => {
       // Same key from the same person: return the first notice (double click, retry, back button).
       const [dup] = await tx.select().from(attendanceNotices).where(and(eq(attendanceNotices.userId, v.userId), eq(attendanceNotices.idempotencyKey, d.idempotencyKey)));
       if (dup) return { notice: dup, duplicate: true };
-      const link = await guardianLink(tx, v, d.studentId, 'submit_attendance');
-      if (!link) throw new ValidationError('You can\'t send attendance notices for this child. Please contact the office.');
       const since = new Date(now.getTime() - 24 * 3600_000);
       const [c] = await tx.select({ n: sql<number>`count(*)::int` }).from(attendanceNotices).where(and(eq(attendanceNotices.userId, v.userId), gte(attendanceNotices.createdAt, since)));
       if ((c?.n ?? 0) >= DAILY_LIMIT) throw new ValidationError('You have sent many notices today. Please call the office.');
@@ -118,7 +124,7 @@ export async function submitNotice(tenantId: string, viewer: Viewer, input: unkn
         .from(attendanceNotices)
         .where(
           and(
-            eq(attendanceNotices.studentId, link.s.id),
+            eq(attendanceNotices.studentKey, child.key),
             eq(attendanceNotices.type, d.type),
             sql`${attendanceNotices.status} not in ('rejected', 'cancelled')`,
             sql`${attendanceNotices.dateFrom} <= ${d.dateTo}::date and ${attendanceNotices.dateTo} >= ${d.dateFrom}::date`,
@@ -130,7 +136,10 @@ export async function submitNotice(tenantId: string, viewer: Viewer, input: unkn
         .insert(attendanceNotices)
         .values({
           tenantId,
-          studentId: link.s.id,
+          studentId: child.studentId,
+          studentKey: child.key,
+          studentName: child.name,
+          gradeId: child.gradeId,
           membershipId: v.membershipId,
           userId: v.userId,
           type: d.type,
@@ -152,12 +161,12 @@ export async function submitNotice(tenantId: string, viewer: Viewer, input: unkn
         kind: 'attendance',
         trigger: 'attendance_notice',
         facts: { type: d.type, reason: d.reason, days },
-        subject: `${TYPE_LABEL[d.type]}: ${studentName(link.s)}, ${when}${d.time ? ` at ${d.time}` : ''}`,
+        subject: `${TYPE_LABEL[d.type]}: ${child.name}, ${when}${d.time ? ` at ${d.time}` : ''}`,
         body: `${REASON_LABEL[d.reason]}${d.comment ? `\n\n${d.comment}` : ''}`,
         requesterUserId: v.userId,
         requesterMembershipId: v.membershipId,
-        studentId: link.s.id,
-        gradeId: link.s.gradeId,
+        student: { key: child.key, name: child.name, studentId: child.studentId },
+        gradeId: child.gradeId,
         now,
       });
       assertTransition('submitted', 'received');

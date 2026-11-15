@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Última actualización: 15 de noviembre de 2026 (ampliación IA, fase 3: avisos de ausencia, bandeja y flujos).
+Última actualización: 15 de noviembre de 2026 (alumnos desde FACTS sin listado propio).
 
 ## Fase 1 — Auditoría
 
@@ -275,3 +275,18 @@ Guía: `docs/08-operaciones.md`.
 3. **Correo:** R2 ya funciona en producción. Para el correo está decidido Resend, pero falta la cuenta.
 4. **Dominio de la plataforma:** para subdominios por escuela hace falta un dominio propio apuntado a Vercel. Mientras tanto, modo ruta (`/s/stmary`).
 5. **Vercel Hobby** no permite uso comercial.
+
+## Alumnos desde FACTS (15 nov 2026)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Fuente de alumnos por colegio: FACTS, listado del colegio o ninguna | Hecho | Pruebas |
+| Lectura en vivo de FACTS (GET, cabeceras de Reach), caché de 5 min | Hecho, **sin verificar con FACTS real** | Pruebas con FACTS simulado y con `fetch` simulado |
+| Familia ↔ FACTS por correo exacto y único, o ID puesto por la oficina | Hecho | Pruebas |
+| Avisos y solicitudes guardan clave, nombre y grado del momento (no el alumno) | Hecho; migración 0024 copia los datos antiguos | Pruebas |
+| Clave del colegio cifrada (AES‑256‑GCM, atada al colegio) | Hecho | Pruebas |
+| Bloqueos de custodia sobre lo que diga FACTS | Hecho | Pruebas |
+| Admin → Settings → Student records | Hecho | `next build` |
+| Inicio de sesión con FACTS (SSO) | No disponible: no hay evidencia pública de que FACTS lo ofrezca a terceros | Investigación, `docs/09-facts.md` |
+
+Resultado de pruebas: **238 de 238**.

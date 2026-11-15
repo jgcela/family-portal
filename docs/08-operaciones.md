@@ -19,7 +19,7 @@ Guía para el colegio y pasos de puesta en marcha. Todo lo de esta guía está e
 
 - **No escribe en FACTS ni en ningún SIS.** Al aceptar un aviso, la oficina lo introduce en el SIS como siempre y pulsa "I entered it in the SIS". El estado "In school records" queda reservado para cuando exista un conector verificado (Fase 5).
 - No envía correos ni SMS.
-- No importa alumnos desde FACTS automáticamente: se cargan con un CSV.
+- No escribe en FACTS. Lee de FACTS qué alumnos tiene cada familia (sin guardarlos), y solo cuando FACTS dé el acceso: ver `docs/09-facts.md`.
 
 ## Quién ve qué
 
@@ -36,8 +36,11 @@ Cada cambio queda en la auditoría.
 ## Puesta en marcha (paso a paso)
 
 1. **Módulos**: Admin → **Module Manager** → activa **Operations Inbox** y **Attendance Notices**. En Smart o Autonomous, activa también **Workflows**.
-2. **Alumnos**: Admin → **Students** → **Import from a CSV**. El archivo necesita las columnas `first_name, last_name, grade, sis_id, guardian_emails`. Puedes exportarlo de FACTS (lista de alumnos con el correo de los padres) y renombrar las columnas. Los padres se vinculan solo si ya tienen cuenta de familia aprobada con ese correo; el resultado dice cuáles faltan.
-3. **Revisa los vínculos** de familias con custodia especial y márcalos como **Restricted** con su nota.
+2. **Alumnos**: Admin → **Settings → Student records**. Elige de dónde salen los hijos de cada familia:
+   - **FACTS** (recomendado para St. Mary): se leen de FACTS cada vez, sin guardar un listado. Pasos en `docs/09-facts.md`.
+   - **Listado del colegio** (respaldo, para colegios sin SIS conectado): aparece el menú **Students** con la importación CSV (`first_name, last_name, grade, sis_id, guardian_emails`).
+   - Mientras no elijas ninguno, las familias no pueden avisar ausencias.
+3. **Custodias**: con FACTS, bloquea en **Student records → Access blocks** las combinaciones familia‑alumno que no deben actuar. Con el listado del colegio, marca el vínculo como **Restricted** con su nota.
 4. **Personal de asistencia**: Admin → **Staff** → da el rol **Attendance Office** a quien revise avisos.
 5. **Reglas** (opcional, Smart o superior): Admin → **Workflows** → **Use template** en "Attendance notices to the attendance office", elige responsable y actívala. Si quieres, añade "Accept one-day illness absences automatically" con un número de orden menor.
 6. **Plantillas de respuesta**: Admin → **Inbox** → **Reply templates**.

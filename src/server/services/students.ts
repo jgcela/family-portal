@@ -13,6 +13,7 @@ import { can, type AuthzContext } from '../rbac/authorize';
 import { ValidationError } from './modules';
 import { assertFamily, assertId, assertStaff, deny, gradeScope, studentName, type FamilyViewer } from './ops-common';
 import type { Viewer } from '../viewer';
+import { directorySource } from './directory';
 
 const name = z.string().trim().min(1, 'Enter a name.').max(80);
 
@@ -43,6 +44,12 @@ function needView(ctx: AuthzContext) {
 function needManage(ctx: AuthzContext) {
   assertStaff(ctx, { write: true });
   if (!can(ctx, 'students.manage')) deny('Not allowed: students.manage');
+}
+
+/** Adding to the manual list only makes sense when the school uses it (Settings → Student records). */
+async function needManualList(ctx: AuthzContext, db: Db) {
+  if ((await directorySource(ctx.tenantId, db)) !== 'manual')
+    throw new ValidationError('The manual student list is switched off. Turn it on in Settings → Student records, or connect FACTS instead.');
 }
 
 async function validGrade(tx: Tx, gradeId: string | null) {
@@ -117,6 +124,7 @@ export async function getStudent(ctx: AuthzContext, id: string, db: Db = platfor
 
 export async function saveStudent(ctx: AuthzContext, id: string | null, input: unknown, db: Db = platformDb()) {
   needManage(ctx);
+  await needManualList(ctx, db);
   const d = studentSchema.parse(input);
   return withTenant(
     ctx.tenantId,
@@ -143,6 +151,7 @@ export async function saveStudent(ctx: AuthzContext, id: string | null, input: u
 
 export async function setGuardian(ctx: AuthzContext, studentId: string, input: unknown, db: Db = platformDb()) {
   needManage(ctx);
+  await needManualList(ctx, db);
   assertId(studentId, 'Student');
   const d = guardianSchema.parse(input);
   if (d.access === 'restricted' && !d.restrictionNote) throw new ValidationError('Add a note explaining the restriction (for staff only).');
@@ -249,6 +258,7 @@ const MAX_IMPORT_ROWS = 3000;
  */
 export async function importStudents(ctx: AuthzContext, csv: string, db: Db = platformDb()) {
   needManage(ctx);
+  await needManualList(ctx, db);
   const rows = parseCsv(csv.replace(/^﻿/, ''));
   if (rows.length < 2) throw new ValidationError('The file has no rows. The first row must be the column names.');
   const head = rows[0]!.map((h) => h.trim().toLowerCase().replace(/\s+/g, '_'));

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPortalView, getTenantOr404, getViewer, tenantBase } from '@/server/request';
 import { myRequests } from '@/server/services/inbox';
-import { myChildren } from '@/server/services/students';
+import { familyChildren } from '@/server/services/directory';
 import { NewRequestForm } from './forms';
 import { ITEM_STATUS, KIND, NOTICE_STATUS } from './labels';
 
@@ -27,7 +27,8 @@ export default async function RequestsPage({ params, searchParams }: Props) {
       </div>
     );
   }
-  const [rows, kids] = await Promise.all([myRequests(tenant.id, viewer), myChildren(tenant.id, viewer)]);
+  // The child list is optional here: if the SIS is unreachable, the family can still write.
+  const [rows, kids] = await Promise.all([myRequests(tenant.id, viewer), sp.new === '1' ? familyChildren(tenant.id, viewer).catch(() => []) : Promise.resolve([])]);
   const fmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeZone: tenant.timezone });
   const showNew = sp.new === '1';
   return (
@@ -46,7 +47,7 @@ export default async function RequestsPage({ params, searchParams }: Props) {
           <NewRequestForm
             tenantKey={key}
             base={base}
-            kids={kids.map((k) => ({ id: k.id, name: k.name }))}
+            kids={kids.filter((k) => k.canView).map((k) => ({ id: k.key, name: k.name }))}
             kind={sp.kind === 'question' ? 'question' : 'request'}
             defaultSubject={sp.subject?.slice(0, 150)}
             defaultBody={sp.body?.slice(0, 1000)}
