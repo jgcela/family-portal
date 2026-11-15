@@ -23,9 +23,12 @@ describe('plan catalog', () => {
     }
     // Every mapped module exists in the registry.
     for (const ids of Object.values(FEATURE_MODULES)) for (const id of ids) expect(MODULES.some((m) => m.id === id)).toBe(true);
-    // Everything that works today is in the first plan.
-    const live = MODULES.filter((m) => m.implemented).map((m) => m.id);
-    for (const id of live) expect(PLAN_CATALOG[0]!.includedModules).toContain(id);
+    // Everything that works today is sold in some plan, and the highest plan has it all.
+    const live = MODULES.filter((m) => m.implemented && !m.required).map((m) => m.id);
+    for (const id of live) expect(PLAN_CATALOG[PLAN_CATALOG.length - 1]!.includedModules).toContain(id);
+    // AI is not part of Essential.
+    expect(PLAN_CATALOG[0]!.includedModules).not.toContain('knowledge_ai');
+    expect(PLAN_CATALOG[1]!.includedModules).toContain('knowledge_ai');
   });
 
   it('sync writes the plans and moves schools from retired plans', async () => {

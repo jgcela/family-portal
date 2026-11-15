@@ -68,6 +68,9 @@ export const plans = pgTable('plans', {
   staffUserLimit: integer('staff_user_limit'),
   // Display-only. No payment processing exists yet (see docs/02-arquitectura.md).
   priceCentsPerYear: integer('price_cents_per_year'),
+  implementationCents: integer('implementation_cents'),
+  // Usage limits (entitlements), see src/server/billing/catalog.ts PlanLimits.
+  limits: jsonb('limits').$type<Record<string, number | string | null>>().notNull().default({}),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -92,6 +95,8 @@ export const subscriptions = pgTable(
       .references(() => plans.id),
     status: subscriptionStatus('status').notNull().default('trialing'),
     extraModules: text('extra_modules').array().notNull().default(sql`'{}'::text[]`),
+    // Per-school limits that replace the plan's (set by the platform owner).
+    limitOverrides: jsonb('limit_overrides').$type<Record<string, number | string | null>>().notNull().default({}),
     trialEndsAt: timestamp('trial_ends_at', { withTimezone: true }),
     renewsAt: timestamp('renews_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

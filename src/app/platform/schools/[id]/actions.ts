@@ -1,4 +1,5 @@
 'use server';
+import { LIMIT_KEYS } from '@/server/billing/catalog';
 import { revalidatePath } from 'next/cache';
 import { requirePlatformAdmin } from '@/server/request';
 import {
@@ -40,6 +41,7 @@ export async function subscriptionAction(tenantId: string, _p: PlatformResult, f
       extraModules: fd.getAll('extraModules').filter((x): x is string => typeof x === 'string'),
       trialEndsAt: s(fd, 'trialEndsAt'),
       renewsAt: s(fd, 'renewsAt'),
+      limitOverrides: Object.fromEntries(LIMIT_KEYS.map((k) => [k, s(fd, `limit_${k}`)])),
     });
     revalidatePath(`/platform/schools/${tenantId}`);
     revalidatePath('/platform');

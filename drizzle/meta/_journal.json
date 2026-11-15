@@ -127,6 +127,34 @@
       "when": 1794619827127,
       "tag": "0017_messenger_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794750030368,
+      "tag": "0018_entitlements",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794750031302,
+      "tag": "0019_entitlements_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794750403944,
+      "tag": "0020_knowledge",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794750404982,
+      "tag": "0021_knowledge_rls",
+      "breakpoints": true
     }
   ]
 }

@@ -15,24 +15,41 @@ export const FEATURE_MODULES: Record<FeatureId, string[]> = {
   calendarImports: ['calendar'],
   documents: ['documents'],
   rolesPermissions: [],
-  absenceNotices: [],
+  absenceNotices: ['attendance_notices'],
   familyReceipts: [],
-  officeInbox: [],
-  knowledgeAI: ['search', 'ai_search'],
-  forms: ['forms'],
+  officeInbox: ['operations_inbox'],
+  knowledgeAI: ['search', 'knowledge_ai'],
+  forms: ['forms', 'workflows'],
   reminders: ['action_required', 'notifications'],
-  analytics: [],
-  familyAssistant: [],
+  analytics: ['ops_analytics'],
+  familyAssistant: ['family_assistant'],
   studentQueries: ['student_profiles'],
   advancedWorkflows: [],
-  sisIntegrations: ['facts_integration'],
+  sisIntegrations: ['sis_connectors'],
 };
 
-/** Platform limits per plan. The marketing site does not promise these; the platform owner sets them here. */
-const LIMITS: Record<MarketingPlan['id'], { storageLimitMb: number; staffUserLimit: number | null }> = {
-  essential: { storageLimitMb: 10 * 1024, staffUserLimit: null },
-  smart: { storageLimitMb: 25 * 1024, staffUserLimit: null },
-  autonomous: { storageLimitMb: 100 * 1024, staffUserLimit: null },
+/**
+ * Usage limits per plan (entitlements). The marketing site does not promise
+ * these numbers; the platform owner sets them here, and a school can get its
+ * own values from the Super Admin (subscriptions.limit_overrides).
+ * null = no limit. 0 = not included.
+ */
+export type PlanLimits = {
+  storageMb: number;
+  staffUsers: number | null;
+  /** null = unlimited for the plan (a hidden platform safety cap still applies, see entitlements.ts). */
+  aiQuestionsPerMonth: number | null;
+  automationRunsPerMonth: number;
+  integrations: number;
+  supportLevel: 'standard' | 'priority';
+};
+
+export const LIMIT_KEYS = ['storageMb', 'staffUsers', 'aiQuestionsPerMonth', 'automationRunsPerMonth', 'integrations'] as const;
+
+const LIMITS: Record<MarketingPlan['id'], PlanLimits> = {
+  essential: { storageMb: 10 * 1024, staffUsers: null, aiQuestionsPerMonth: 0, automationRunsPerMonth: 0, integrations: 0, supportLevel: 'standard' },
+  smart: { storageMb: 25 * 1024, staffUsers: null, aiQuestionsPerMonth: 3000, automationRunsPerMonth: 5000, integrations: 0, supportLevel: 'standard' },
+  autonomous: { storageMb: 100 * 1024, staffUsers: null, aiQuestionsPerMonth: null, automationRunsPerMonth: 25000, integrations: 2, supportLevel: 'standard' },
 };
 
 /** Plans retired when the catalog moved to the marketing names, and where their schools go. */
@@ -49,6 +66,7 @@ export type CatalogPlan = {
   features: FeatureId[];
   storageLimitMb: number;
   staffUserLimit: number | null;
+  limits: PlanLimits;
 };
 
 /** Each plan includes everything in the plans before it (as the marketing page says). */
@@ -67,7 +85,9 @@ export const PLAN_CATALOG: CatalogPlan[] = (() => {
       priceIsFrom: !!p.from,
       includedModules: modules,
       features: [...features],
-      ...LIMITS[p.id],
+      storageLimitMb: LIMITS[p.id].storageMb,
+      staffUserLimit: LIMITS[p.id].staffUsers,
+      limits: LIMITS[p.id],
     });
   }
   return out;

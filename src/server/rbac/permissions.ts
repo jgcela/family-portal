@@ -20,6 +20,8 @@ export type PermissionGroup =
   | 'People'
   | 'Portal design'
   | 'Modules'
+  | 'Operations'
+  | 'AI'
   | 'Settings';
 
 const content = (resource: string, label: string, group: PermissionGroup = 'Content'): PermissionDef[] => [
@@ -65,6 +67,17 @@ export const PERMISSIONS: readonly PermissionDef[] = [
   { key: 'modules.configure', group: 'Modules', label: 'Configure modules', scopable: false },
   { key: 'modules.toggle', group: 'Modules', label: 'Enable and disable modules', scopable: false },
   { key: 'integrations.manage', group: 'Modules', label: 'Manage integrations', scopable: false, ownerOnly: true },
+  { key: 'ai.knowledge.manage', group: 'AI', label: 'Manage AI knowledge sources and test the assistant', scopable: false },
+  { key: 'ai.settings.manage', group: 'AI', label: 'Configure the AI assistant, escalations and privacy', scopable: false },
+  { key: 'ai.quality.review', group: 'AI', label: 'See AI quality reports (unanswered topics, failures; no conversations)', scopable: false },
+  { key: 'ai.conversations.review', group: 'AI', label: 'Read the text of questions families asked the assistant (audited)', scopable: false, ownerOnly: true },
+  { key: 'students.view', group: 'Operations', label: 'View students and their guardians', scopable: true },
+  { key: 'students.manage', group: 'Operations', label: 'Manage students, guardians and custody restrictions', scopable: false },
+  { key: 'attendance.review', group: 'Operations', label: 'Review attendance notices', scopable: true },
+  { key: 'inbox.view', group: 'Operations', label: 'See the operations inbox', scopable: true },
+  { key: 'inbox.manage', group: 'Operations', label: 'Assign, resolve and bulk-update inbox items', scopable: true },
+  { key: 'workflows.manage', group: 'Operations', label: 'Create and run workflows from templates', scopable: false },
+  { key: 'analytics.view', group: 'Operations', label: 'View operations analytics', scopable: false },
   { key: 'settings.manage', group: 'Settings', label: 'Edit school profile and settings', scopable: false },
   { key: 'academic_years.manage', group: 'Settings', label: 'Manage academic years', scopable: false },
   { key: 'notifications.send', group: 'Settings', label: 'Send notifications', scopable: false },

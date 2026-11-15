@@ -4,6 +4,7 @@
 // comes from loadPlatformContext(), and it never grants access to a school's
 // content: creating a school, changing its plan or suspending it are platform
 // records; reading its announcements or documents would need a support grant.
+import { LIMIT_KEYS } from '../billing/catalog';
 import { randomBytes } from 'node:crypto';
 import { and, asc, count, desc, eq, inArray, isNull, like, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -426,6 +427,8 @@ const subscriptionSchema = z
     extraModules: z.array(z.string()).default([]),
     trialEndsAt: z.union([z.literal(''), date]).default(''),
     renewsAt: z.union([z.literal(''), date]).default(''),
+    // Blank = use the plan's value. A number (0 or more) replaces it for this school only.
+    limitOverrides: z.partialRecord(z.enum(LIMIT_KEYS), z.union([z.literal(''), z.literal('unlimited'), z.coerce.number().int().min(0).max(100_000_000)])).default({}),
   })
   .strict();
 
@@ -445,12 +448,20 @@ export async function updateSubscription(ctx: PlatformContext, tenantId: string,
   if (extras.some((m) => !MODULES.some((x) => x.id === m && x.implemented))) throw new ValidationError('Only available modules can be added.');
   if (v.status === 'trialing' && !v.trialEndsAt) throw new ValidationError('A trial needs an end date.');
   const toDate = (d: string) => (d ? new Date(`${d}T00:00:00Z`) : null);
+  const overrides: Record<string, number | null> = {};
+  for (const [k, val] of Object.entries(v.limitOverrides)) {
+    if (val === '') continue;
+    if (val === 'unlimited') {
+      if (k === 'storageMb') throw new ValidationError('Storage needs a number.');
+      overrides[k] = null;
+    } else overrides[k] = val;
+  }
   await db.transaction(async (tx) => {
     const [before] = await tx.select().from(subscriptions).where(eq(subscriptions.tenantId, tenantId));
     if (!before) throw new ValidationError('School not found.');
     await tx
       .update(subscriptions)
-      .set({ planId: plan.id, status: v.status, extraModules: extras, trialEndsAt: v.status === 'trialing' ? toDate(v.trialEndsAt) : null, renewsAt: toDate(v.renewsAt), updatedAt: new Date() })
+      .set({ planId: plan.id, status: v.status, extraModules: extras, limitOverrides: overrides, trialEndsAt: v.status === 'trialing' ? toDate(v.trialEndsAt) : null, renewsAt: toDate(v.renewsAt), updatedAt: new Date() })
       .where(eq(subscriptions.tenantId, tenantId));
     await audit(tx, {
       tenantId,
@@ -459,7 +470,7 @@ export async function updateSubscription(ctx: PlatformContext, tenantId: string,
       action: 'platform.subscription_changed',
       targetType: 'subscription',
       targetId: before.id,
-      metadata: { from: { planId: before.planId, status: before.status, extraModules: before.extraModules }, to: { planId: plan.id, status: v.status, extraModules: extras } },
+      metadata: { from: { planId: before.planId, status: before.status, extraModules: before.extraModules, limitOverrides: before.limitOverrides }, to: { planId: plan.id, status: v.status, extraModules: extras, limitOverrides: overrides } },
     });
   });
 }

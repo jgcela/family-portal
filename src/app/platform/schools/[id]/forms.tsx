@@ -51,7 +51,7 @@ export function StatusForm({ run, label, danger = false, needsReason = false, he
   );
 }
 
-type Plan = { id: string; name: string; includedModules: string[] };
+type Plan = { id: string; name: string; includedModules: string[]; limits?: Record<string, unknown> };
 type Mod = { id: string; name: string };
 
 export function SubscriptionForm({
@@ -63,7 +63,7 @@ export function SubscriptionForm({
   run: Run;
   plans: Plan[];
   modules: Mod[];
-  current: { planId: string; status: string; extraModules: string[]; trialEndsAt: string; renewsAt: string };
+  current: { planId: string; status: string; extraModules: string[]; trialEndsAt: string; renewsAt: string; limitOverrides: Record<string, unknown> };
 }) {
   const [state, action, pending] = useActionState(run, undefined);
   const [planId, setPlanId] = useState(current.planId);
@@ -126,6 +126,30 @@ export function SubscriptionForm({
           </div>
         </fieldset>
       )}
+      <fieldset className="field">
+        <legend>Limits for this school</legend>
+        <p className="muted" style={{ margin: 0 }}>
+          Leave blank to use the plan&apos;s limit. Type a number to replace it for this school, or &quot;unlimited&quot;.
+        </p>
+        <div className="form-row">
+          {LIMIT_FIELDS.map(([k, label]) => {
+            const cur = current.limitOverrides[k];
+            const planVal = (plan?.limits as Record<string, unknown> | undefined)?.[k];
+            return (
+              <div className="field" key={k}>
+                <label htmlFor={`limit_${k}`}>{label}</label>
+                <input
+                  id={`limit_${k}`}
+                  name={`limit_${k}`}
+                  inputMode="numeric"
+                  placeholder={planVal === null ? 'Plan: unlimited' : planVal !== undefined ? `Plan: ${String(planVal)}` : ''}
+                  defaultValue={cur === undefined ? '' : cur === null ? 'unlimited' : String(cur)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </fieldset>
       <p className="muted">
         Removing a module hides it from the school; nothing is deleted. Payments are not taken here: this records what
         was agreed.
@@ -139,6 +163,14 @@ export function SubscriptionForm({
     </form>
   );
 }
+
+const LIMIT_FIELDS = [
+  ['storageMb', 'Storage (MB)'],
+  ['staffUsers', 'Staff accounts'],
+  ['aiQuestionsPerMonth', 'AI questions / month'],
+  ['automationRunsPerMonth', 'Automation runs / month'],
+  ['integrations', 'Integrations'],
+] as const;
 
 export function OwnerInviteForm({ run }: { run: Run }) {
   const [state, action, pending] = useActionState(run, undefined);
