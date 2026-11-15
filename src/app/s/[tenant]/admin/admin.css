@@ -225,3 +225,12 @@ fieldset.panel { padding: 0; min-width: 0; }
 /* A paragraph that introduces the form under it. */
 .form-intro { margin-bottom: var(--space-4); }
 .form-subhead { font-size: 1rem; margin: var(--space-4) 0 var(--space-1); }
+/* Analytics */
+.analytics-big { margin: 0 0 var(--space-2); font-size: 1rem; }
+.analytics-big strong { font-size: 2rem; font-weight: 700; margin-right: var(--space-2); }
+.analytics-note { font-size: 0.85rem; font-weight: 500; color: var(--warning); }
+.analytics-weeks td:last-child { width: 45%; }
+.analytics-bar-cell { white-space: nowrap; }
+.analytics-bar { display: inline-block; height: 10px; vertical-align: middle; }
+.analytics-bar-a { background: var(--color-primary, #4b3fbf); border-radius: 2px 0 0 2px; }
+.analytics-bar-b { background: color-mix(in srgb, var(--color-primary, #4b3fbf) 40%, transparent); border-radius: 0 2px 2px 0; }

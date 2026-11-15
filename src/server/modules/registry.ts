@@ -3,6 +3,7 @@
 // loading. `implemented` is the honest status: a module can only be enabled
 // once its code actually ships. Flip it in the PR that delivers the module.
 import { z } from 'zod';
+import { assumptionsSchema } from './analytics-config';
 
 export type ModuleWidget = { id: string; name: string; description: string };
 export type NavContribution = { label: string; path: string; area: 'primary' | 'secondary' | 'family' };
@@ -308,11 +309,11 @@ export const MODULES: ModuleDefinition[] = [
   {
     id: 'ops_analytics',
     name: 'Operations Analytics',
-    description: 'Volume, automation rate and estimated staff time saved, from completed work.',
+    description: 'Volume, response times, automation, AI use and cost, and an estimate of staff time saved from the school\'s own assumptions.',
     category: 'operations',
     stage: 'core',
-    implemented: false,
-    configSchema: empty,
+    implemented: true,
+    configSchema: assumptionsSchema,
     permissions: ['analytics.view'],
     dependencies: [],
     widgets: [],

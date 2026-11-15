@@ -32,6 +32,7 @@ export default async function AdminLayout({ children, params }: Props) {
         { href: `${a}/students`, label: 'Students', show: !ctx.support && source === 'manual' && ops.has('attendance_notices') && hasAnywhere(ctx, 'students.view') },
         { href: `${a}/workflows`, label: 'Workflows', show: !ctx.support && ops.has('workflows') && can(ctx, 'workflows.manage') },
         { href: `${a}/ai`, label: 'AI Control Center', show: can(ctx, 'ai.knowledge.manage') || can(ctx, 'ai.quality.review') },
+        { href: `${a}/analytics`, label: 'Analytics', show: !ctx.support && ops.has('ops_analytics') && can(ctx, 'analytics.view') },
       ],
     },
     {
