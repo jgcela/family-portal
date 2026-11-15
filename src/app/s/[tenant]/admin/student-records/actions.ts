@@ -2,7 +2,8 @@
 // Settings → Student records. The services check integrations.manage.
 import { revalidatePath } from 'next/cache';
 import { requireStaff, tenantBase } from '@/server/request';
-import { addBlock, removeBlock, setPersonLink, testFactsConnection, updateDirectorySettings } from '@/server/services/directory';
+import { addBlock, removeBlock, setPersonLink, testConnection, updateDirectorySettings } from '@/server/services/directory';
+import { PROVIDERS } from '@/server/sis/connector';
 import { errorMessage, str } from '../_components/action-helpers';
 import type { OpsResult } from '../_ops/actions';
 
@@ -19,16 +20,25 @@ async function run(tenantKey: string, fn: (ctx: Awaited<ReturnType<typeof requir
 
 export async function saveSourceAction(tenantKey: string, _p: OpsResult, fd: FormData) {
   return run(tenantKey, async (ctx) => {
-    await updateDirectorySettings(ctx, { source: str(fd, 'source'), factsApiKey: str(fd, 'factsApiKey') });
+    // The OneRoster block is sent only when the school filled it in.
+    const or = str(fd, 'orBaseUrl') || str(fd, 'orTokenUrl') || str(fd, 'orClientId') || str(fd, 'orClientSecret');
+    await updateDirectorySettings(ctx, {
+      source: str(fd, 'source'),
+      factsApiKey: str(fd, 'factsApiKey'),
+      oneroster: or
+        ? { product: str(fd, 'orProduct'), version: str(fd, 'orVersion'), baseUrl: str(fd, 'orBaseUrl'), tokenUrl: str(fd, 'orTokenUrl'), clientId: str(fd, 'orClientId'), clientSecret: str(fd, 'orClientSecret') }
+        : undefined,
+    });
   });
 }
 
 export async function testConnectionAction(tenantKey: string, _p: OpsResult) {
   const { ctx } = await requireStaff(tenantKey);
   try {
-    const r = await testFactsConnection(ctx);
+    const r = await testConnection(ctx);
     revalidatePath(`${await tenantBase(tenantKey)}/admin/student-records`);
-    return r.ok ? { ok: 'FACTS answered. The connection works.' } : { error: r.error ?? 'The connection test failed.' };
+    const name = PROVIDERS[r.provider].name;
+    return r.ok ? { ok: r.note ?? `${name} answered. The connection works.` } : { error: r.error ?? 'The connection test failed.' };
   } catch (err) {
     return { error: errorMessage(err) };
   }
@@ -44,7 +54,7 @@ export async function personLinkAction(tenantKey: string, _p: OpsResult, fd: For
 
 export async function addBlockAction(tenantKey: string, _p: OpsResult, fd: FormData) {
   return run(tenantKey, async (ctx) => {
-    await addBlock(ctx, { membershipId: str(fd, 'membershipId'), factsStudentId: str(fd, 'factsStudentId'), note: str(fd, 'note') });
+    await addBlock(ctx, { membershipId: str(fd, 'membershipId'), studentId: str(fd, 'studentId'), note: str(fd, 'note') });
     return 'Blocked. That account no longer sees this student.';
   });
 }

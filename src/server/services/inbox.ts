@@ -505,7 +505,7 @@ export const familyRequestSchema = z.object({
   subject: z.string().trim().min(3, 'Add a short subject.').max(150),
   body: z.string().trim().min(1, 'Write your message.').max(3000),
   /** A child key from the student directory ("facts:…", "manual:…"); empty for none. */
-  studentId: z.string().max(80).optional(),
+  studentId: z.string().max(120).optional(),
 });
 
 export async function createFamilyRequest(tenantId: string, viewer: Viewer, input: unknown, now = new Date(), db: Db = platformDb()) {
