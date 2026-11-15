@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Última actualización: 15 de noviembre de 2026 (ampliación IA, fase 2: School Knowledge AI).
+Última actualización: 15 de noviembre de 2026 (ampliación IA, fase 3: avisos de ausencia, bandeja y flujos).
 
 ## Fase 1 — Auditoría
 
@@ -246,6 +246,20 @@ Los planes, sus nombres, precios y contenidos no cambian (decisión del 15 nov 2
 | Refresco diario (`/api/cron/knowledge`, Vercel Cron) | Hecho | Falta `CRON_SECRET` en producción |
 
 Pendiente de verificar en producción: una pregunta real con `ANTHROPIC_API_KEY` configurada. Hasta entonces la web comercial sigue marcando la IA como "planned".
+
+### Fase 3 — Avisos de ausencia, bandeja y flujos
+
+| Pieza | Estado | Probado |
+|---|---|---|
+| Alumnos y vínculos con cuentas de familia (permisos por hijo, restricción por custodia con nota solo para personal), importación CSV | Hecho | Pruebas + navegador |
+| Avisos de ausencia, retraso y salida anticipada con máquina de estados, recibo, cancelación e idempotencia | Hecho | Pruebas + navegador (móvil) |
+| Bandeja: responsable, estado, prioridad, vencimiento, historial, notas internas, respuestas, filtros, vistas guardadas, acciones en bloque, plantillas, tiempos medios | Hecho | Pruebas + navegador |
+| Reglas de flujo desde plantillas (asignar, vencer, escalar, aceptar avisos simples); vocabulario cerrado validado, sin código | Hecho | Pruebas (incluida una regla manipulada) |
+| Plantillas que necesitan formularios (excursiones, acuse del manual, voluntariado, documentos) | Pendiente: módulo de formularios | — |
+| Escritura en el SIS | No existe: la oficina lo introduce a mano y lo marca | — |
+| Avisos por correo a familias y personal | Pendiente: proveedor de correo | — |
+
+Guía: `docs/08-operaciones.md`.
 
 ## Lo que todavía no existe (no simulado)
 
