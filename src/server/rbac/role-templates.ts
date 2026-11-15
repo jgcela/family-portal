@@ -69,7 +69,16 @@ const TEMPLATES: RoleTemplate[] = [
       ...actions(['announcements', 'events', 'resources', 'documents'], ['view', 'create', 'edit']),
       'documents.upload',
       'media.upload',
+      'students.view',
+      'attendance.review',
+      'inbox.view',
     ],
+  },
+  {
+    key: 'attendance_staff',
+    name: 'Attendance Office',
+    description: 'Reviews attendance notices and works the operations inbox.',
+    permissions: ['dashboard.view', 'students.view', 'attendance.review', 'inbox.view', 'inbox.manage'],
   },
   {
     key: 'volunteer_coordinator',
@@ -83,7 +92,7 @@ const TEMPLATES: RoleTemplate[] = [
     description: 'Can inspect permitted content without changing it.',
     permissions: [
       'dashboard.view',
-      ...keysWhere((k) => k.endsWith('.view') && k !== 'users.view'),
+      ...keysWhere((k) => k.endsWith('.view') && k !== 'users.view' && k !== 'students.view'),
     ],
   },
   {

@@ -1,6 +1,7 @@
 // Staff management: list, invite (link-based), accept, suspend, remove.
 // Invitations are delivered as a one-time link the admin copies and sends;
 // email delivery comes later. Only the token's hash is stored.
+import { limitsFor } from '../billing/entitlements';
 import { createHash, randomBytes } from 'node:crypto';
 import { and, asc, count, countDistinct, desc, eq, gt, inArray, isNull, ne } from 'drizzle-orm';
 import { z } from 'zod';
@@ -51,12 +52,8 @@ async function staffSeats(tx: Tx, tenantId: string) {
     .select({ n: count() })
     .from(invitations)
     .where(and(isNull(invitations.acceptedAt), isNull(invitations.revokedAt), gt(invitations.expiresAt, new Date())));
-  const [p] = await tx
-    .select({ limit: plans.staffUserLimit })
-    .from(subscriptions)
-    .innerJoin(plans, eq(plans.id, subscriptions.planId))
-    .where(eq(subscriptions.tenantId, tenantId));
-  return { used: (m?.n ?? 0) + (i?.n ?? 0), limit: p?.limit ?? null };
+  const limits = await limitsFor(tx, tenantId);
+  return { used: (m?.n ?? 0) + (i?.n ?? 0), limit: limits.staffUsers };
 }
 
 // ---------- Reads ----------

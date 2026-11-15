@@ -129,8 +129,8 @@ export default function Home() {
               </div>
               <div className="hero-side" data-enter>
                 <p className="lede">
-                  Give families one place to get answers, report absences, and complete school forms. Give your front office a
-                  clear view of what needs attention.
+                  Give teachers more time to teach and school offices less administration to manage. Families get one place
+                  for answers, absence notices and school forms; the office gets one queue for what needs attention.
                 </p>
                 <div className="hero-actions">
                   <a className="btn btn-primary" href="#demo">

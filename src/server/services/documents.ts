@@ -1,5 +1,6 @@
 // Documents: private files with versions and a stable link.
 // Bytes go to private object storage; the database keeps metadata only.
+import { limitsFor } from '../billing/entitlements';
 import { createHash, randomUUID } from 'node:crypto';
 import { and, asc, desc, eq, max, sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -77,12 +78,8 @@ export async function storageUsage(tx: Tx, tenantId: string) {
     .select({ bytes: sql<string>`coalesce(sum(${documentVersions.sizeBytes}), 0)` })
     .from(documentVersions)
     .where(eq(documentVersions.tenantId, tenantId));
-  const [plan] = await tx
-    .select({ mb: plans.storageLimitMb })
-    .from(subscriptions)
-    .innerJoin(plans, eq(plans.id, subscriptions.planId))
-    .where(eq(subscriptions.tenantId, tenantId));
-  return { usedBytes: Number(used?.bytes ?? 0), limitBytes: plan ? plan.mb * 1024 * 1024 : 0 };
+  const limits = await limitsFor(tx, tenantId);
+  return { usedBytes: Number(used?.bytes ?? 0), limitBytes: limits.storageMb * 1024 * 1024 };
 }
 
 type Checked = { fileName: string; contentType: string; sizeBytes: number; sha256: string; bytes: Uint8Array; storedKey?: string };

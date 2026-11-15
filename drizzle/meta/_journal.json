@@ -127,6 +127,20 @@
       "when": 1794619827127,
       "tag": "0017_messenger_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794750030368,
+      "tag": "0018_entitlements",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794750031302,
+      "tag": "0019_entitlements_rls",
+      "breakpoints": true
     }
   ]
 }

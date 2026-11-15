@@ -68,6 +68,21 @@ export default async function PlansPage() {
                   <td key={p.id}>{p.staffUserLimit ?? 'Unlimited'}</td>
                 ))}
               </tr>
+              {([
+                ['aiQuestionsPerMonth', 'AI questions / month'],
+                ['automationRunsPerMonth', 'Automation runs / month'],
+                ['integrations', 'Integrations'],
+                ['supportLevel', 'Support'],
+              ] as const).map(([k, label]) => (
+                <tr key={k}>
+                  <th scope="row">{label}</th>
+                  <td />
+                  {plans.map((p) => {
+                    const v = (p.limits as Record<string, unknown>)[k];
+                    return <td key={p.id}>{v === null ? 'Unlimited' : v === 0 ? 'Not included' : v === undefined ? '—' : typeof v === 'number' ? v.toLocaleString('en-US') : String(v)}</td>;
+                  })}
+                </tr>
+              ))}
               {mods.map((m) => (
                 <tr key={m.id}>
                   <th scope="row">

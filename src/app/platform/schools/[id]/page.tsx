@@ -158,7 +158,7 @@ export default async function SchoolPage({ params }: { params: Promise<{ id: str
               run={subscriptionAction.bind(null, t.id)}
               plans={plans.map((p) => ({ id: p.id, name: p.name, includedModules: p.includedModules }))}
               modules={MODULES.filter((m) => m.implemented && !m.required).map((m) => ({ id: m.id, name: m.name }))}
-              current={{ planId: sub.planId, status: sub.status, extraModules: sub.extraModules, trialEndsAt: isoDate(sub.trialEndsAt), renewsAt: isoDate(sub.renewsAt) }}
+              current={{ planId: sub.planId, status: sub.status, extraModules: sub.extraModules, trialEndsAt: isoDate(sub.trialEndsAt), renewsAt: isoDate(sub.renewsAt), limitOverrides: sub.limitOverrides }}
             />
           </div>
         </section>
