@@ -300,6 +300,16 @@ Guía: `docs/08-operaciones.md`.
 
 Guía: `docs/10-conectores-sis.md`.
 
+## Fase 6 — Analítica (15 nov 2026)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Página Analytics: volumen, rapidez (medianas), automatización, IA y coste, solo agregados | Hecho | 6 pruebas + navegador (escritorio y 390 px, sin desbordes) |
+| Tiempo ahorrado estimado con minutos y coste por hora que pone el colegio | Hecho; los minutos por defecto son supuestos | Pruebas |
+| Exportar a CSV, comparar con el periodo anterior | No hecho | — |
+
+Guía: `docs/11-analitica.md`.
+
 
 Resultado de pruebas: **238 de 238**.
 
