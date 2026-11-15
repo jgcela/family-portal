@@ -224,3 +224,4 @@ fieldset.panel { padding: 0; min-width: 0; }
 
 /* A paragraph that introduces the form under it. */
 .form-intro { margin-bottom: var(--space-4); }
+.form-subhead { font-size: 1rem; margin: var(--space-4) 0 var(--space-1); }

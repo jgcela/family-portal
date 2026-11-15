@@ -66,7 +66,7 @@ type ToolCtx = {
 
 type Tool = { spec: ToolSpec; schema: z.ZodType; needs: string[]; run: (c: ToolCtx, input: never) => Promise<unknown> };
 
-const childRef = z.string().min(1).max(80).describe('A child "ref" from list_my_children');
+const childRef = z.string().min(1).max(120).describe('A child "ref" from list_my_children');
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function tool<S extends z.ZodType>(name: string, description: string, schema: S, needs: string[], run: (c: ToolCtx, input: z.infer<S>) => Promise<unknown>): Tool {

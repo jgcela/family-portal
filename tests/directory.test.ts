@@ -183,7 +183,7 @@ describe('children from FACTS', () => {
     expect(await familyChildren(s.tenant.id, p.viewer)).toEqual([]);
     await setPersonLink(s.ownerCtx, p.membershipId, '5008');
     expect((await familyChildren(s.tenant.id, p.viewer)).map((c) => c.key)).toEqual(['facts:9050']);
-    await expect(setPersonLink(s.ownerCtx, p.membershipId, 'bad id!')).rejects.toThrow(/person ID/);
+    await expect(setPersonLink(s.ownerCtx, p.membershipId, 'bad id!')).rejects.toThrow(/ID from the SIS/);
   });
 });
 

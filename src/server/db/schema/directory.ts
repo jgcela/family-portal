@@ -11,19 +11,25 @@ import { user } from './auth';
 import { tenants } from './platform';
 import { memberships } from './tenant';
 
-export const directorySource = pgEnum('directory_source', ['none', 'manual', 'facts']);
+export const directorySource = pgEnum('directory_source', ['none', 'manual', 'facts', 'oneroster']);
 export const directoryStatus = pgEnum('directory_status', ['not_configured', 'connected', 'error']);
 
 export const directorySettings = pgTable('directory_settings', {
   tenantId: uuid('tenant_id')
     .primaryKey()
     .references(() => tenants.id, { onDelete: 'cascade' }),
-  /** none: families see no children. manual: the school's own list. facts: read live from FACTS. */
+  /** none: families see no children. manual: the school's own list. facts / oneroster: read live from the SIS. */
   source: directorySource('source').notNull().default('none'),
   /** The school's Facts-Api-Key, encrypted (see crypto/secrets.ts). Never shown again after saving. */
   factsApiKeyEnc: text('facts_api_key_enc'),
   /** Last four characters, so staff can tell which key is saved. */
   factsApiKeyHint: text('facts_api_key_hint'),
+  /** OneRoster (PowerSchool, Infinite Campus…): addresses and client ID. Not secret. */
+  onerosterConfig: jsonb('oneroster_config').$type<{ version: 'v1p1' | 'v1p2'; baseUrl: string; tokenUrl: string; clientId: string; product: string }>(),
+  /** The OneRoster client secret, encrypted. Never shown again after saving. */
+  onerosterSecretEnc: text('oneroster_secret_enc'),
+  onerosterSecretHint: text('oneroster_secret_hint'),
+  /** Status of the last connection test of the selected SIS (columns named before OneRoster existed). */
   factsStatus: directoryStatus('facts_status').notNull().default('not_configured'),
   factsCheckedAt: timestamp('facts_checked_at', { withTimezone: true }),
   factsLastError: text('facts_last_error'),

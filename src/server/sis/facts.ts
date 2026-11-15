@@ -15,43 +15,16 @@
 // is matched to a FACTS person by email, and FACTS returns that person's
 // students. Nothing returned is stored except the parent's FACTS person id.
 
-export type FactsPerson = { personId: string; email: string | null };
-export type FactsChild = {
-  studentId: string;
-  firstName: string;
-  lastName: string;
-  nickname: string | null;
-  gradeLevel: string | null;
-  /** False when FACTS marks the relationship as having no custody or no portal access. */
-  canAct: boolean;
-};
+import { field, SisError, str, type SisChild, type SisConnector, type SisPerson } from './connector';
 
-export interface FactsApi {
-  /** One request that proves the keys work. */
-  ping(): Promise<void>;
-  findParentByEmail(email: string): Promise<FactsPerson | null>;
-  childrenOf(parentPersonId: string): Promise<FactsChild[]>;
-}
-
-export class FactsError extends Error {
-  constructor(
-    message: string,
-    readonly kind: 'not_configured' | 'unauthorized' | 'unavailable' | 'bad_response',
-  ) {
-    super(message);
-    this.name = 'FactsError';
-  }
-}
+export { field } from './connector';
+export type FactsPerson = SisPerson;
+export type FactsChild = SisChild;
+export type FactsApi = SisConnector;
+/** Kept for older imports: FACTS errors are SIS errors. */
+export const FactsError = SisError;
 
 type Json = Record<string, unknown>;
-
-/** Field lookup that ignores case and underscores: personId, PersonID, person_id. */
-export function field(o: Json, ...names: string[]): unknown {
-  const want = names.map((n) => n.toLowerCase().replace(/_/g, ''));
-  for (const [k, v] of Object.entries(o)) if (want.includes(k.toLowerCase().replace(/_/g, ''))) return v;
-  return undefined;
-}
-const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : typeof v === 'number' ? String(v) : null);
 
 /** Accepts a bare array or the usual envelopes ({ results }, { data }, { items }, { value }). */
 export function rows(body: unknown): Json[] {
@@ -92,8 +65,8 @@ export class HttpFactsApi implements FactsApi {
   private async get(path: string, params: Record<string, string> = {}): Promise<unknown> {
     const base = this.opts.baseUrl ?? process.env.FACTS_API_BASE_URL;
     const sub = this.opts.subscriptionKey ?? process.env.FACTS_SUBSCRIPTION_KEY;
-    if (!base || !sub) throw new FactsError('The FACTS connection is not set up on this platform yet.', 'not_configured');
-    if (!/^https:\/\//.test(base)) throw new FactsError('FACTS_API_BASE_URL must start with https://', 'not_configured');
+    if (!base || !sub) throw new SisError('The FACTS connection is not set up on this platform yet.', 'not_configured');
+    if (!/^https:\/\//.test(base)) throw new SisError('FACTS_API_BASE_URL must start with https://', 'not_configured');
     const url = new URL(base.replace(/\/+$/, '') + path);
     for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
     let res: Response;
@@ -105,15 +78,15 @@ export class HttpFactsApi implements FactsApi {
         cache: 'no-store',
       });
     } catch {
-      throw new FactsError('FACTS did not answer in time.', 'unavailable');
+      throw new SisError('FACTS did not answer in time.', 'unavailable');
     }
-    if (res.status === 401 || res.status === 403) throw new FactsError('FACTS refused the key. Check the API key and its "People" permission.', 'unauthorized');
+    if (res.status === 401 || res.status === 403) throw new SisError('FACTS refused the key. Check the API key and its "People" permission.', 'unauthorized');
     if (res.status === 404) return null;
-    if (!res.ok) throw new FactsError(`FACTS answered with an error (${res.status}).`, 'unavailable');
+    if (!res.ok) throw new SisError(`FACTS answered with an error (${res.status}).`, 'unavailable');
     try {
       return await res.json();
     } catch {
-      throw new FactsError('FACTS sent a response the portal could not read.', 'bad_response');
+      throw new SisError('FACTS sent a response the portal could not read.', 'bad_response');
     }
   }
 

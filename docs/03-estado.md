@@ -266,7 +266,7 @@ Guía: `docs/08-operaciones.md`.
 - **Recuperar contraseña:** no hay correo conectado, así que nadie puede restablecer su contraseña desde los paneles.
 - **Activar el inicio de sesión en dos pasos:** el login lo pide a quien lo tenga, pero no hay pantalla para activarlo.
 - Messenger (retirado), búsqueda, directorio, notificaciones, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
-- Login con FACTS (SSO).
+- Login con FACTS u otro SIS (SSO).
 
 ## Bloqueos y riesgos abiertos
 
@@ -288,6 +288,18 @@ Guía: `docs/08-operaciones.md`.
 | Bloqueos de custodia sobre lo que diga FACTS | Hecho | Pruebas |
 | Admin → Settings → Student records | Hecho | `next build` |
 | Inicio de sesión con FACTS (SSO) | No disponible: no hay evidencia pública de que FACTS lo ofrezca a terceros | Investigación, `docs/09-facts.md` |
+
+## Fase 5 — Conectores SIS (15 nov 2026)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Interfaz común de conector con tabla de capacidades declaradas (hijos sí; inicio de sesión, escritura de ausencias, notas y horarios no) | Hecho | Pruebas; la tabla se ve en Student records |
+| Conector OneRoster 1.1 y 1.2 (PowerSchool, Infinite Campus, Skyward…), OAuth 2.0 client credentials, solo lecturas | Hecho, **sin verificar con un distrito real** | 12 pruebas con un distrito simulado + navegador contra un servidor OneRoster HTTPS simulado |
+| FACTS pasa a ser un conector más | Hecho | Pruebas existentes de FACTS |
+| OAuth 1.0a (algunos servidores OneRoster 1.1) | No soportado | — |
+
+Guía: `docs/10-conectores-sis.md`.
+
 
 Resultado de pruebas: **238 de 238**.
 

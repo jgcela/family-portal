@@ -67,7 +67,7 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 export const noticeSchema = z
   .object({
     /** A child key from the student directory ("facts:…", "manual:…", or a manual-list id). */
-    studentId: z.string().min(1, 'Choose your child.').max(80),
+    studentId: z.string().min(1, 'Choose your child.').max(120),
     type: z.enum(['absent', 'late', 'early_dismissal']),
     dateFrom: z.string().regex(DATE, 'Choose a date.'),
     dateTo: z.string().regex(DATE).or(z.literal('')).optional(),
