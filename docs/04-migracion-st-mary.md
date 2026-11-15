@@ -177,9 +177,15 @@ El portal nuevo puede verse como el antiguo, pero el colegio tiene que configura
 | Volunteer | `/volunteer` |
 | Teacher wishlists | `/community#wishlists` |
 | Staff favorites | `/community#favorites` |
-| School Messenger (opcional) | La dirección del archivo de Flocknote, en pestaña nueva |
 
-   Los enlaces de la barra superior ya no se repiten en el menú principal.
+   School Messenger no va en la barra por ahora (decisión del 2026-11-15). Si ya lo creaste, desactívalo en Admin → Links.
+
+   Cómo queda la cabecera (igual que el original):
+   - Barra fina de arriba: estos enlaces a páginas separadas y, a la derecha, **Sign in** o **My family** y **Sign out**.
+   - Menú principal: **This week**, **Documents**, **Calendar** y **Contact**, que saltan a cada sección de la portada. Salen solos según los bloques de la portada; si falta un bloque, ese enlace abre su página propia.
+   - Botón **FACTS Login** (Admin → Links, menú **Header**).
+   - En el móvil, todo eso se recoge en el botón de menú (☰).
+   - Las demás páginas (Updates, School info, Community…) están en el pie de página.
 3. **Portada** (Admin → **Homepage**), de arriba abajo:
    - **Calendar alert**: Add, sin cambios ("No school", 14 días).
    - **Welcome banner**:
@@ -189,6 +195,7 @@ El portal nuevo puede verse como el antiguo, pero el colegio tiene que configura
      - Deja marcadas las dos casillas.
    - **This week**: Heading `This week and next`, Days `14`.
    - **Family documents**: Add, y en "Line under the heading" pon `Forms, handbooks and flyers for 2026–27, grouped by what you need to do.`
+   - **Upcoming events**: Add, Heading `School calendar 2026–27`, Within days `90`, Limit `20`. Sale a lo ancho después de los documentos y es el destino del enlace **Calendar** del menú.
    - Quita o desactiva los bloques que no estaban en el portal antiguo, como School Updates o Quick Access. Los enlaces "Popular" del buscador salen de Quick access, así que no hace falta el bloque.
    - Pulsa **Preview draft on the portal**, revisa y pulsa **Save and publish**.
 
@@ -196,4 +203,4 @@ Diferencias que quedan respecto al original:
 - El buscador busca solo en documentos, no en eventos.
 - El orden de las categorías de documentos es alfabético.
 - No hay apartado "Most used" con las tarjetas destacadas.
-- El calendario completo está en su propia página (**Calendar**), no al final de la portada.
+- Al final de la portada hay una lista por meses; la vista de cuadrícula mensual y los filtros están en la página **Calendar**.

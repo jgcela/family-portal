@@ -10,7 +10,19 @@ import { assistantAvailableFor } from '@/server/services/assistant';
 import { familyAssistantAvailable } from '@/server/services/family-assistant';
 import { SignOutButton } from './account/sign-out';
 import { Icon } from './portal-icons';
+import { MobileMenu } from './mobile-menu';
+import { defaultTopLinks, modulePages, sectionLinks, visibleBlocks, type NavLink } from '@/server/tenancy/portal-nav';
 import '../portal.css';
+
+/** A menu link: in-portal links are plain anchors so #section jumps work from any page. */
+function NavA({ l }: { l: NavLink }) {
+  return (
+    <a href={l.href} {...(l.newTab ? { target: '_blank', rel: 'noopener' } : {})}>
+      {l.label}
+      {l.newTab && <span className="visually-hidden"> (opens in a new tab)</span>}
+    </a>
+  );
+}
 
 type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
 
@@ -26,29 +38,47 @@ export default async function PortalLayout({ children, params }: Props) {
     ? (await listPublicAnnouncements(tenant.id, await getViewer(tenant.id), { limit: 3 })).filter((x) => x.isUrgent)
     : [];
 
-  const hasLinks = view.activeModules.some((m) => m.id === 'quick_links');
-  const [headerButtons, topLinks] = hasLinks ? await Promise.all([listMenuLinks(tenant.id, 'header', viewer), listMenuLinks(tenant.id, 'top', viewer)]) : [[], []];
-  // A page already linked from the top bar is not repeated in the main menu.
-  const inTopBar = new Set(topLinks.filter((l) => l.kind === 'page').map((l) => l.target.split(/[?#]/)[0]));
-  const nav = [
-    ...view.activeModules
-      .filter((m) => m.nav?.area === 'primary' && !inTopBar.has(m.nav.path))
-      .map((m) => ({ label: m.nav!.label, href: `${base}${m.nav!.path === '/' ? '' : m.nav!.path}` || '/' })),
-    // Families with the private assistant use it instead of the plain Q&A page (it searches the same sources).
-    ...((await familyAssistantAvailable(tenant.id, viewer))
-      ? [{ label: 'Assistant', href: `${base}/assistant` }]
-      : (await assistantAvailableFor(tenant.id, viewer, view.activeModules.map((m) => m.id)))
-        ? [{ label: 'Ask', href: `${base}/ask` }]
-        : []),
-    // Signed-in families: report an absence and follow their requests.
-    ...(viewer.kind === 'family' && view.activeModules.some((m) => m.id === 'attendance_notices') ? [{ label: 'Report an absence', href: `${base}/absence` }] : []),
-    ...(viewer.kind === 'family' && view.activeModules.some((m) => m.id === 'operations_inbox') ? [{ label: 'My requests', href: `${base}/requests` }] : []),
+  const active = new Set(view.activeModules.map((m) => m.id));
+  const hasLinks = active.has('quick_links');
+  const [headerButtons, topLinks, canAsk, hasAssistant] = await Promise.all([
+    hasLinks ? listMenuLinks(tenant.id, 'header', viewer) : [],
+    hasLinks ? listMenuLinks(tenant.id, 'top', viewer) : [],
+    assistantAvailableFor(tenant.id, viewer, [...active]),
+    familyAssistantAvailable(tenant.id, viewer),
+  ]);
+  // Families with the private assistant use it instead of the plain Q&A page (it searches the same sources).
+  const ask = hasAssistant ? [{ label: 'Assistant', href: `${base}/assistant` }] : canAsk ? [{ label: 'Ask', href: `${base}/ask` }] : [];
+  const hasContact = !!(p.phone || p.email || p.officeHours);
+  // Main menu: jumps to the homepage sections (This week, Documents, Calendar, Contact),
+  // plus any links the school added to the Main menu.
+  const sections = [
+    ...sectionLinks(visibleBlocks(view.homepage, active), active, base, hasContact),
     ...view.customNav
       .filter((n) => n.menu === 'primary' && linkVisibleTo(n.visibility, viewer))
       .map((n) => ({ label: n.label, href: linkHref(n, base), newTab: n.opensInNewTab })),
   ];
+  // Top bar: separate pages. The school's own Top bar links, or the module pages when it has none.
+  const pages = topLinks.length
+    ? topLinks.map((l) => ({ label: l.label, href: linkHref(l, base), newTab: l.opensInNewTab }))
+    : [...defaultTopLinks(view.activeModules, base), ...ask];
+  // Footer: every page, so nothing is out of reach when the top bar is short.
+  const explore = [...modulePages(view.activeModules, base), ...ask];
   const tel = p.phone ? `tel:${p.phone.replace(/[^\d+]/g, '').replace(/^(\d{10})$/, '+1$1')}` : null;
   const logo = view.theme.header === 'solid' ? view.theme.logo.onDark ?? view.theme.logo.primary : view.theme.logo.primary;
+
+  const account = isStaff ? (
+    <>
+      <Link href={`${base}/admin`}>Manage portal</Link>
+      <SignOutButton to={base || '/'} />
+    </>
+  ) : session ? (
+    <>
+      {viewer.kind === 'family' ? <Link href={`${base}/family`}>My family</Link> : <span className="portal-user">{session.user.name}</span>}
+      <SignOutButton to={base || '/'} />
+    </>
+  ) : (
+    <Link href={`${base}/login`}>Sign in</Link>
+  );
 
   return (
     <div className={`portal portal-header-${view.theme.header}`}>
@@ -75,86 +105,66 @@ export default async function PortalLayout({ children, params }: Props) {
           </div>
         </div>
       )}
-      {topLinks.length > 0 && (
-        <nav className="top-bar" aria-label="More">
-          <ul className="container top-bar-inner">
-            {topLinks.map((l) => (
-              <li key={l.id}>
-                <a href={linkHref(l, base)} {...(l.opensInNewTab ? { target: '_blank', rel: 'noopener' } : {})}>
-                  {l.label}
-                  {l.opensInNewTab && <span className="visually-hidden"> (opens in a new tab)</span>}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
-      <header className="portal-header">
-        <div className="container portal-header-inner">
-          <Link href={base || '/'} className="portal-brand">
-            {logo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logo} alt={`${p.displayName} home`} className="portal-logo" />
-            ) : (
-              <span className="portal-wordmark">{p.shortName ?? p.displayName}</span>
+      <div className="portal-masthead">
+        <div className="top-bar">
+          <div className="container top-bar-inner">
+            {pages.length > 0 && (
+              <nav aria-label="More pages" className="top-bar-pages">
+                <ul>
+                  {pages.map((l) => (
+                    <li key={l.href + l.label}>
+                      <NavA l={l} />
+                    </li>
+                  ))}
+                </ul>
+              </nav>
             )}
-          </Link>
-          <nav aria-label="Main" className="portal-nav">
-            <ul>
-              {nav.map((n) => (
-                <li key={n.href + n.label}>
-                  {'newTab' in n && n.newTab ? (
-                    <a href={n.href} target="_blank" rel="noopener">
-                      {n.label}
-                      <span className="visually-hidden"> (opens in a new tab)</span>
-                    </a>
-                  ) : (
-                    <Link href={n.href}>{n.label}</Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="portal-account">
-            {headerButtons.map((b) =>
-              b.opensInNewTab ? (
-                <a key={b.id} href={linkHref(b, base)} className="btn btn-accent portal-header-link" target="_blank" rel="noopener">
-                  {b.label}
-                  <Icon name="external" size={18} />
-                  <span className="visually-hidden"> (opens in a new tab)</span>
-                </a>
-              ) : (
-                <a key={b.id} href={linkHref(b, base)} className="btn btn-accent portal-header-link">
-                  {b.label}
-                </a>
-              ),
-            )}
-            {isStaff ? (
-              <>
-                <Link href={`${base}/admin`} className="btn btn-accent">
-                  Manage portal
-                </Link>
-                <SignOutButton to={base || '/'} />
-              </>
-            ) : session ? (
-              <>
-                {viewer.kind === 'family' ? (
-                  <Link href={`${base}/family`} className="portal-signin">
-                    My family
-                  </Link>
-                ) : (
-                  <span className="portal-user">{session.user.name}</span>
-                )}
-                <SignOutButton to={base || '/'} />
-              </>
-            ) : (
-              <Link href={`${base}/login`} className="portal-signin">
-                Sign in
-              </Link>
-            )}
+            <div className="top-bar-account">{account}</div>
           </div>
         </div>
-      </header>
+        <header className="portal-header">
+          <div className="container portal-header-inner">
+            <Link href={base || '/'} className="portal-brand">
+              {logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logo} alt={`${p.displayName} home`} className="portal-logo" />
+              ) : (
+                <span className="portal-wordmark">{p.shortName ?? p.displayName}</span>
+              )}
+            </Link>
+            {sections.length > 0 && (
+              <nav aria-label="Portal sections" className="portal-nav">
+                <ul>
+                  {sections.map((l) => (
+                    <li key={l.href + l.label}>
+                      <NavA l={l} />
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+            <div className="portal-actions">
+              {headerButtons.map((b) => (
+                <a
+                  key={b.id}
+                  href={linkHref(b, base)}
+                  className="btn btn-accent portal-header-link"
+                  {...(b.opensInNewTab ? { target: '_blank', rel: 'noopener' } : {})}
+                >
+                  {b.label}
+                  {b.opensInNewTab && (
+                    <>
+                      <Icon name="external" size={18} />
+                      <span className="visually-hidden"> (opens in a new tab)</span>
+                    </>
+                  )}
+                </a>
+              ))}
+              <MobileMenu sections={sections} pages={pages} account={account} />
+            </div>
+          </div>
+        </header>
+      </div>
       {urgent.length > 0 && (
         <div className="urgent-banner" role="region" aria-label="Urgent announcements">
           <div className="container">
@@ -167,7 +177,7 @@ export default async function PortalLayout({ children, params }: Props) {
         </div>
       )}
       <main id="main">{children}</main>
-      <footer className="portal-footer">
+      <footer className="portal-footer" id="contact">
         <div className="container">
           {(p.phone || p.email || p.officeHours) && (
             <>
@@ -194,6 +204,17 @@ export default async function PortalLayout({ children, params }: Props) {
                 )}
               </ul>
             </>
+          )}
+          {explore.length > 0 && (
+            <nav aria-label="All pages" className="footer-pages">
+              <ul>
+                {explore.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href}>{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           )}
           <p className="footer-legal">
             {p.displayName}

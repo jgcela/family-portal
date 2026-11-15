@@ -1,16 +1,16 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { getDisplayView, getSession, getTenantOr404, tenantBase, getViewer } from '@/server/request';
+import { visibleBlocks } from '@/server/tenancy/portal-nav';
 import { BLOCK_INFO, CALENDAR_ALERT_DEFAULTS, type HomepageBlock } from '@/server/tenancy/homepage-defaults';
 import { renderMarkdown } from '@/server/content/markdown';
 import { listCalendars, listPublicOccurrences } from '@/server/services/calendar';
 import { listPublicDocuments } from '@/server/services/documents';
-import { WeekAgenda } from './calendar/week-agenda';
+import { MonthAgenda, WeekAgenda } from './calendar/week-agenda';
 import { DocGroups } from './documents/doc-groups';
 import { toDocItems } from './documents/doc-items';
 import { Icon } from './portal-icons';
 import { addDays, toDateStr } from '@/server/calendar/time';
-import { EventList } from './calendar/event-list';
 import { AnnouncementList } from './updates/announcement-list';
 import { listPublicAnnouncements } from '@/server/services/content';
 import { listPublicVolunteer } from '@/server/services/volunteer';
@@ -40,12 +40,7 @@ export default async function FamilyHome({ params }: Props) {
   const tenant = await getTenantOr404(key);
   const [view, session, base] = await Promise.all([getDisplayView(tenant.id), getSession(), tenantBase(key)]);
   const active = new Set(view.activeModules.map((m) => m.id));
-  const blocks = view.homepage.filter((b) => {
-    const info = BLOCK_INFO[b.type];
-    if (!b.enabled || !info.rendered) return false;
-    if (b.type === 'custom-content' && !(typeof b.settings.body === 'string' && b.settings.body.trim())) return false;
-    return !info.module || active.has(info.module);
-  });
+  const blocks = visibleBlocks(view.homepage, active);
   const quickLinks =
     blocks.some((b) => b.type === 'quick-access' || (b.type === 'welcome' && b.settings.popular !== false)) && active.has('quick_links')
       ? await listMenuLinks(tenant.id, 'quick', await getViewer(tenant.id))
@@ -54,11 +49,12 @@ export default async function FamilyHome({ params }: Props) {
   const welcome = blocks.find((b) => b.type === 'welcome');
   const wantPopular = !!welcome && welcome.settings.popular !== false && active.has('quick_links');
   const docBlocks = blocks.filter((b) => b.type === 'documents');
-  const content = blocks.filter((b) => !['welcome', 'calendar-alert', 'documents'].includes(b.type) && (b.type !== 'quick-access' || quickLinks.length > 0));
+  const content = blocks.filter((b) => !['welcome', 'calendar-alert', 'documents', 'upcoming-events'].includes(b.type) && (b.type !== 'quick-access' || quickLinks.length > 0));
   const alertBlocks = blocks.filter((b) => b.type === 'calendar-alert');
   const today = toDateStr(new Date(), tenant.timezone);
   // Calendar blocks share one query over the longest window any of them needs.
-  const calBlocks = content.filter((b) => b.type === 'this-week' || b.type === 'upcoming-events');
+  const calBlocks = blocks.filter((b) => b.type === 'this-week' || b.type === 'upcoming-events');
+  const calBands = blocks.filter((b) => b.type === 'upcoming-events');
   const horizon = Math.max(
     0,
     ...calBlocks.map((b) => (b.type === 'this-week' ? num(b.settings.days, 7, 1, 21) : num(b.settings.withinDays, 60, 7, 180))),
@@ -120,11 +116,11 @@ export default async function FamilyHome({ params }: Props) {
       const end = addDays(today, num(b.settings.withinDays, 60, 7, 180));
       const limit = num(b.settings.limit, 5, 1, 20);
       return (
-        <EventList
-          items={occurrences.filter((o) => o.date <= end && o.date >= today).slice(0, limit)}
+        <MonthAgenda
+          items={occurrences.filter((o) => o.date <= end && o.endDate >= today).slice(0, limit)}
           base={base}
           tz={tenant.timezone}
-          emptyText="No upcoming events."
+          alertCategories={alertBlocks.map(alertCategory)}
         />
       );
     }
@@ -207,15 +203,15 @@ export default async function FamilyHome({ params }: Props) {
       <div className={`container home-grid${content.length ? '' : ' home-grid-single'}`}>
         <div hidden={!content.length} className="home-col">
           {content.map((b) => (
-            <section key={b.id} className="home-section" aria-labelledby={b.title || b.type !== 'custom-content' ? `block-${b.id}` : undefined}>
+            <section key={b.id} className="home-section" id={b.type === 'this-week' ? 'this-week' : undefined} aria-labelledby={b.title || b.type !== 'custom-content' ? `block-${b.id}` : undefined}>
               {b.type === 'this-week' && <p className="section-eyebrow">Today is {todayLabel}</p>}
               <div className="section-title" hidden={!b.title && b.type === 'custom-content'}>
                 <h2 id={`block-${b.id}`}>{b.title || BLOCK_INFO[b.type].label}</h2>
               </div>
               {renderBlock(b)}
-              {(b.type === 'this-week' || b.type === 'upcoming-events') && (
+              {b.type === 'this-week' && (
                 <p className="section-more">
-                  <Link href={`${base}/calendar`}>See the full calendar</Link>
+                  <a href={calBands.length ? '#calendar' : `${base}/calendar`}>See the full calendar</a>
                 </p>
               )}
               {b.type === 'school-updates' && (
@@ -246,7 +242,7 @@ export default async function FamilyHome({ params }: Props) {
             </div>
           )}
           {(p.phone || p.email || p.officeHours) && (
-            <div className="side-card" id="contact">
+            <div className="side-card">
               <h2>Need the front office?</h2>
               <ul className="contact-list">
                 {p.phone && (
@@ -280,6 +276,28 @@ export default async function FamilyHome({ params }: Props) {
             </div>
             {typeof b.settings.intro === 'string' && b.settings.intro && <p className="section-intro">{b.settings.intro}</p>}
             <DocGroups items={docs} base={base} />
+          </div>
+        </section>
+      ))}
+      {calBands.map((b, i) => (
+        <section key={b.id} className="cal-band" id={i === 0 ? 'calendar' : undefined} aria-labelledby={`block-${b.id}`}>
+          <div className="container">
+            <div className="cal-band-head">
+              <div className="section-title">
+                <h2 id={`block-${b.id}`}>{b.title || BLOCK_INFO['upcoming-events'].label}</h2>
+              </div>
+              <div className="cal-band-tools">
+                {subscribeCal && (
+                  <a className="btn btn-outline" href={`webcal://${host}${base}/calendar/feed/${subscribeCal.key}.ics`}>
+                    Subscribe
+                  </a>
+                )}
+                <Link className="btn btn-primary" href={`${base}/calendar`}>
+                  Open the full calendar
+                </Link>
+              </div>
+            </div>
+            {renderBlock(b)}
           </div>
         </section>
       ))}
