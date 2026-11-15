@@ -30,6 +30,56 @@ function when(o: PublicOccurrence, tz: string) {
   return `${day} · ${formatTime(o.start!, tz)}`;
 }
 
+/** One event: date tile, title, when and where, category pills. */
+function AgendaRow({ o, base, tz, alertCategories }: { o: PublicOccurrence; base: string; tz: string; alertCategories: string[] }) {
+  return (
+    <li className={o.isImportant ? 'is-important' : undefined}>
+      <span className="date-tile" aria-hidden="true">
+        <span className="date-tile-month">{md(o.date, { month: 'short' })}</span>
+        <span className="date-tile-day">{md(o.date, { day: 'numeric' })}</span>
+      </span>
+      <div className="week-row-main">
+        <Link href={occurrenceHref(base, o)} className="week-row-title">
+          {o.title}
+        </Link>
+        <p className="week-row-meta">
+          <span className="visually-hidden">{formatDate(o.date)}, </span>
+          {when(o, tz)}
+          {o.location && ` · ${o.location}`}
+        </p>
+      </div>
+      <span className="week-row-tags">
+        {o.category && <span className={pillClass(o.category, alertCategories)}>{categoryLabel(o.category)}</span>}
+        {o.isImportant && <span className="pill pill-outline">Important</span>}
+      </span>
+    </li>
+  );
+}
+
+/** Upcoming events grouped by month ("November 2026"), same rows as the weekly view. */
+export function MonthAgenda({ items, base, tz, alertCategories }: { items: PublicOccurrence[]; base: string; tz: string; alertCategories: string[] }) {
+  if (!items.length) return <p className="week-empty">No upcoming events.</p>;
+  const months = new Map<string, PublicOccurrence[]>();
+  for (const o of items) months.set(o.date.slice(0, 7), [...(months.get(o.date.slice(0, 7)) ?? []), o]);
+  return (
+    <div className="week-agenda by-month-agenda">
+      {[...months.entries()].map(([m, list]) => {
+        const label = md(`${m}-01`, { month: 'long', year: 'numeric' });
+        return (
+          <section key={m} aria-label={label}>
+            <h3 className="week-label">{label}</h3>
+            <ul className="week-rows">
+              {list.map((o) => (
+                <AgendaRow key={`${o.eventId}-${o.date}`} o={o} base={base} tz={tz} alertCategories={alertCategories} />
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
 /**
  * Events from today to `days` ahead, grouped by week (Sunday to Saturday) with a
  * date tile per event. Weeks with nothing still show, so families see it is quiet.
@@ -65,26 +115,7 @@ export function WeekAgenda({
             ) : (
               <ul className="week-rows">
                 {list.map((o) => (
-                  <li key={`${o.eventId}-${o.date}`} className={o.isImportant ? 'is-important' : undefined}>
-                    <span className="date-tile" aria-hidden="true">
-                      <span className="date-tile-month">{md(o.date, { month: 'short' })}</span>
-                      <span className="date-tile-day">{md(o.date, { day: 'numeric' })}</span>
-                    </span>
-                    <div className="week-row-main">
-                      <Link href={occurrenceHref(base, o)} className="week-row-title">
-                        {o.title}
-                      </Link>
-                      <p className="week-row-meta">
-                        <span className="visually-hidden">{formatDate(o.date)}, </span>
-                        {when(o, tz)}
-                        {o.location && ` · ${o.location}`}
-                      </p>
-                    </div>
-                    <span className="week-row-tags">
-                      {o.category && <span className={pillClass(o.category, alertCategories)}>{categoryLabel(o.category)}</span>}
-                      {o.isImportant && <span className="pill pill-outline">Important</span>}
-                    </span>
-                  </li>
+                  <AgendaRow key={`${o.eventId}-${o.date}`} o={o} base={base} tz={tz} alertCategories={alertCategories} />
                 ))}
               </ul>
             )}
