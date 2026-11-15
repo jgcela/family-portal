@@ -222,12 +222,15 @@ Lo que esta validación **no** cubre:
 
 Orden acordado: 2 conocimiento con IA → 3 flujos, avisos de ausencia y bandeja → 4 asistente privado de familias → 5 conectores SIS → 6 analítica.
 
-### Planes nuevos (PR #26)
+### Planes y límites (PR #26)
+
+Los planes, sus nombres, precios y contenidos no cambian (decisión del 15 nov 2026). Solo se añaden límites de uso internos:
 
 | Pieza | Estado | Probado |
 |---|---|---|
-| Essential $2,990 + $500, Smart $6,990 + $1,500, Autonomous desde $12,990 + desde $3,500 | Hecho en marketing y en el catálogo | Pruebas de planes |
-| Límites por plan (almacenamiento, preguntas IA/mes, automatizaciones/mes, integraciones, soporte) y excepciones por colegio en Super Admin | Hecho; aviso al 80 %, bloqueo al 100 %, sin cobro extra | 5 pruebas |
+| IA: Essential sin IA, Smart con límite mensual (3.000 preguntas), Autonomous ilimitada | Hecho | Pruebas |
+| Tope técnico oculto para planes ilimitados (`AI_MONTHLY_SAFETY_CAP`, 50.000 preguntas/mes por colegio por defecto) y 20 preguntas cada 10 minutos por persona | Hecho | Prueba |
+| Excepciones por colegio en Super Admin; aviso al 80 %, bloqueo al 100 %, sin cobro extra | Hecho | 6 pruebas |
 
 ### Fase 2 — School Knowledge AI
 

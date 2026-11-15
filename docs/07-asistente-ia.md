@@ -52,7 +52,7 @@ Responde preguntas de familias con lo que el colegio ha publicado y aprobado. Ca
 
 ## Costes
 
-Cada pregunta con el modelo por defecto cuesta del orden de 1–3 céntimos de dólar [estimación: unos 3.000–6.000 tokens de entrada y 300 de salida]. La pestaña **Quality & usage** muestra el gasto real del mes. El plan limita las preguntas al mes (Smart 3.000, Autonomous 10.000); al llegar al 80 % se avisa y al 100 % el asistente deja de responder hasta el mes siguiente y pide contactar con la oficina. No hay cobro extra.
+Cada pregunta con el modelo por defecto cuesta del orden de 1–3 céntimos de dólar [estimación: unos 3.000–6.000 tokens de entrada y 300 de salida]. La pestaña **Quality & usage** muestra el gasto real del mes. Essential no incluye IA. Smart incluye 3.000 preguntas al mes: al 80 % se avisa y al 100 % el asistente deja de responder hasta el mes siguiente y pide contactar con la oficina, sin cobro extra. Autonomous es ilimitado; solo hay un tope técnico contra abusos (50.000 preguntas al mes por colegio, cambiable con la variable `AI_MONTHLY_SAFETY_CAP` o por colegio en Super Admin) que no se muestra como límite del plan.
 
 ## Privacidad
 

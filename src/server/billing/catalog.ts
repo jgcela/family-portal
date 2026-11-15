@@ -10,33 +10,22 @@ import { plans as marketingPlans, type FeatureId, type Plan as MarketingPlan } f
  * the feature has no module in the app yet: nothing is switched on for it.
  */
 export const FEATURE_MODULES: Record<FeatureId, string[]> = {
-  familyPortal: ['home', 'family_accounts'],
-  schoolCms: ['announcements', 'pages', 'messenger'],
+  familyPortal: ['home', 'announcements', 'pages', 'resources', 'quick_links', 'community', 'directory', 'volunteer', 'messenger', 'family_accounts'],
+  adminDashboard: [],
   calendarImports: ['calendar'],
   documents: ['documents'],
-  resources: ['resources', 'community', 'directory', 'volunteer'],
-  quickLinks: ['quick_links'],
-  conventionalSearch: ['search'],
-  adminDashboard: [],
   rolesPermissions: [],
-  basicAnalytics: [],
-  knowledgeAI: ['knowledge_ai'],
-  aiAdmin: [],
   absenceNotices: ['attendance_notices'],
   familyReceipts: [],
   officeInbox: ['operations_inbox'],
-  workflowTemplates: ['workflows'],
-  forms: ['forms', 'action_required'],
-  reminders: ['notifications'],
+  knowledgeAI: ['search', 'knowledge_ai'],
+  forms: ['forms', 'workflows'],
+  reminders: ['action_required', 'notifications'],
   analytics: ['ops_analytics'],
   familyAssistant: ['family_assistant'],
   studentQueries: ['student_profiles'],
   advancedWorkflows: [],
   sisIntegrations: ['sis_connectors'],
-  sisWrite: [],
-  syncMonitoring: [],
-  advancedAnalytics: [],
-  prioritySupport: [],
 };
 
 /**
@@ -48,7 +37,8 @@ export const FEATURE_MODULES: Record<FeatureId, string[]> = {
 export type PlanLimits = {
   storageMb: number;
   staffUsers: number | null;
-  aiQuestionsPerMonth: number;
+  /** null = unlimited for the plan (a hidden platform safety cap still applies, see entitlements.ts). */
+  aiQuestionsPerMonth: number | null;
   automationRunsPerMonth: number;
   integrations: number;
   supportLevel: 'standard' | 'priority';
@@ -59,7 +49,7 @@ export const LIMIT_KEYS = ['storageMb', 'staffUsers', 'aiQuestionsPerMonth', 'au
 const LIMITS: Record<MarketingPlan['id'], PlanLimits> = {
   essential: { storageMb: 10 * 1024, staffUsers: null, aiQuestionsPerMonth: 0, automationRunsPerMonth: 0, integrations: 0, supportLevel: 'standard' },
   smart: { storageMb: 25 * 1024, staffUsers: null, aiQuestionsPerMonth: 3000, automationRunsPerMonth: 5000, integrations: 0, supportLevel: 'standard' },
-  autonomous: { storageMb: 100 * 1024, staffUsers: null, aiQuestionsPerMonth: 10000, automationRunsPerMonth: 25000, integrations: 2, supportLevel: 'priority' },
+  autonomous: { storageMb: 100 * 1024, staffUsers: null, aiQuestionsPerMonth: null, automationRunsPerMonth: 25000, integrations: 2, supportLevel: 'standard' },
 };
 
 /** Plans retired when the catalog moved to the marketing names, and where their schools go. */

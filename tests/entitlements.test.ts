@@ -21,13 +21,14 @@ describe('entitlements', () => {
     expect((l as Record<string, unknown>).bogus).toBeUndefined();
   });
 
-  it('Essential has no AI allowance; Smart and Autonomous do', () => {
+  it('Essential has no AI, Smart has a monthly limit, Autonomous is unlimited; prices unchanged', () => {
     const by = Object.fromEntries(PLAN_CATALOG.map((p) => [p.id, p.limits]));
     expect(by.essential!.aiQuestionsPerMonth).toBe(0);
     expect(by.smart!.aiQuestionsPerMonth).toBeGreaterThan(0);
+    expect(by.autonomous!.aiQuestionsPerMonth).toBeNull();
     expect(by.autonomous!.integrations).toBeGreaterThan(0);
-    expect(PLAN_CATALOG.map((p) => p.priceCentsPerYear)).toEqual([299000, 699000, 1299000]);
-    expect(PLAN_CATALOG.map((p) => p.implementationCents)).toEqual([50000, 150000, 350000]);
+    expect(PLAN_CATALOG.map((p) => p.priceCentsPerYear)).toEqual([499900, 899900, 1499900]);
+    expect(PLAN_CATALOG.map((p) => p.implementationCents)).toEqual([100000, 200000, 400000]);
   });
 
   it('counts usage atomically and blocks at the limit without going over', async () => {
@@ -46,6 +47,24 @@ describe('entitlements', () => {
     // A new month starts again.
     const next = await withTenant(s.tenant.id, (tx) => usageFor(tx, s.tenant.id, 'aiQuestionsPerMonth', new Date('2026-12-01T00:00:00Z')));
     expect(next.used).toBe(0);
+  });
+
+  it('Autonomous has unlimited AI questions, with only the hidden safety cap', async () => {
+    await syncPlans();
+    const s = await createSchool('unlimited');
+    await platformDb().update(subscriptions).set({ planId: 'autonomous', status: 'active' }).where(eq(subscriptions.tenantId, s.tenant.id));
+    const now = new Date('2026-11-15T12:00:00Z');
+    const prev = process.env.AI_MONTHLY_SAFETY_CAP;
+    process.env.AI_MONTHLY_SAFETY_CAP = '2';
+    try {
+      const first = await withTenant(s.tenant.id, (tx) => consume(tx, s.tenant.id, 'aiQuestionsPerMonth', 1, now));
+      expect(first).toMatchObject({ limit: null, warn: false, blocked: false });
+      await withTenant(s.tenant.id, (tx) => consume(tx, s.tenant.id, 'aiQuestionsPerMonth', 1, now));
+      await expect(withTenant(s.tenant.id, (tx) => consume(tx, s.tenant.id, 'aiQuestionsPerMonth', 1, now))).rejects.toThrow(/paused/);
+    } finally {
+      if (prev === undefined) delete process.env.AI_MONTHLY_SAFETY_CAP;
+      else process.env.AI_MONTHLY_SAFETY_CAP = prev;
+    }
   });
 
   it('a canceled school keeps its data but has no metered allowance', async () => {

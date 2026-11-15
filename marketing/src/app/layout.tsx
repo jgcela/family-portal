@@ -6,7 +6,7 @@ import { brand, siteUrl } from '@/config/site';
 
 const title = `${brand.name} · ${brand.descriptor} for K–8 schools`;
 const description =
-  'One place for families to get answers, report absences and complete school forms, and one clear inbox for your front office. Built for independent and Catholic K–8 schools. Plans from $2,990 per school per year.';
+  'One place for families to get answers, report absences and complete school forms, and one clear inbox for your front office. Built for independent and Catholic K–8 schools. Plans from $4,999 per school per year.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

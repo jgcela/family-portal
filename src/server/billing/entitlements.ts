@@ -66,13 +66,27 @@ export async function usageFor(tx: Tx, tenantId: string, metric: Metric, now = n
   return quotaStatus(metric, row?.count ?? 0, limits[metric] as number | null);
 }
 
+/**
+ * Platform safety cap for metrics a plan leaves unlimited: stops runaway use
+ * (a bug, a script, abuse) from running up model costs. It is not a plan
+ * limit and is not shown to schools; set AI_MONTHLY_SAFETY_CAP to change it,
+ * or give one school a higher explicit limit from the Super Admin.
+ */
+export function safetyCap(metric: Metric): number {
+  if (metric !== 'aiQuestionsPerMonth') return 2_000_000_000;
+  const n = Number(process.env.AI_MONTHLY_SAFETY_CAP);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 50_000;
+}
+
 export class QuotaExceededError extends Error {
   readonly status = 429;
   constructor(readonly quota: QuotaStatus) {
     super(
       quota.limit === 0
         ? 'This feature is not included in the school\'s plan.'
-        : `The school has used its ${quota.limit} included ${quota.metric === 'aiQuestionsPerMonth' ? 'AI questions' : 'automation runs'} this month.`,
+        : quota.limit === null
+          ? 'This feature is paused for the school this month. Please contact the school office.'
+          : `The school has used its ${quota.limit} included ${quota.metric === 'aiQuestionsPerMonth' ? 'AI questions' : 'automation runs'} this month.`,
     );
     this.name = 'QuotaExceededError';
   }
@@ -87,7 +101,7 @@ export async function consume(tx: Tx, tenantId: string, metric: Metric, amount =
   const limits = await limitsFor(tx, tenantId);
   const limit = limits[metric] as number | null;
   const p = period(now);
-  const cap = limit ?? 2_000_000_000;
+  const cap = limit ?? safetyCap(metric);
   const rows = await tx.execute<{ count: number }>(sql`
     INSERT INTO usage_counters (tenant_id, metric, period, count, updated_at)
     SELECT ${tenantId}::uuid, ${metric}, ${p}, ${amount}, now() WHERE ${amount} <= ${cap}
