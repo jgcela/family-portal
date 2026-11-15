@@ -345,3 +345,18 @@
   .ops-meta, .ops-list .badge { grid-column: 1; grid-row: auto; justify-self: start; }
   .ops-facts { grid-template-columns: 1fr; }
 }
+
+/* Family assistant */
+.fa-page { max-width: 760px; }
+.fa-messages { list-style: none; margin: var(--space-4) 0; padding: 0; display: grid; gap: var(--space-3); }
+.fa-msg { padding: var(--space-3) var(--space-4); border-radius: var(--radius); border: 1px solid var(--border); background: var(--color-surface); scroll-margin-top: var(--space-4); }
+.fa-msg-user { background: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface)); margin-left: clamp(0px, 8vw, 72px); }
+.fa-text { margin: 0; white-space: pre-line; line-height: 1.6; overflow-wrap: anywhere; }
+.fa-card { margin: var(--space-2) 0 0; }
+.fa-draft { margin-top: var(--space-3); display: grid; gap: var(--space-2); }
+.fa-draft p { margin: 0; }
+.fa-draft-summary { white-space: pre-line; }
+.fa-draft-result { font-weight: 600; }
+.fa-delete { margin-top: var(--space-3); }
+.fa-past { margin-top: var(--space-6, 2.5rem); }
+.fa-past h2 { font-size: 1.1rem; }

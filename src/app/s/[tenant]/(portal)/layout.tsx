@@ -7,6 +7,7 @@ import { hasAnywhere } from '@/server/rbac/authorize';
 import { listPublicAnnouncements } from '@/server/services/content';
 import { linkHref, linkVisibleTo, listMenuLinks } from '@/server/services/links';
 import { assistantAvailableFor } from '@/server/services/assistant';
+import { familyAssistantAvailable } from '@/server/services/family-assistant';
 import { SignOutButton } from './account/sign-out';
 import { Icon } from './portal-icons';
 import '../portal.css';
@@ -33,7 +34,12 @@ export default async function PortalLayout({ children, params }: Props) {
     ...view.activeModules
       .filter((m) => m.nav?.area === 'primary' && !inTopBar.has(m.nav.path))
       .map((m) => ({ label: m.nav!.label, href: `${base}${m.nav!.path === '/' ? '' : m.nav!.path}` || '/' })),
-    ...((await assistantAvailableFor(tenant.id, viewer, view.activeModules.map((m) => m.id))) ? [{ label: 'Ask', href: `${base}/ask` }] : []),
+    // Families with the private assistant use it instead of the plain Q&A page (it searches the same sources).
+    ...((await familyAssistantAvailable(tenant.id, viewer))
+      ? [{ label: 'Assistant', href: `${base}/assistant` }]
+      : (await assistantAvailableFor(tenant.id, viewer, view.activeModules.map((m) => m.id)))
+        ? [{ label: 'Ask', href: `${base}/ask` }]
+        : []),
     // Signed-in families: report an absence and follow their requests.
     ...(viewer.kind === 'family' && view.activeModules.some((m) => m.id === 'attendance_notices') ? [{ label: 'Report an absence', href: `${base}/absence` }] : []),
     ...(viewer.kind === 'family' && view.activeModules.some((m) => m.id === 'operations_inbox') ? [{ label: 'My requests', href: `${base}/requests` }] : []),
