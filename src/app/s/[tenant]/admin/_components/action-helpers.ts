@@ -1,9 +1,11 @@
 import 'server-only';
 import { AuthorizationError } from '@/server/rbac/authorize';
+import { ZodError } from 'zod';
 import { ValidationError } from '@/server/services/modules';
 
 export function errorMessage(err: unknown): string {
   if (err instanceof ValidationError) return err.message;
+  if (err instanceof ZodError) return err.issues[0]?.message ?? 'Check the form and try again.';
   if (err instanceof AuthorizationError) return err.message.startsWith('Not allowed') ? 'You do not have permission to do that.' : err.message;
   if (err instanceof Error && (err.name === 'AssistantUnavailableError' || err.name === 'QuotaExceededError')) return err.message;
   console.error(err);

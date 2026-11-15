@@ -3,7 +3,7 @@ import { useActionState, useState } from 'react';
 import { askAction, feedbackAction } from './actions';
 import { AnswerView } from '@/app/_ai/answer-view';
 
-export function AskForm({ tenantKey, base, examples }: { tenantKey: string; base: string; examples: string[] }) {
+export function AskForm({ tenantKey, base, examples, canEscalate = false }: { tenantKey: string; base: string; examples: string[]; canEscalate?: boolean }) {
   const [state, action, pending] = useActionState(askAction.bind(null, tenantKey), undefined);
   const [q, setQ] = useState('');
   const [voted, setVoted] = useState<string | null>(null);
@@ -36,6 +36,16 @@ export function AskForm({ tenantKey, base, examples }: { tenantKey: string; base
         <section className="ai-result" aria-label="Answer">
           {state.question && <p className="muted">You asked: {state.question}</p>}
           <AnswerView result={state.result} base={base} />
+          {canEscalate && state.question && state.result.outcome !== 'answered' && (
+            <p>
+              <a
+                className="btn btn-quiet"
+                href={`${base}/requests?new=1&kind=question&subject=${encodeURIComponent(state.question.slice(0, 120))}&body=${encodeURIComponent(state.question)}`}
+              >
+                Send this question to the office
+              </a>
+            </p>
+          )}
           {qid && state.result.outcome === 'answered' && (
             <div className="btn-row">
               {voted === qid ? (

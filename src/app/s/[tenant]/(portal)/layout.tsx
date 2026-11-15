@@ -34,6 +34,9 @@ export default async function PortalLayout({ children, params }: Props) {
       .filter((m) => m.nav?.area === 'primary' && !inTopBar.has(m.nav.path))
       .map((m) => ({ label: m.nav!.label, href: `${base}${m.nav!.path === '/' ? '' : m.nav!.path}` || '/' })),
     ...((await assistantAvailableFor(tenant.id, viewer, view.activeModules.map((m) => m.id))) ? [{ label: 'Ask', href: `${base}/ask` }] : []),
+    // Signed-in families: report an absence and follow their requests.
+    ...(viewer.kind === 'family' && view.activeModules.some((m) => m.id === 'attendance_notices') ? [{ label: 'Report an absence', href: `${base}/absence` }] : []),
+    ...(viewer.kind === 'family' && view.activeModules.some((m) => m.id === 'operations_inbox') ? [{ label: 'My requests', href: `${base}/requests` }] : []),
     ...view.customNav
       .filter((n) => n.menu === 'primary' && linkVisibleTo(n.visibility, viewer))
       .map((n) => ({ label: n.label, href: linkHref(n, base), newTab: n.opensInNewTab })),

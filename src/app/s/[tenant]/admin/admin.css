@@ -205,3 +205,19 @@ fieldset.panel { padding: 0; min-width: 0; }
 .ai-sources { display: grid; gap: var(--space-2); padding-left: 1.25rem; margin: 0; }
 .ai-sources blockquote { margin: var(--space-1) 0 0; padding-left: var(--space-2); border-left: 3px solid var(--border); color: var(--color-text-muted); font-size: 0.9rem; }
 .form textarea { width: 100%; font: inherit; padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: 8px; background: var(--color-surface); color: var(--color-text); }
+
+/* Operations: inbox, students, workflows */
+.split { display: grid; gap: var(--space-5); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1000px) { .split { grid-template-columns: minmax(0, 1fr) 300px; align-items: start; } }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--space-2) var(--space-4); margin: 0; }
+.facts dt { font-weight: 600; color: var(--color-text-muted); font-size: 0.85rem; }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; } .facts dd { margin-bottom: var(--space-2); } }
+.timeline { list-style: none; margin: 0; display: grid; gap: var(--space-3); }
+.timeline li { padding-left: var(--space-3); border-left: 3px solid var(--border-strong); font-size: 0.9rem; overflow-wrap: anywhere; }
+.timeline time { color: var(--color-text-muted); font-size: 0.8rem; }
+.template-list { list-style: none; margin: 0; display: grid; gap: var(--space-3); }
+.template-list li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-3); border-bottom: 1px solid var(--border); padding-bottom: var(--space-3); }
+.template-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.template-list p { margin: 2px 0 0; font-size: 0.875rem; }
+.plain-list { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; gap: var(--space-2); }
