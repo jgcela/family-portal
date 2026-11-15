@@ -1,6 +1,6 @@
 # Estado de implementación
 
-Última actualización: 13 de noviembre de 2026 (Fase 3).
+Última actualización: 15 de noviembre de 2026 (ampliación IA, fase 2: School Knowledge AI).
 
 ## Fase 1 — Auditoría
 
@@ -217,6 +217,32 @@ Lo que esta validación **no** cubre:
 - Lectores de pantalla reales y navegación completa con teclado: axe solo detecta parte de los problemas.
 - Safari e iPhone reales: se probó con Chromium.
 - Pruebas de carga.
+
+## Ampliación IA y operaciones (desde el 15 nov 2026)
+
+Orden acordado: 2 conocimiento con IA → 3 flujos, avisos de ausencia y bandeja → 4 asistente privado de familias → 5 conectores SIS → 6 analítica.
+
+### Planes nuevos (PR #26)
+
+| Pieza | Estado | Probado |
+|---|---|---|
+| Essential $2,990 + $500, Smart $6,990 + $1,500, Autonomous desde $12,990 + desde $3,500 | Hecho en marketing y en el catálogo | Pruebas de planes |
+| Límites por plan (almacenamiento, preguntas IA/mes, automatizaciones/mes, integraciones, soporte) y excepciones por colegio en Super Admin | Hecho; aviso al 80 %, bloqueo al 100 %, sin cobro extra | 5 pruebas |
+
+### Fase 2 — School Knowledge AI
+
+| Pieza | Estado | Probado |
+|---|---|---|
+| Fuentes: documentos (PDF, DOCX, HTML, texto), páginas, anuncios, calendario en vivo, voluntariado, textos escritos por el personal | Hecho | Extracción PDF y DOCX reales en pruebas |
+| Índice por colegio (búsqueda de texto de Postgres, sin embeddings ni índice compartido) con visibilidad y audiencias por fragmento | Hecho | Aislamiento entre colegios y por grado |
+| Nada llega a familias sin aprobación; quitar o despublicar algo lo saca de las respuestas al momento | Hecho | Pruebas |
+| Respuestas con cita literal verificada por el servidor; si la cita no aparece en la fuente, no se muestra respuesta | Hecho | Prueba con citas inventadas |
+| Sin clave de IA: modo solo búsqueda (enlaces a fuentes) | Hecho | Prueba |
+| AI Control Center: base de conocimiento, sandbox (como visitante, familia de un grado o personal), ajustes, calidad | Hecho | Typecheck + build; falta prueba en producción con clave real |
+| Registro de preguntas: solo el propietario, con motivo, y queda auditado; retención configurable | Hecho | Pruebas |
+| Refresco diario (`/api/cron/knowledge`, Vercel Cron) | Hecho | Falta `CRON_SECRET` en producción |
+
+Pendiente de verificar en producción: una pregunta real con `ANTHROPIC_API_KEY` configurada. Hasta entonces la web comercial sigue marcando la IA como "planned".
 
 ## Lo que todavía no existe (no simulado)
 

@@ -254,11 +254,11 @@ export const MODULES: ModuleDefinition[] = [
     description: 'Answers family questions from school-approved sources, with the source shown.',
     category: 'operations',
     stage: 'core',
-    implemented: false,
+    implemented: true,
     configSchema: empty,
     permissions: ['ai.knowledge.manage', 'ai.settings.manage', 'ai.quality.review'],
     dependencies: [],
-    nav: { label: 'Ask', path: '/ask', area: 'primary' },
+    // The "Ask" menu item is added by the portal layout only when the school has switched the assistant on.
     widgets: [],
     dataTables: ['knowledge_sources', 'knowledge_chunks', 'ai_questions', 'ai_settings'],
     onDisable: 'The assistant is hidden from families. Sources and logs are kept.',

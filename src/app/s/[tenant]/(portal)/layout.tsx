@@ -6,6 +6,7 @@ import { loadAuthzContext } from '@/server/rbac/context';
 import { hasAnywhere } from '@/server/rbac/authorize';
 import { listPublicAnnouncements } from '@/server/services/content';
 import { linkHref, linkVisibleTo, listMenuLinks } from '@/server/services/links';
+import { assistantAvailableFor } from '@/server/services/assistant';
 import { SignOutButton } from './account/sign-out';
 import { Icon } from './portal-icons';
 import '../portal.css';
@@ -32,6 +33,7 @@ export default async function PortalLayout({ children, params }: Props) {
     ...view.activeModules
       .filter((m) => m.nav?.area === 'primary' && !inTopBar.has(m.nav.path))
       .map((m) => ({ label: m.nav!.label, href: `${base}${m.nav!.path === '/' ? '' : m.nav!.path}` || '/' })),
+    ...((await assistantAvailableFor(tenant.id, viewer, view.activeModules.map((m) => m.id))) ? [{ label: 'Ask', href: `${base}/ask` }] : []),
     ...view.customNav
       .filter((n) => n.menu === 'primary' && linkVisibleTo(n.visibility, viewer))
       .map((n) => ({ label: n.label, href: linkHref(n, base), newTab: n.opensInNewTab })),

@@ -88,3 +88,49 @@ export function canSee(row: { visibility: string; audienceIds: string[] }, v: Vi
   if (v.kind === 'public' || row.visibility !== 'families') return false;
   return row.audienceIds.length === 0 || row.audienceIds.some((a) => v.audienceIds.includes(a));
 }
+
+/**
+ * A viewer for the AI sandbox: lets staff who manage the knowledge base see
+ * answers exactly as a visitor or a family in the chosen grades would. It
+ * never grants more than those viewers have (it can only narrow what staff
+ * already see), and only for the staff member's own school.
+ */
+export async function loadSandboxViewer(
+  tenantId: string,
+  staffUserId: string,
+  mode: 'public' | 'family' | 'staff',
+  gradeIds: string[],
+  db: Db = platformDb(),
+): Promise<Viewer> {
+  if (mode === 'public') return PUBLIC_VIEWER;
+  return withTenant(
+    tenantId,
+    async (tx) => {
+      let v: Viewer;
+      if (mode === 'staff') {
+        v = Object.freeze({ kind: 'staff', tenantId, userId: staffUserId });
+      } else {
+        const known = gradeIds.length
+          ? (await tx.select({ id: audienceGrades.gradeId }).from(audienceGrades).where(inArray(audienceGrades.gradeId, gradeIds))).map((r) => r.id)
+          : [];
+        const grades = [...new Set(known)];
+        const rows = await tx
+          .selectDistinct({ id: audiences.id })
+          .from(audiences)
+          .leftJoin(audienceGrades, eq(audienceGrades.audienceId, audiences.id))
+          .where(or(eq(audiences.kind, 'school'), grades.length ? and(inArray(audienceGrades.gradeId, grades), ne(audiences.kind, 'staff')) : undefined));
+        v = Object.freeze({
+          kind: 'family',
+          tenantId,
+          userId: staffUserId,
+          membershipId: '00000000-0000-0000-0000-000000000000',
+          audienceIds: Object.freeze(rows.map((r) => r.id)),
+          gradeIds: Object.freeze(grades),
+        });
+      }
+      verified.add(v);
+      return v;
+    },
+    db,
+  );
+}

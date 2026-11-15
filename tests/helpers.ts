@@ -1,18 +1,21 @@
 import { randomUUID } from 'node:crypto';
+import { sql } from 'drizzle-orm';
 import { platformDb } from '@/server/db/client';
 import { plans, user } from '@/server/db/schema';
 import { provisionTenant, type ProvisionInput } from '@/server/tenancy/provision';
 import { loadAuthzContext } from '@/server/rbac/context';
 import { MODULES } from '@/server/modules/registry';
 
+const TEST_LIMITS = { aiQuestionsPerMonth: 100000, automationRunsPerMonth: 100000, integrations: 10 };
+
 export async function ensurePlans() {
   await platformDb()
     .insert(plans)
     .values([
-      { id: 'test-all', name: 'All modules', includedModules: MODULES.map((m) => m.id), storageLimitMb: 1000 },
+      { id: 'test-all', name: 'All modules', includedModules: MODULES.map((m) => m.id), storageLimitMb: 1000, limits: TEST_LIMITS },
       { id: 'test-basic', name: 'Basic', includedModules: ['home'], storageLimitMb: 100 },
     ])
-    .onConflictDoNothing();
+    .onConflictDoUpdate({ target: plans.id, set: { includedModules: sql`excluded.included_modules`, limits: sql`excluded.limits` } });
 }
 
 export async function createUser(name = 'Test User') {

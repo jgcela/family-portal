@@ -4,7 +4,8 @@ import { ValidationError } from '@/server/services/modules';
 
 export function errorMessage(err: unknown): string {
   if (err instanceof ValidationError) return err.message;
-  if (err instanceof AuthorizationError) return 'You do not have permission to do that.';
+  if (err instanceof AuthorizationError) return err.message.startsWith('Not allowed') ? 'You do not have permission to do that.' : err.message;
+  if (err instanceof Error && (err.name === 'AssistantUnavailableError' || err.name === 'QuotaExceededError')) return err.message;
   console.error(err);
   return 'Something went wrong. Please try again.';
 }

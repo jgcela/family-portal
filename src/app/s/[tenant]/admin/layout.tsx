@@ -1,5 +1,5 @@
 import { getPortalView, requireStaff, tenantBase } from '@/server/request';
-import { hasAnywhere } from '@/server/rbac/authorize';
+import { can, hasAnywhere } from '@/server/rbac/authorize';
 import { AdminShell } from '@/app/_shell/admin-shell';
 import './admin.css';
 
@@ -22,6 +22,10 @@ export default async function AdminLayout({ children, params }: Props) {
         { href: `${a}/volunteer`, label: 'Volunteer', show: hasAnywhere(ctx, 'volunteer.view') },
         { href: `${a}/community`, label: 'Community', show: hasAnywhere(ctx, 'community.view') },
       ],
+    },
+    {
+      title: 'AI & Operations',
+      items: [{ href: `${a}/ai`, label: 'AI Control Center', show: can(ctx, 'ai.knowledge.manage') || can(ctx, 'ai.quality.review') }],
     },
     {
       title: 'Portal design',
