@@ -10,6 +10,7 @@ import { listPublicAnnouncements } from '@/server/services/content';
 import { listPublicDocuments } from '@/server/services/documents';
 import { myRequests } from '@/server/services/inbox';
 import { assistantAvailableFor } from '@/server/services/assistant';
+import { familyAssistantAvailable } from '@/server/services/family-assistant';
 import { CALENDAR_ALERT_DEFAULTS } from '@/server/tenancy/homepage-defaults';
 import { addDays, toDateStr } from '@/server/calendar/time';
 import { WeekAgenda } from '../calendar/week-agenda';
@@ -37,12 +38,13 @@ export default async function MyFamily({ params }: { params: Promise<{ tenant: s
   const forMe = (ids: string[]) => ids.length > 0 && ids.some((id) => mine.has(id));
   const today = toDateStr(new Date(), tenant.timezone);
 
-  const [events, updates, docs, requests, canAsk] = await Promise.all([
+  const [events, updates, docs, requests, canAsk, hasAssistant] = await Promise.all([
     active.has('calendar') ? listPublicOccurrences(tenant.id, viewer, { from: today, to: addDays(today, 13) }, { audienceIds: [...viewer.audienceIds] }) : [],
     active.has('announcements') ? listPublicAnnouncements(tenant.id, viewer, { audienceIds: [...viewer.audienceIds], limit: 30 }) : [],
     active.has('documents') ? listPublicDocuments(tenant.id, viewer) : [],
     active.has('operations_inbox') ? myRequests(tenant.id, viewer) : [],
     assistantAvailableFor(tenant.id, viewer, [...active]),
+    familyAssistantAvailable(tenant.id, viewer),
   ]);
   // Events: the query already keeps whole-school events plus this family's grades.
   // Updates and documents: only what is aimed at this family (their grades, or family-only items).
@@ -72,7 +74,11 @@ export default async function MyFamily({ params }: { params: Promise<{ tenant: s
           { href: `${base}/requests?new=1`, icon: 'mail' as const, title: 'Contact the office', text: 'Send a question or a request and get a reference number.' },
         ]
       : []),
-    ...(canAsk ? [{ href: `${base}/ask`, icon: 'chat' as const, title: 'Ask a question', text: 'Get answers from the school’s handbook and documents.' }] : []),
+    ...(hasAssistant
+      ? [{ href: `${base}/assistant`, icon: 'chat' as const, title: 'Family assistant', text: 'Ask a question, check a request or get help reporting an absence.' }]
+      : canAsk
+        ? [{ href: `${base}/ask`, icon: 'chat' as const, title: 'Ask a question', text: 'Get answers from the school’s handbook and documents.' }]
+        : []),
     ...(active.has('volunteer') ? [{ href: `${base}/volunteer`, icon: 'heart' as const, title: 'Volunteer', text: 'See where the school needs a hand.' }] : []),
   ];
 

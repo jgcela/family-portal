@@ -500,7 +500,7 @@ export async function deleteView(ctx: AuthzContext, id: string, db: Db = platfor
 
 const FAMILY_DAILY_LIMIT = 10;
 
-const familyRequestSchema = z.object({
+export const familyRequestSchema = z.object({
   kind: z.enum(['question', 'request']),
   subject: z.string().trim().min(3, 'Add a short subject.').max(150),
   body: z.string().trim().min(1, 'Write your message.').max(3000),

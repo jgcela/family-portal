@@ -6,7 +6,7 @@ Responde preguntas de familias con lo que el colegio ha publicado y aprobado. Ca
 
 - Solo usa fuentes aprobadas por el personal. Lo que no esté aprobado no existe para el asistente.
 - Respeta la visibilidad: un visitante solo ve contenido público; una familia, también el de sus grados; el personal, todo lo publicado.
-- No ve datos de alumnos (asistencia, notas, horarios). Eso llegará con el asistente privado de familias y depende de una integración autorizada con el SIS.
+- Esta página pública ("Ask") no ve datos de alumnos. El asistente privado de familias (abajo) sí ve los hijos y solicitudes de la familia que ha iniciado sesión, y nada más.
 - No da consejo médico ni legal. En emergencias remite al colegio o al 911.
 - El servidor comprueba cada cita. Si el modelo cita algo que no está en la fuente, la respuesta se descarta.
 
@@ -60,3 +60,33 @@ Cada pregunta con el modelo por defecto cuesta del orden de 1–3 céntimos de d
 - Solo el propietario de la cuenta del colegio puede leer preguntas concretas, indicando un motivo; cada lectura queda en la auditoría. El resto del personal ve solo estadísticas.
 - Los datos enviados a Anthropic por la API no se usan para entrenar modelos según sus condiciones comerciales [verificar en el contrato antes de firmar con un colegio].
 - Límite: 20 preguntas cada 10 minutos por persona o por IP.
+
+## Asistente privado de familias (Fase 4)
+
+Solo en el plan **Autonomous** (módulo **Family Assistant**). Las familias con sesión iniciada ven **Assistant** en el menú, en lugar de **Ask**.
+
+### Qué puede hacer
+
+| Herramienta | Qué hace | Necesita el módulo |
+|---|---|---|
+| `list_my_children` | Hijos de esta familia (de FACTS o del listado del colegio) | — |
+| `list_my_requests`, `get_request` | Solicitudes y avisos de esta familia y su estado | Operations inbox |
+| `search_school_info` | Busca en las fuentes aprobadas, con citas verificadas | School Knowledge AI |
+| `upcoming_events` | Calendario visible para la familia | Calendar |
+| `prepare_absence_notice` | Prepara un aviso de ausencia, retraso o salida | Attendance notices |
+| `prepare_office_request` | Prepara un mensaje a la oficina | Operations inbox |
+
+### Reglas que no dependen del modelo
+
+- Cada herramienta corre con la identidad verificada de la familia. El modelo no ve claves ni decide permisos: si pide los datos de otra familia, el servidor responde "no existe".
+- El modelo no puede enviar nada. Prepara un borrador; la familia lo revisa y pulsa **Send to the office**. Al pulsar, el servidor vuelve a comprobar el hijo, las fechas y los límites. Un borrador solo se puede enviar una vez y caduca a las 24 horas.
+- Las conversaciones son privadas: ninguna pantalla del personal las muestra. El colegio ve solo cuántas preguntas se hicieron y su coste, nunca el texto. Se borran solas con el periodo de retención de **AI Control Center → Settings**. La familia puede borrar cada conversación.
+- Las citas y las referencias R-… que se muestran las construye el servidor con lo que devolvieron las herramientas. Si el modelo inventa una cita, la respuesta no se muestra.
+- 20 mensajes cada 10 minutos por persona; cuenta para el límite mensual de IA del plan.
+
+### Ponerlo en marcha
+
+1. Haz los pasos 1 y 2 de arriba (clave de Anthropic en Vercel). Sin clave, la página dice que el asistente no está activado.
+2. Super Admin → el colegio → plan **Autonomous**.
+3. Admin del colegio → **Modules** → activa **Family Assistant**.
+4. Entra como una familia de prueba, abre **Assistant** y escribe, por ejemplo, "My child is sick tomorrow". Debe aparecer un borrador con **Send to the office** y **Discard**. Envíalo y comprueba que llega a **Inbox**.

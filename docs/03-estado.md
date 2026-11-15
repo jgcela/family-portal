@@ -220,7 +220,7 @@ Lo que esta validación **no** cubre:
 
 ## Ampliación IA y operaciones (desde el 15 nov 2026)
 
-Orden acordado: 2 conocimiento con IA → 3 flujos, avisos de ausencia y bandeja → 4 asistente privado de familias → 5 conectores SIS → 6 analítica.
+Orden acordado: 2 conocimiento con IA → 3 flujos, avisos de ausencia y bandeja → 4 asistente privado de familias (hecho, ver abajo) → 5 conectores SIS → 6 analítica.
 
 ### Planes y límites (PR #26)
 
@@ -290,3 +290,17 @@ Guía: `docs/08-operaciones.md`.
 | Inicio de sesión con FACTS (SSO) | No disponible: no hay evidencia pública de que FACTS lo ofrezca a terceros | Investigación, `docs/09-facts.md` |
 
 Resultado de pruebas: **238 de 238**.
+
+## Fase 4 — Asistente privado de familias (15 nov 2026)
+
+| Pieza | Estado | Cómo se comprobó |
+|---|---|---|
+| Conversaciones privadas por cuenta de familia, borrado por la familia y por retención | Hecho | Pruebas |
+| 7 herramientas tipadas (hijos, solicitudes, fuentes aprobadas, calendario, borradores) que corren con la identidad de la familia | Hecho | Pruebas con un modelo que intenta leer datos de otra familia |
+| Borradores que solo se envían cuando la familia pulsa Send, con nueva comprobación al enviar | Hecho | Pruebas + navegador (móvil 390 px) |
+| Citas verificadas por el servidor | Hecho | Pruebas con citas inventadas |
+| Bucle con la API de Anthropic | Hecho, **sin probar contra la API real** | Navegador contra una API simulada local |
+| Página **Assistant** en el portal | Hecho | `next build` + navegador |
+
+Guía: sección "Asistente privado de familias" de `docs/07-asistente-ia.md`.
+

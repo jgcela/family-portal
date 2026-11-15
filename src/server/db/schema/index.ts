@@ -12,3 +12,4 @@ export * from './usage';
 export * from './knowledge';
 export * from './operations';
 export * from './directory';
+export * from './assistant';

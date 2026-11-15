@@ -1,7 +1,7 @@
 // Super Admin: creating schools, first administrator, status and subscriptions.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { closeDb, platformDb, withTenant } from '@/server/db/client';
 import { academicYears, grades, platformAdmins, schoolProfiles, subscriptions, tenantModules, tenants, user } from '@/server/db/schema';
 import {
@@ -93,7 +93,7 @@ describe('creating a school', () => {
     expect(sub!.trialEndsAt!.getTime()).toBeGreaterThan(Date.now() + 13 * 86400_000);
 
     await withTenant(tenant.id, async (tx) => {
-      const g = await tx.select().from(grades);
+      const g = await tx.select().from(grades).orderBy(asc(grades.sortOrder));
       expect(g.map((x) => x.code)).toEqual(['K', '1', '2', '3', '4', '5', '6', '7']);
       const [y] = await tx.select().from(academicYears);
       expect(y!.label).toBe('2026-27');

@@ -22,6 +22,7 @@ import {
   pageVersions,
   volunteerOpportunities,
   type EscalationContact,
+  assistantConversations,
 } from '../db/schema';
 import { audit } from '../audit/log';
 import { assertVerifiedContext } from '../rbac/context';
@@ -381,6 +382,8 @@ export async function purgeOldQuestions(tx: Tx, tenantId: string) {
   const s = await settingsRow(tx, tenantId);
   const cutoff = new Date(Date.now() - s.retentionDays * 24 * 3600 * 1000);
   await tx.delete(aiQuestions).where(lt(aiQuestions.createdAt, cutoff));
+  // Family Assistant conversations follow the same retention, counted from their last message.
+  await tx.delete(assistantConversations).where(lt(assistantConversations.updatedAt, cutoff));
 }
 
 // ---------- Staff actions on sources ----------

@@ -7,6 +7,7 @@ import { hasAnywhere } from '@/server/rbac/authorize';
 import { listPublicAnnouncements } from '@/server/services/content';
 import { linkHref, linkVisibleTo, listMenuLinks } from '@/server/services/links';
 import { assistantAvailableFor } from '@/server/services/assistant';
+import { familyAssistantAvailable } from '@/server/services/family-assistant';
 import { SignOutButton } from './account/sign-out';
 import { Icon } from './portal-icons';
 import { MobileMenu } from './mobile-menu';
@@ -39,12 +40,14 @@ export default async function PortalLayout({ children, params }: Props) {
 
   const active = new Set(view.activeModules.map((m) => m.id));
   const hasLinks = active.has('quick_links');
-  const [headerButtons, topLinks, canAsk] = await Promise.all([
+  const [headerButtons, topLinks, canAsk, hasAssistant] = await Promise.all([
     hasLinks ? listMenuLinks(tenant.id, 'header', viewer) : [],
     hasLinks ? listMenuLinks(tenant.id, 'top', viewer) : [],
     assistantAvailableFor(tenant.id, viewer, [...active]),
+    familyAssistantAvailable(tenant.id, viewer),
   ]);
-  const ask = canAsk ? [{ label: 'Ask', href: `${base}/ask` }] : [];
+  // Families with the private assistant use it instead of the plain Q&A page (it searches the same sources).
+  const ask = hasAssistant ? [{ label: 'Assistant', href: `${base}/assistant` }] : canAsk ? [{ label: 'Ask', href: `${base}/ask` }] : [];
   const hasContact = !!(p.phone || p.email || p.officeHours);
   // Main menu: jumps to the homepage sections (This week, Documents, Calendar, Contact),
   // plus any links the school added to the Main menu.
