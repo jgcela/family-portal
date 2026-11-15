@@ -10,5 +10,7 @@ export default defineConfig({
     testTimeout: 20000,
     hookTimeout: 60000,
     globalSetup: ['tests/global-setup.ts'],
+    // Test-only secret for encrypting stored keys (see src/server/crypto/secrets.ts).
+    env: { BETTER_AUTH_SECRET: 'test-only-secret-not-used-anywhere-else' },
   },
 });

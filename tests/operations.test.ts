@@ -4,7 +4,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { closeDb, platformDb, withTenant } from '@/server/db/client';
-import { familyGrades, grades, inboxItems, memberships, membershipRoles, roles, subscriptions, user, usageCounters, workflows } from '@/server/db/schema';
+import { directorySettings, familyGrades, grades, inboxItems, memberships, membershipRoles, roles, subscriptions, user, usageCounters, workflows } from '@/server/db/schema';
 import { loadViewer } from '@/server/viewer';
 import { loadAuthzContext } from '@/server/rbac/context';
 import { importStudents, myChildren, parseCsv, removeGuardian, saveStudent, setGuardian, getStudent, listStudents } from '@/server/services/students';
@@ -65,9 +65,16 @@ async function child(gradeCode: string, guardianMembershipId?: string, s = a, li
 
 const absent = (studentId: string, extra: Record<string, unknown> = {}) => ({ studentId, type: 'absent', dateFrom: '2026-11-17', dateTo: '', reason: 'illness', comment: '', idempotencyKey: k(), ...extra });
 
+/** A school using its own student list (these tests don't involve FACTS). */
+async function opsSchool(slug: string) {
+  const s = await createSchool(slug, { enabledModules: OPS, status: 'active' });
+  await withTenant(s.tenant.id, (tx) => tx.insert(directorySettings).values({ tenantId: s.tenant.id, source: 'manual' }));
+  return s;
+}
+
 beforeAll(async () => {
-  a = await createSchool('ops-a', { enabledModules: OPS, status: 'active' });
-  b = await createSchool('ops-b', { enabledModules: OPS, status: 'active' });
+  a = await opsSchool('ops-a');
+  b = await opsSchool('ops-b');
 });
 afterAll(async () => {
   await closeDb();
@@ -198,6 +205,7 @@ describe('attendance notices', () => {
 
   it('is refused when the module is off, and a viewer from another school is rejected', async () => {
     const off = await createSchool('ops-off', { enabledModules: ['family_accounts'], status: 'active' });
+    await withTenant(off.tenant.id, (tx) => tx.insert(directorySettings).values({ tenantId: off.tenant.id, source: 'manual' }));
     const p = await family(off);
     const s = await child('3', p.membershipId, off);
     await expect(submitNotice(off.tenant.id, p.viewer, absent(s.id), NOW)).rejects.toThrow(/not taking attendance/);
@@ -255,7 +263,7 @@ describe('operations inbox', () => {
 
 describe('workflow rules', () => {
   it('auto-accepts only what the rule matches, routes the rest, and counts automation runs', async () => {
-    const s = await createSchool('ops-wf', { enabledModules: OPS, status: 'active' });
+    const s = await opsSchool('ops-wf');
     const office = await staff('attendance_staff', {}, s);
     const auto = await createFromTemplate(s.ownerCtx, 'attendance_auto_accept');
     const route = await createFromTemplate(s.ownerCtx, 'attendance_route');
@@ -275,7 +283,7 @@ describe('workflow rules', () => {
   });
 
   it('falls back to the defaults when the automation allowance is used up', async () => {
-    const s = await createSchool('ops-quota', { enabledModules: OPS, status: 'active' });
+    const s = await opsSchool('ops-quota');
     await platformDb().update(subscriptions).set({ limitOverrides: { automationRunsPerMonth: 0 } }).where(eq(subscriptions.tenantId, s.tenant.id));
     const auto = await createFromTemplate(s.ownerCtx, 'attendance_auto_accept');
     await updateWorkflow(s.ownerCtx, auto.id, { name: auto.name, enabled: true, sortOrder: 10, config: workflowConfigSchema.parse(auto.config) });
@@ -286,7 +294,7 @@ describe('workflow rules', () => {
   });
 
   it('skips a tampered rule, refuses unavailable templates and escalates once', async () => {
-    const s = await createSchool('ops-esc', { enabledModules: OPS, status: 'active' });
+    const s = await opsSchool('ops-esc');
     await expect(createFromTemplate(s.ownerCtx, 'field_trip_permission')).rejects.toThrow(/not available/);
     const boss = await staff('school_admin', {}, s);
     const w = await createFromTemplate(s.ownerCtx, 'office_request');

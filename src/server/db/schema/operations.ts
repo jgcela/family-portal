@@ -107,7 +107,12 @@ export const inboxItems = pgTable(
     /** Family member who started it (null when staff created it). */
     requesterUserId: text('requester_user_id').references(() => user.id, { onDelete: 'set null' }),
     requesterMembershipId: uuid('requester_membership_id'),
+    /** Only for students on the school's manual list. SIS students are not stored. */
     studentId: uuid('student_id'),
+    /** Which child, as the student directory names it: "manual:<uuid>" or "facts:<id>". */
+    studentKey: text('student_key'),
+    /** The child's name when the request was made (kept for the office's record). */
+    studentName: text('student_name'),
     /** Grade used for scoped staff access. Null = school-wide (needs a school-wide grant). */
     gradeId: uuid('grade_id'),
     assigneeUserId: text('assignee_user_id').references(() => user.id, { onDelete: 'set null' }),
@@ -203,7 +208,13 @@ export const attendanceNotices = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     tenantId: tenantId(),
-    studentId: uuid('student_id').notNull(),
+    /** Only for students on the school's manual list. SIS students are not stored. */
+    studentId: uuid('student_id'),
+    /** Which child, as the student directory names it: "manual:<uuid>" or "facts:<id>". */
+    studentKey: text('student_key').notNull(),
+    /** Name and grade when the notice was sent (kept for the office's record). */
+    studentName: text('student_name').notNull(),
+    gradeId: uuid('grade_id'),
     membershipId: uuid('membership_id').notNull(),
     userId: text('user_id')
       .notNull()
@@ -230,7 +241,7 @@ export const attendanceNotices = pgTable(
   },
   (t) => [
     uniqueIndex('attendance_notices_idem_uq').on(t.tenantId, t.userId, t.idempotencyKey),
-    index('attendance_notices_student_idx').on(t.tenantId, t.studentId, t.dateFrom),
+    index('attendance_notices_student_idx').on(t.tenantId, t.studentKey, t.dateFrom),
     index('attendance_notices_status_idx').on(t.tenantId, t.status, t.dateFrom),
     foreignKey({ columns: [t.tenantId, t.studentId], foreignColumns: [students.tenantId, students.id] }).onDelete('cascade'),
     foreignKey({ columns: [t.tenantId, t.membershipId], foreignColumns: [memberships.tenantId, memberships.id] }).onDelete('cascade'),

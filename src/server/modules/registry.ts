@@ -274,7 +274,7 @@ export const MODULES: ModuleDefinition[] = [
     permissions: ['attendance.review', 'students.manage'],
     dependencies: ['operations_inbox'],
     widgets: [],
-    dataTables: ['students', 'student_guardians', 'attendance_notices'],
+    dataTables: ['students', 'student_guardians', 'attendance_notices', 'directory_settings', 'sis_person_links', 'directory_blocks'],
     onDisable: KEEP,
   },
   {

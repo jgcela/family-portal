@@ -221,3 +221,6 @@ fieldset.panel { padding: 0; min-width: 0; }
 .template-list li:last-child { border-bottom: 0; padding-bottom: 0; }
 .template-list p { margin: 2px 0 0; font-size: 0.875rem; }
 .plain-list { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; gap: var(--space-2); }
+
+/* A paragraph that introduces the form under it. */
+.form-intro { margin-bottom: var(--space-4); }

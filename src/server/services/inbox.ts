@@ -21,11 +21,10 @@ import {
   canOnGrade,
   deny,
   gradeScope,
-  guardianLink,
   nextInboxNumber,
-  studentName,
   type FamilyViewer,
 } from './ops-common';
+import { childFor } from './directory';
 import { decide, DEFAULT_CONFIG, validAssignee, workflowConfigSchema, type Facts, type Trigger, type WorkflowConfig } from './workflows';
 import type { Viewer } from '../viewer';
 
@@ -44,7 +43,8 @@ export type NewItem = {
   body: string;
   requesterUserId: string | null;
   requesterMembershipId: string | null;
-  studentId: string | null;
+  /** The child, as resolved by the student directory (see directory.ts). */
+  student: { key: string; name: string; studentId: string | null } | null;
   gradeId: string | null;
   familyMessage?: string;
   now?: Date;
@@ -83,7 +83,9 @@ export async function createInboxItem(tx: Tx, n: NewItem): Promise<{ item: Inbox
       body: n.body.slice(0, 4000),
       requesterUserId: n.requesterUserId,
       requesterMembershipId: n.requesterMembershipId,
-      studentId: n.studentId,
+      studentId: n.student?.studentId ?? null,
+      studentKey: n.student?.key ?? null,
+      studentName: n.student?.name ?? null,
       gradeId: n.gradeId,
       assigneeUserId: assignee,
       workflowId: workflow?.id ?? null,
@@ -161,12 +163,11 @@ export async function listInbox(ctx: AuthzContext, filters: InboxFilters, now = 
       if (q) {
         const num = /^r?-?(\d{1,9})$/i.exec(q)?.[1];
         const like = `%${q.replace(/[%_\\]/g, (x) => `\\${x}`)}%`;
-        c.push(or(ilike(inboxItems.subject, like), ilike(students.lastName, like), ilike(students.firstName, like), num ? eq(inboxItems.number, Number(num)) : undefined));
+        c.push(or(ilike(inboxItems.subject, like), ilike(inboxItems.studentName, like), num ? eq(inboxItems.number, Number(num)) : undefined));
       }
       const rows = await tx
-        .select({ i: inboxItems, s: students, grade: grades.name, assignee: assigneeUser.name, requester: requesterUser.name })
+        .select({ i: inboxItems, grade: grades.name, assignee: assigneeUser.name, requester: requesterUser.name })
         .from(inboxItems)
-        .leftJoin(students, eq(students.id, inboxItems.studentId))
         .leftJoin(grades, eq(grades.id, inboxItems.gradeId))
         .leftJoin(assigneeUser, eq(assigneeUser.id, inboxItems.assigneeUserId))
         .leftJoin(requesterUser, eq(requesterUser.id, inboxItems.requesterUserId))
@@ -178,7 +179,7 @@ export async function listInbox(ctx: AuthzContext, filters: InboxFilters, now = 
         .limit(300);
       return rows.map((r) => ({
         ...r.i,
-        student: r.s ? studentName(r.s) : null,
+        student: r.i.studentName,
         grade: r.grade,
         assignee: r.assignee,
         requester: r.requester,
@@ -255,7 +256,9 @@ export async function getInboxItem(ctx: AuthzContext, id: string, db: Db = platf
       return {
         item,
         events: events.map((x) => ({ ...x.e, actor: x.actor })),
-        student: s ? { id: s.id, name: studentName(s), externalId: s.externalId } : null,
+        student: item.studentName
+          ? { id: s?.id ?? null, name: item.studentName, externalId: s?.externalId ?? (item.studentKey?.startsWith('facts:') ? item.studentKey.slice(6) : null) }
+          : null,
         notice: notice ?? null,
         requester: requester ?? null,
         assignee: assignee?.name ?? null,
@@ -501,7 +504,8 @@ const familyRequestSchema = z.object({
   kind: z.enum(['question', 'request']),
   subject: z.string().trim().min(3, 'Add a short subject.').max(150),
   body: z.string().trim().min(1, 'Write your message.').max(3000),
-  studentId: z.string().uuid().or(z.literal('')).optional(),
+  /** A child key from the student directory ("facts:…", "manual:…"); empty for none. */
+  studentId: z.string().max(80).optional(),
 });
 
 export async function createFamilyRequest(tenantId: string, viewer: Viewer, input: unknown, now = new Date(), db: Db = platformDb()) {
@@ -510,6 +514,9 @@ export async function createFamilyRequest(tenantId: string, viewer: Viewer, inpu
   const mods = await activeModuleIds(tenantId);
   if (!mods.has('operations_inbox')) throw new ValidationError('The school is not taking requests here yet. Please contact the office.');
   const d = familyRequestSchema.parse(input);
+  // Resolve the child before the transaction: it may call the school's SIS.
+  const child = d.studentId ? await childFor(tenantId, v, d.studentId, 'view', db) : null;
+  if (d.studentId && !child) throw new ValidationError('Choose one of your children.');
   return withTenant(
     tenantId,
     async (tx) => {
@@ -519,14 +526,6 @@ export async function createFamilyRequest(tenantId: string, viewer: Viewer, inpu
         .from(inboxItems)
         .where(and(eq(inboxItems.requesterUserId, v.userId), gte(inboxItems.createdAt, since), notInArray(inboxItems.kind, ['attendance'])));
       if ((c?.n ?? 0) >= FAMILY_DAILY_LIMIT) throw new ValidationError('You have sent several requests today. Please call the office if it is urgent.');
-      let studentId: string | null = null;
-      let gradeId: string | null = null;
-      if (d.studentId) {
-        const link = await guardianLink(tx, v, d.studentId, 'view');
-        if (!link) throw new ValidationError('Choose one of your children.');
-        studentId = link.s.id;
-        gradeId = link.s.gradeId;
-      }
       const { item } = await createInboxItem(tx, {
         tenantId,
         kind: d.kind,
@@ -536,8 +535,8 @@ export async function createFamilyRequest(tenantId: string, viewer: Viewer, inpu
         body: d.body,
         requesterUserId: v.userId,
         requesterMembershipId: v.membershipId,
-        studentId,
-        gradeId,
+        student: child ? { key: child.key, name: child.name, studentId: child.studentId } : null,
+        gradeId: child?.gradeId ?? null,
         now,
       });
       await audit(tx, { tenantId, actorUserId: v.userId, action: 'inbox.family_created', targetType: 'inbox_item', targetId: item.id, metadata: { kind: d.kind } });
@@ -554,9 +553,8 @@ export async function myRequests(tenantId: string, viewer: Viewer, db: Db = plat
     tenantId,
     async (tx) => {
       const rows = await tx
-        .select({ i: inboxItems, s: students, n: attendanceNotices })
+        .select({ i: inboxItems, n: attendanceNotices })
         .from(inboxItems)
-        .leftJoin(students, eq(students.id, inboxItems.studentId))
         .leftJoin(attendanceNotices, eq(attendanceNotices.inboxItemId, inboxItems.id))
         .where(eq(inboxItems.requesterUserId, v.userId))
         .orderBy(desc(inboxItems.createdAt))
@@ -568,7 +566,7 @@ export async function myRequests(tenantId: string, viewer: Viewer, db: Db = plat
         subject: r.i.subject,
         status: r.i.status,
         noticeStatus: r.n?.status ?? null,
-        student: r.s ? studentName(r.s) : null,
+        student: r.i.studentName,
         createdAt: r.i.createdAt,
         updatedAt: r.i.updatedAt,
       }));
@@ -591,12 +589,11 @@ export async function myRequest(tenantId: string, viewer: Viewer, id: string, db
         .from(inboxEvents)
         .where(and(eq(inboxEvents.itemId, id), eq(inboxEvents.visibleToFamily, true)))
         .orderBy(asc(inboxEvents.createdAt));
-      const [s] = item.studentId ? await tx.select().from(students).where(eq(students.id, item.studentId)) : [];
       const [notice] = item.kind === 'attendance' ? await tx.select().from(attendanceNotices).where(eq(attendanceNotices.inboxItemId, id)) : [];
       return {
         item: { id: item.id, number: item.number, kind: item.kind, subject: item.subject, body: item.body, status: item.status, createdAt: item.createdAt },
         events,
-        student: s ? studentName(s) : null,
+        student: item.studentName,
         notice: notice
           ? { id: notice.id, type: notice.type, dateFrom: notice.dateFrom, dateTo: notice.dateTo, time: notice.time, reason: notice.reason, comment: notice.comment, status: notice.status, reviewNote: notice.reviewNote }
           : null,

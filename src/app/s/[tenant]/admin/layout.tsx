@@ -1,6 +1,7 @@
 import { getPortalView, requireStaff, tenantBase } from '@/server/request';
 import { can, hasAnywhere } from '@/server/rbac/authorize';
 import { AdminShell } from '@/app/_shell/admin-shell';
+import { directorySource } from '@/server/services/directory';
 import './admin.css';
 
 type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
@@ -8,7 +9,7 @@ type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
 export default async function AdminLayout({ children, params }: Props) {
   const key = (await params).tenant;
   const { tenant, ctx, user } = await requireStaff(key);
-  const [view, base] = await Promise.all([getPortalView(tenant.id), tenantBase(key)]);
+  const [view, base, source] = await Promise.all([getPortalView(tenant.id), tenantBase(key), directorySource(tenant.id)]);
   const a = `${base}/admin`;
   const ops = new Set(view.activeModules.map((m) => m.id));
   const sections: { title: string; items: { href: string; label: string; show: boolean }[] }[] = [
@@ -28,7 +29,7 @@ export default async function AdminLayout({ children, params }: Props) {
       title: 'AI & Operations',
       items: [
         { href: `${a}/inbox`, label: 'Inbox', show: !ctx.support && ops.has('operations_inbox') && hasAnywhere(ctx, 'inbox.view') },
-        { href: `${a}/students`, label: 'Students', show: !ctx.support && ops.has('attendance_notices') && hasAnywhere(ctx, 'students.view') },
+        { href: `${a}/students`, label: 'Students', show: !ctx.support && source === 'manual' && ops.has('attendance_notices') && hasAnywhere(ctx, 'students.view') },
         { href: `${a}/workflows`, label: 'Workflows', show: !ctx.support && ops.has('workflows') && can(ctx, 'workflows.manage') },
         { href: `${a}/ai`, label: 'AI Control Center', show: can(ctx, 'ai.knowledge.manage') || can(ctx, 'ai.quality.review') },
       ],
@@ -56,6 +57,7 @@ export default async function AdminLayout({ children, params }: Props) {
     {
       title: 'Settings',
       items: [
+        { href: `${a}/student-records`, label: 'Student records', show: !ctx.support && can(ctx, 'integrations.manage') },
         { href: `${a}/domains`, label: 'Domains', show: !ctx.support && hasAnywhere(ctx, 'domains.manage') },
         { href: `${a}/support`, label: 'Support access', show: !ctx.support && hasAnywhere(ctx, 'support.grant') },
       ],

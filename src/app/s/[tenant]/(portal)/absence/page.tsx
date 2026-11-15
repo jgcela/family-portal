@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPortalView, getTenantOr404, getViewer, tenantBase } from '@/server/request';
-import { myChildren } from '@/server/services/students';
+import { DirectoryUnavailableError, familyChildren, type Child } from '@/server/services/directory';
 import { toDateStr } from '@/server/calendar/time';
 import { AbsenceForm } from './absence-form';
 
@@ -26,17 +26,29 @@ export default async function AbsencePage({ params }: { params: Promise<{ tenant
       </div>
     );
   }
-  const kids = (await myChildren(tenant.id, viewer)).filter((c) => c.canSubmitAttendance);
+  let kids: Child[] = [];
+  let unavailable: string | null = null;
+  try {
+    kids = (await familyChildren(tenant.id, viewer)).filter((c) => c.canSubmitAttendance);
+  } catch (err) {
+    if (!(err instanceof DirectoryUnavailableError)) throw err;
+    unavailable = err.message;
+  }
   return (
     <div className="container content-page ops-page">
       <h1>Report an absence</h1>
       <p className="section-intro">Tell the office before school starts. You&apos;ll get a reference and can follow the notice under My requests.</p>
-      {kids.length === 0 ? (
+      {unavailable ? (
+        <p className="notice notice-error" role="alert">
+          {unavailable}
+          {phone ? ` Office: ${phone}.` : ''}
+        </p>
+      ) : kids.length === 0 ? (
         <p className="notice">
-          Your account isn&apos;t linked to a child who you can report absences for yet. Please contact the office{phone ? ` at ${phone}` : ''} so they can link it.
+          We couldn&apos;t find a child you can report absences for. The school&apos;s records may list a different email for you. Please contact the office{phone ? ` at ${phone}` : ''}.
         </p>
       ) : (
-        <AbsenceForm tenantKey={key} base={base} children={kids} idempotencyKey={randomUUID()} today={toDateStr(new Date(), tenant.timezone)} />
+        <AbsenceForm tenantKey={key} base={base} children={kids.map((c) => ({ id: c.key, name: c.name, grade: c.grade }))} idempotencyKey={randomUUID()} today={toDateStr(new Date(), tenant.timezone)} />
       )}
       <p className="hint">For emergencies, call the school{phone ? ` at ${phone}` : ''} or 911.</p>
     </div>

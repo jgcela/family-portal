@@ -11,3 +11,4 @@ export * from './messenger';
 export * from './usage';
 export * from './knowledge';
 export * from './operations';
+export * from './directory';

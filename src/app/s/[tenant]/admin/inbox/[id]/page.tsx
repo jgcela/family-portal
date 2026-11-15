@@ -74,7 +74,7 @@ export default async function InboxItemPage({ params }: { params: Promise<{ tena
                   <>
                     <dt>Student</dt>
                     <dd>
-                      <Link href={`${a}/students/${d.student.id}`}>{d.student.name}</Link>
+                      {d.student.id ? <Link href={`${a}/students/${d.student.id}`}>{d.student.name}</Link> : d.student.name}
                       {d.student.externalId ? ` · SIS id ${d.student.externalId}` : ''}
                     </dd>
                   </>
