@@ -16,7 +16,7 @@ export function Pricing() {
           >
             <div>
               {p.featured && <p className="plan-flag">{p.featured}</p>}
-              <h3 id={`plan-${p.id}`} className="plan-name" style={p.featured ? { marginTop: 14 } : undefined}>
+              <h3 id={`plan-${p.id}`} className="plan-name">
                 {p.name}
               </h3>
               <p className="plan-summary">{p.summary}</p>
@@ -41,20 +41,23 @@ export function Pricing() {
               </div>
             </div>
 
-            {p.note ? <p className="price-note">{p.note}</p> : <span aria-hidden="true" />}
+            <div className="plan-body">
+              {p.featuredReason && <p className="plan-reason">{p.featuredReason}</p>}
+              {p.note && <p className="price-note">{p.note}</p>}
 
-            <ul className="feature-list">
-              {p.includesPrevious && <li className="includes">{p.includesPrevious}</li>}
-              {p.features.map((f) => (
-                <li key={f}>
-                  <Check size={18} />
-                  <span>
-                    {features[f].label}
-                    <FeatureBadge id={f} />
-                  </span>
-                </li>
-              ))}
-            </ul>
+              <ul className="feature-list">
+                {p.includesPrevious && <li className="includes">{p.includesPrevious}</li>}
+                {p.features.map((f) => (
+                  <li key={f}>
+                    <Check size={18} />
+                    <span>
+                      {features[f].label}
+                      <FeatureBadge id={f} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             <a
               className={`btn ${p.featured ? 'btn-primary' : 'btn-secondary'}`}

@@ -2226,16 +2226,34 @@ button {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   align-items: stretch;
+  /* Room for the "Recommended" tag that sits on the featured card's top edge. */
+  padding-top: 16px;
 }
 
 .plan {
+  position: relative;
   background: var(--canvas);
   border: 1px solid var(--hairline-strong);
   border-radius: var(--r-feature);
   padding: 28px;
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-rows: auto auto 1fr auto;
   gap: 20px;
+}
+
+/* Three columns: name, prices and buttons line up across the cards. */
+@media (min-width: 1101px) {
+  .plan {
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 20px;
+  }
+}
+
+.plan-body {
+  display: grid;
+  gap: 20px;
+  align-content: start;
 }
 
 /* Featured plan: a lime color block, black text. */
@@ -2257,9 +2275,14 @@ button {
 }
 
 .plan-flag {
-  justify-self: start;
-  background: #000;
-  color: #fff;
+  /* Sits on the card's top edge so all three plan names line up. */
+  position: absolute;
+  top: 0;
+  left: 28px;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  background: var(--block-lilac);
+  color: #000;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -2330,6 +2353,19 @@ button {
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--text-2);
+}
+
+.plan-reason {
+  background: var(--block-lilac);
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.45;
+  padding: 10px 12px;
+  border-radius: var(--r-img);
 }
 
 .price-note {

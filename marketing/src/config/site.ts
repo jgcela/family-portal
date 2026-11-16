@@ -113,6 +113,8 @@ export type Plan = {
   includesPrevious?: string;
   features: FeatureId[];
   featured?: string;
+  /** Why this plan is recommended, shown under the prices of the featured plan. */
+  featuredReason?: string;
   cta: string;
   note?: string;
 };
@@ -146,7 +148,8 @@ export const plans: Plan[] = [
     summary: 'Routine questions and forms handled without the front desk.',
     includesPrevious: 'Everything in Essential, plus',
     features: ['knowledgeAI', 'forms', 'reminders', 'analytics'],
-    featured: 'Recommended for schools automating routine office work',
+    featured: 'Recommended',
+    featuredReason: 'Recommended for schools automating routine office work',
     cta: 'Book a Demo',
   },
   {
