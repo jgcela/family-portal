@@ -16,6 +16,7 @@ export default async function ModulesPage({ params }: Props) {
   const state = await getModuleState(tenant.id);
   const core = state.catalog.filter((m) => m.stage === 'core');
   const future = state.catalog.filter((m) => m.stage === 'future');
+  const nameOf = new Map(state.catalog.map((m) => [m.id, m.name]));
 
   const status = (m: (typeof state.catalog)[number]) => {
     if (m.enabled && m.implemented) return <span className="badge badge-on">On</span>;
@@ -48,7 +49,7 @@ export default async function ModulesPage({ params }: Props) {
                   <th scope="col">Description</th>
                   <th scope="col">Needs</th>
                   <th scope="col">Status</th>
-                  {canToggle && <th scope="col"><span className="visually-hidden">Action</span></th>}
+                  {canToggle && <th scope="col" style={{ whiteSpace: "nowrap" }}>On / off</th>}
                 </tr>
               </thead>
               <tbody>
@@ -56,7 +57,7 @@ export default async function ModulesPage({ params }: Props) {
                   <tr key={m.id}>
                     <th scope="row">{m.name}</th>
                     <td className="muted">{m.description}</td>
-                    <td className="muted">{m.dependencies.join(', ') || '—'}</td>
+                    <td className="muted">{m.dependencies.map((d) => nameOf.get(d) ?? d).join(', ') || '—'}</td>
                     <td>{status(m)}</td>
                     {canToggle && (
                       <td>

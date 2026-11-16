@@ -306,3 +306,20 @@
 /* Lists inside panels line up with the panel titles. */
 .shell .member, .shell .role-list li { padding-inline: 24px; }
 .shell .member > .btn { justify-self: start; }
+
+/* On/off switch (Module Manager). Green track when on, like the "On" pill. */
+.shell .switch {
+  position: relative; flex: none; width: 44px; height: 26px; padding: 0; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--hair-strong); background: var(--slate-2); transition: background-color 160ms ease, border-color 160ms ease;
+}
+.shell .switch::after { content: ''; position: absolute; inset: -9px -2px; } /* 44px tap target */
+.shell .switch-knob {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); transition: transform 160ms ease;
+}
+.shell .switch[aria-checked='true'] { background: #2f8f5b; border-color: #2f8f5b; }
+.shell .switch[aria-checked='true'] .switch-knob { transform: translateX(18px); }
+.shell .switch:disabled { opacity: 0.6; cursor: progress; }
+.shell .switch:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.shell .mod-toggle { display: grid; gap: 6px; justify-items: start; }
+@media (prefers-reduced-motion: reduce) { .shell .switch, .shell .switch-knob { transition: none; } }
