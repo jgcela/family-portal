@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { Icon } from './icons';
 import { QuickJump, ShellCrumb, ShellMobileMenu, ShellSideNav, type ShellGroup } from './nav';
+import { AccountMenu } from '@/app/_account/account-menu';
 import './shell.css';
+import '@/app/_account/account.css';
 
 type Props = {
   /** Square mark next to the name: the school's initials in its own colour, or the platform's letter. */
@@ -12,6 +14,12 @@ type Props = {
   navLabel: string;
   userName: string;
   userDetail?: string;
+  userEmail: string;
+  userImage?: string | null;
+  /** The account settings page for this area. */
+  settingsHref: string;
+  /** Where Sign out lands. */
+  signOutTo: string;
   portalHref?: string;
   banner?: React.ReactNode;
   children: React.ReactNode;
@@ -23,15 +31,8 @@ type Props = {
  * are, the "Go to…" search and the account, then the page on a calm white canvas.
  * The school admin takes its accent from the school's theme; the platform uses ink.
  */
-export function AdminShell({ mark, title, subtitle, groups, navLabel, userName, userDetail, portalHref, banner, children }: Props) {
+export function AdminShell({ mark, title, subtitle, groups, navLabel, userName, userDetail, userEmail, userImage, settingsHref, signOutTo, portalHref, banner, children }: Props) {
   const tone = mark.tone ?? 'brand';
-  const first = userName.split(/\s+/)[0] || userName;
-  const initials = userName
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
   const portalLink = portalHref ? (
     <Link className="shell-portal" href={portalHref}>
       View family portal
@@ -66,15 +67,15 @@ export function AdminShell({ mark, title, subtitle, groups, navLabel, userName, 
           <ShellCrumb groups={groups} />
           <QuickJump groups={groups} />
           <div className="shell-actions">
-            <span className="shell-user" title={userDetail ? `${userName} · ${userDetail}` : userName}>
-              <span className="shell-avatar" aria-hidden="true">
-                {initials}
-              </span>
-              <span className="shell-user-text">
-                <span className="shell-user-hi">{first}</span>
-                {userDetail && <span className="shell-user-detail">{userDetail}</span>}
-              </span>
-            </span>
+            <AccountMenu
+              name={userName}
+              email={userEmail}
+              image={userImage}
+              detail={userDetail}
+              settingsHref={settingsHref}
+              links={portalHref ? [{ href: portalHref, label: 'View family portal' }] : []}
+              signOutTo={signOutTo}
+            />
             <ShellMobileMenu groups={groups} label={navLabel} extra={portalLink} />
           </div>
         </header>

@@ -65,7 +65,7 @@ export function ShellCrumb({ groups }: { groups: ShellGroup[] }) {
           <span aria-hidden="true"> / </span>
         </>
       )}
-      <span className="shell-crumb-here">{hit?.i.label ?? ''}</span>
+      <span className="shell-crumb-here">{hit?.i.label ?? (/\/account$/.test(pathname) ? 'Account settings' : '')}</span>
     </p>
   );
 }

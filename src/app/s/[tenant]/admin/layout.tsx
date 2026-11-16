@@ -86,6 +86,10 @@ export default async function AdminLayout({ children, params }: Props) {
       groups={groups}
       navLabel="Administration"
       userName={user.name}
+      userEmail={user.email}
+      userImage={user.image}
+      settingsHref={`${a}/account`}
+      signOutTo={base || '/'}
       portalHref={base || '/'}
       banner={
         ctx.support && (

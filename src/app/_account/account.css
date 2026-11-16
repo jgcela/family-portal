@@ -1,0 +1,55 @@
+/* Account menu (avatar button) and account settings. Uses the shared tokens, so it
+   follows the school theme in the family workspace and the back-office palette in the shell. */
+
+.acct { position: relative; }
+.acct-btn {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 8px 4px 4px;
+  border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--color-text);
+  font: inherit; cursor: pointer; max-width: 240px;
+}
+.acct-btn:hover, .acct-btn[aria-expanded='true'] { background: color-mix(in srgb, var(--color-text) 5%, transparent); border-color: var(--border); }
+.acct-btn-text { display: grid; line-height: 1.2; min-width: 0; text-align: left; }
+.acct-btn-name { font-weight: 600; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acct-btn-detail { font-size: 0.72rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acct-chevron { flex: none; color: var(--color-text-muted); }
+.acct-avatar { flex: none; border-radius: 50%; object-fit: cover; display: block; }
+.acct-avatar-initials {
+  display: grid; place-items: center; font-weight: 700;
+  background: var(--color-tint, #e9eef1); color: var(--color-on-tint, #1f3a4d);
+}
+.shell .acct-avatar-initials { background: var(--accent-soft); color: var(--ink); }
+
+.acct-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; width: min(300px, calc(100vw - 24px));
+  background: var(--color-surface); color: var(--color-text); border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06); padding: 8px;
+}
+.acct-who { display: flex; gap: 12px; align-items: center; padding: 10px 10px 14px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+.acct-who span { display: grid; min-width: 0; }
+.acct-who strong { font-size: 0.92rem; }
+.acct-who small { font-size: 0.8rem; color: var(--color-text-muted); overflow-wrap: anywhere; }
+.acct-menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.acct-menu a, .acct-signout {
+  display: flex; align-items: center; width: 100%; min-height: 42px; padding: 0 10px; border-radius: 9px; border: 0;
+  background: none; color: var(--color-text); font: inherit; font-size: 0.9rem; text-decoration: none; cursor: pointer; text-align: left;
+}
+.acct-menu a:hover, .acct-signout:hover { background: color-mix(in srgb, var(--color-text) 6%, transparent); }
+.acct-menu li:last-child { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px; }
+
+/* Settings page */
+.acct-settings { display: grid; gap: 16px; max-width: 640px; }
+.acct-card { border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; background: var(--color-surface); display: grid; gap: 12px; }
+.acct-card h2 { margin: 0; font-family: var(--font-body); font-size: 1.05rem; font-weight: 700; color: var(--color-text); }
+.acct-form { display: grid; gap: 14px; }
+.acct-form .field { display: grid; gap: 6px; }
+.acct-form input { max-width: 420px; }
+.acct-email { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.acct-ok { margin: 0; color: var(--success, #17623a); font-weight: 600; }
+.acct-photo { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.acct-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.acct-photo-actions .field-error, .acct-photo-actions .acct-ok { flex-basis: 100%; }
+
+@media (max-width: 760px) {
+  .acct-btn-text, .acct-chevron { display: none; }
+  .acct-btn { padding: 4px; }
+}

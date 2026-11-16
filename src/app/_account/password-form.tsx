@@ -8,9 +8,11 @@ export function PasswordForm() {
   const [pending, setPending] = useState(false);
   if (!open) {
     return (
-      <button type="button" className="btn btn-sm" onClick={() => setOpen(true)}>
-        Change password
-      </button>
+      <div>
+        <button type="button" className="btn btn-quiet btn-sm" onClick={() => setOpen(true)}>
+          Change password
+        </button>
+      </div>
     );
   }
   return (
