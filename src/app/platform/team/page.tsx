@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { requirePlatformAdmin } from '@/server/request';
 import { listPlatformTeam } from '@/server/services/platform-ops';
 import { addMemberAction, removeMemberAction, roleAction } from './actions';
@@ -16,6 +17,9 @@ export default async function TeamPage() {
           <h1>Platform team</h1>
           <p>People who run the platform. These roles never give access to a school’s content; that needs support access approved by the school.</p>
         </div>
+        <Link className="btn btn-quiet" href="/account/security">
+          Your two-step sign-in
+        </Link>
       </div>
       <section className="panel">
         <ul className="member-list">
