@@ -69,6 +69,9 @@ Colors and fonts are tokens at the top of `src/app/site.css`. The look is a ligh
   (`src/lib/meta.ts`). `robots.txt` and `sitemap.xml` are generated at build.
 - Icons: `favicon.ico`, `icon.svg`, `apple-touch-icon.png`, 192/512 PNGs and
   `manifest.webmanifest`. Regenerate the PNGs if `icon.svg` changes.
+- `vercel.json` sets `ignoreCommand` so Vercel builds only when something under
+  `marketing/` changed (the command runs inside the Root Directory, so the
+  path is `.`). It overrides the Ignored Build Step in the dashboard.
 - Security headers (CSP, HSTS, no framing) in `vercel.json`. If you add a
   third-party script, add its host to `script-src` there.
 
