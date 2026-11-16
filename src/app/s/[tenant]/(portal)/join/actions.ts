@@ -3,6 +3,15 @@ import { auth } from '@/server/auth/auth';
 import { getSession, getTenantOr404 } from '@/server/request';
 import { checkJoinCode, requestToJoin } from '@/server/services/families';
 import { ValidationError } from '@/server/services/modules';
+import { allowAttempt, clientIp, TOO_MANY } from '@/server/security/attempts';
+
+/** Join attempts per IP: enough for typos, too few to guess a school code. */
+const JOIN_MAX = 10;
+const JOIN_WINDOW_S = 15 * 60;
+
+async function joinAllowed() {
+  return allowAttempt(`join:${await clientIp()}`, JOIN_MAX, JOIN_WINDOW_S);
+}
 
 export type JoinValues = { name?: string; email?: string; code?: string; note?: string; gradeIds?: string[] };
 export type JoinResult = { error?: string; email?: string; done?: boolean; values?: JoinValues } | undefined;
@@ -25,12 +34,12 @@ function keep(fd: FormData): JoinValues {
 
 // Forms reset after an action; on an error, send the typed values back (never the password).
 export async function joinWithNewAccountAction(tenantKey: string, prev: JoinResult, fd: FormData): Promise<JoinResult> {
-  const r = await newAccount(tenantKey, fd);
+  const r = (await joinAllowed()) ? await newAccount(tenantKey, fd) : { error: TOO_MANY };
   return r?.error ? { ...r, values: keep(fd) } : r;
 }
 
 export async function joinWithExistingAccountAction(tenantKey: string, prev: JoinResult, fd: FormData): Promise<JoinResult> {
-  const r = await existingAccount(tenantKey, fd);
+  const r = (await joinAllowed()) ? await existingAccount(tenantKey, fd) : { error: TOO_MANY };
   return r?.error ? { ...r, values: keep(fd) } : r;
 }
 
