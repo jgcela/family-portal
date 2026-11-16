@@ -17,8 +17,16 @@ export default async function ModulesPage({ params }: Props) {
   const core = state.catalog.filter((m) => m.stage === 'core');
   const future = state.catalog.filter((m) => m.stage === 'future');
   const nameOf = new Map(state.catalog.map((m) => [m.id, m.name]));
+  const byId = new Map(state.catalog.map((m) => [m.id, m]));
+  /** Dependencies this school can never switch on today (not built yet or not in the plan). */
+  const blockers = (m: (typeof state.catalog)[number]) =>
+    m.dependencies.filter((d) => {
+      const dep = byId.get(d);
+      return !dep || !dep.implemented || !dep.entitled;
+    });
 
   const status = (m: (typeof state.catalog)[number]) => {
+    if (m.required && m.implemented) return <span className="badge badge-on">Always on</span>;
     if (m.enabled && m.implemented) return <span className="badge badge-on">On</span>;
     if (!m.implemented) return <span className="badge badge-future">Coming later</span>;
     if (!m.entitled) return <span className="badge">Not in your plan</span>;
@@ -62,7 +70,17 @@ export default async function ModulesPage({ params }: Props) {
                     {canToggle && (
                       <td>
                         {m.implemented && m.entitled && !m.required && (
-                          <ModuleToggle tenantKey={key} moduleId={m.id} name={m.name} enabled={m.enabled} />
+                          <ModuleToggle
+                            tenantKey={key}
+                            moduleId={m.id}
+                            name={m.name}
+                            enabled={m.enabled}
+                            blockedReason={
+                              !m.enabled && blockers(m).length > 0
+                                ? `Needs ${blockers(m).map((d) => nameOf.get(d) ?? d).join(', ')}, which is not available yet.`
+                                : undefined
+                            }
+                          />
                         )}
                       </td>
                     )}
