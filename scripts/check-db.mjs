@@ -6,7 +6,10 @@ if (!url) {
   console.error('Falta DATABASE_URL. Revisa tu archivo .env (ver .env.example).');
   process.exit(1);
 }
-const client = new pg.Client({ connectionString: url });
+// Same strict TLS as the app (src/server/db/url.ts): require → verify-full.
+const u = new URL(url);
+if (['prefer', 'require', 'verify-ca'].includes(u.searchParams.get('sslmode') ?? '')) u.searchParams.set('sslmode', 'verify-full');
+const client = new pg.Client({ connectionString: u.toString() });
 try {
   await client.connect();
   const { rows } = await client.query('SELECT version()');

@@ -2,6 +2,7 @@ import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
 import { Pool } from 'pg';
 import * as schema from './schema';
+import { strictSslUrl } from './url';
 
 export type Db = NodePgDatabase<typeof schema>;
 export type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
@@ -11,7 +12,7 @@ const globalForDb = globalThis as unknown as { __fpPool?: Pool; __fpDb?: Db };
 function createDb(): Db {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error('DATABASE_URL is missing. See .env.example.');
-  const pool = new Pool({ connectionString: url, max: Number(process.env.DB_POOL_MAX ?? 5) });
+  const pool = new Pool({ connectionString: strictSslUrl(url), max: Number(process.env.DB_POOL_MAX ?? 5) });
   globalForDb.__fpPool = pool;
   return drizzle(pool, { schema });
 }
