@@ -1,4 +1,4 @@
-import { brand, legal, legalName, nav, schoolPhoto } from '@/config/site';
+import { brand, legal, legalName, nav, schoolLoginUrl, schoolPhoto } from '@/config/site';
 
 export function Footer() {
   return (
@@ -20,6 +20,7 @@ export function Footer() {
             <a href="/#faq">FAQ</a>
             <a href="/#demo">Book a Demo</a>
             <a href={`mailto:${brand.salesEmail}`}>Email sales</a>
+            <a href={schoolLoginUrl}>School login</a>
             <a href="/privacy">Privacy</a>
             <a href="/terms">Terms</a>
           </nav>

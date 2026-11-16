@@ -41,6 +41,15 @@ export const legal = {
   updated: '2026-11-15',
 };
 
+/**
+ * The product app (portals and school admin). "School login" sends school
+ * staff to its finder page, which asks for the school and opens that school's
+ * admin. Families are not linked: they use their school's own address.
+ * When the app moves to its own domain, set NEXT_PUBLIC_APP_URL in Vercel.
+ */
+export const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://family-portal-brown.vercel.app').replace(/\/+$/, '');
+export const schoolLoginUrl = `${appUrl}/school-login`;
+
 export const legalName = () => legal.entity ?? brand.name;
 export const privacyEmail = () => legal.privacyEmail ?? brand.salesEmail;
 

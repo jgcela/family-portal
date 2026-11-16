@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { brand, nav } from '@/config/site';
+import { brand, nav, schoolLoginUrl } from '@/config/site';
 import { Close, Menu } from './Icons';
 
 export function Header() {
@@ -56,6 +56,9 @@ export function Header() {
               {n.label}
             </a>
           ))}
+          <a className="nav-link nav-login" href={schoolLoginUrl} onClick={close}>
+            School login
+          </a>
           <a className="btn btn-primary btn-sm nav-cta" href="/#demo" onClick={close}>
             Book a Demo
           </a>
