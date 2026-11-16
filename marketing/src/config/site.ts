@@ -25,11 +25,11 @@ export const siteUrl = `https://${brand.domain}`;
  */
 export const legal = {
   /** Registered company name, e.g. "Famitenly LLC". */
-  entity: null as string | null,
+  entity: 'Famitenly, LLC' as string | null,
   /** Postal address shown in the footer and legal pages, one line per entry. */
-  address: [] as string[],
+  address: ['6286 S Sycamore St', 'Littleton, CO 80120'] as string[],
   /** US state whose law governs the terms, e.g. "Colorado". */
-  governingState: null as string | null,
+  governingState: 'Colorado' as string | null,
   /** Inbox for privacy requests. Defaults to the sales inbox. */
   privacyEmail: null as string | null,
   /** Date shown as "Last updated" on both legal pages (YYYY-MM-DD). */
