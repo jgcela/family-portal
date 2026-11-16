@@ -146,7 +146,7 @@ export const plans: Plan[] = [
     summary: 'Routine questions and forms handled without the front desk.',
     includesPrevious: 'Everything in Essential, plus',
     features: ['knowledgeAI', 'forms', 'reminders', 'analytics'],
-    featured: 'Recommended for schools automating routine office work',
+    featured: 'Recommended',
     cta: 'Book a Demo',
   },
   {
