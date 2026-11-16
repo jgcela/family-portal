@@ -81,8 +81,31 @@ No hay cobro real. El estado de facturación de cada colegio (al día, atrasado,
 ## 10. Tareas pendientes de seguridad
 
 1. **Contraseña de Neon:** se pegó en un chat. Haz **Reset password** en Neon y actualiza `DATABASE_URL` en Vercel antes de meter datos reales de familias.
-2. **Inicio de sesión en dos pasos:** el login ya lo pide a quien lo tenga activado, pero todavía no hay ninguna pantalla para activarlo. Hasta que exista, el equipo de plataforma entra solo con contraseña.
+2. **Inicio de sesión en dos pasos:** obligatorio para el equipo de plataforma (apartado 10 bis).
 3. **Vercel Hobby** no permite uso comercial. Antes de cobrar a un colegio, pasa a Pro.
+
+## 10 bis. Inicio de sesión en dos pasos (2FA)
+
+**Quién:** obligatorio para todo el equipo de plataforma (owner, operator, support). Opcional para el personal de los colegios y las familias.
+
+**Cómo se activa:** al entrar en `/platform` sin tenerlo, la plataforma manda a `/account/security`. Allí se escribe la contraseña, se escanea el código QR con una app de autenticación (Google Authenticator, Microsoft Authenticator, 1Password…) y se escribe el primer código de 6 cifras. Después aparecen 10 códigos de respaldo: se ven una sola vez.
+
+**Qué cambia:**
+- Al iniciar sesión, después de la contraseña se pide el código de la app. Si no tienes el móvil, **Use a backup code instead** acepta uno de los códigos de respaldo (cada uno sirve una vez).
+- Al activarlo se cierran todas las demás sesiones abiertas de esa cuenta.
+- El equipo de plataforma no puede desactivarlo desde la web. Sí puede generar códigos de respaldo nuevos en `/account/security` (los anteriores dejan de valer).
+- Un acceso de soporte a un colegio tampoco funciona sin 2FA.
+- 10 códigos fallidos seguidos bloquean el segundo paso de esa cuenta 15 minutos.
+- En **Platform team** aparece "No two-step sign-in" junto a quien aún no lo tenga.
+
+**Si alguien pierde el móvil y los códigos de respaldo** (recuperación):
+1. Confirma que es esa persona por otra vía (llamada o en persona). Este paso quita una protección.
+2. En el Mac, dentro de la carpeta del proyecto, con `DATABASE_URL` de producción en `.env`:
+   `npm run auth:reset-2fa -- persona@ejemplo.com "perdió el móvil"`
+3. El script quita su app de autenticación, cierra todas sus sesiones y lo apunta en el registro de actividad (`auth.two_factor_reset`).
+4. La persona entra con su contraseña y la plataforma le pide configurarlo otra vez.
+
+Si eres la única persona owner y pierdes ambos, el paso 2 es la única salida: guarda los códigos de respaldo fuera del móvil.
 
 ## 11. Problemas frecuentes
 
@@ -91,5 +114,7 @@ No hay cobro real. El estado de facturación de cada colegio (al día, atrasado,
 | "Storage not configured" al subir | Faltan variables R2 en Vercel | Añádelas y vuelve a desplegar |
 | La subida de archivos grandes falla | El bucket no tiene la regla CORS | Paso 1 de `04-migracion-st-mary.md` |
 | No se puede iniciar sesión en un dominio nuevo | El dominio no está en `AUTH_EXTRA_HOSTS` | Apartado 6 |
+| "That code did not work" al iniciar sesión | La hora del móvil no está en automático | Ajustes del móvil → fecha y hora automáticas; usa el código más reciente |
+| Alguien del equipo perdió el móvil y los códigos | — | Apartado 10 bis, recuperación |
 | Alguien olvidó su contraseña | No hay recuperación por correo | Hoy no hay solución desde los paneles: es una limitación conocida |
 | El despliegue falla en "migrate" | Una migración no se pudo aplicar | Vercel → el despliegue → **Build Logs**; no fusiones más cambios hasta arreglarlo |

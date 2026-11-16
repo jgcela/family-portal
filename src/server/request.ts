@@ -19,6 +19,9 @@ import { loadViewer, type Viewer } from './viewer';
 
 const TENANT_BASE_HEADER = 'x-fp-tenant-base';
 
+/** Where a user turns on two-step sign-in (root host only). */
+export const TWO_FACTOR_SETUP_PATH = '/account/security?required=1';
+
 export const getTenantOr404 = cache(async (key: string) => {
   const tenant = await findTenantByKey(decodeURIComponent(key));
   if (!tenant) notFound();
@@ -122,6 +125,10 @@ export async function requirePlatformAdmin() {
   if (!session) redirect('/login?next=/platform');
   const ctx = await loadPlatformContext(session.user.id);
   if (!ctx) notFound();
+  // Super Admin reaches every school: two-step sign-in is mandatory. Better
+  // Auth only creates a session after the second step once it is on, and
+  // turning it on ends every older session (src/server/auth/two-factor.ts).
+  if (!session.user.twoFactorEnabled) redirect(TWO_FACTOR_SETUP_PATH);
   return { user: session.user, role: ctx.role, ctx };
 }
 

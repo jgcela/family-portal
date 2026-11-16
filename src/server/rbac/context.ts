@@ -1,7 +1,7 @@
 // Loads a user's authorization context for one tenant, through RLS.
 import { and, eq } from 'drizzle-orm';
 import { withTenant, type Db, platformDb } from '../db/client';
-import { membershipRoles, memberships, rolePermissions, roles, tenants } from '../db/schema';
+import { membershipRoles, memberships, rolePermissions, roles, tenants, user } from '../db/schema';
 import { AuthorizationError, type AuthzContext, type Grant } from './authorize';
 import { activeSupportGrants } from '../services/support';
 
@@ -32,6 +32,9 @@ export async function loadAuthzContext(
         .limit(1);
       if (!m) {
         // No membership: maybe an approved, read-only platform support session.
+        // Support sessions come from platform accounts, which must use two-step sign-in.
+        const [u] = await db.select({ twoFactorEnabled: user.twoFactorEnabled }).from(user).where(eq(user.id, userId));
+        if (!u?.twoFactorEnabled) return null;
         const sup = await activeSupportGrants(tx, tenantId, userId);
         if (!sup) return null;
         const ctx: AuthzContext = Object.freeze({

@@ -97,10 +97,14 @@ Turns sections of the portal on or off (Calendar, Documents, Volunteer, Communit
 - **Domains:** connect your own address (for example `portal.yourschool.org`). Add it, create the two DNS records shown (TXT and CNAME) with whoever manages your domain, then **Check DNS now**. The platform team also has to add the domain on their side.
 - **Support access:** the platform team can ask to look at your panel to help you. You see the request, the reason, the areas and how long it lasts, and you **Approve** or **Decline**. Support access is read-only, and you can **End access now** at any time. Every step is recorded.
 
+## 12 bis. Two-step sign-in (optional)
+
+Anyone with a password can add a second step: a 6-digit code from an authenticator app on their phone. Sign in, then open **/account/security** on the platform address (for example `https://family-portal-brown.vercel.app/account/security`), type your password, scan the QR code and type the first code. Save the 10 backup codes it shows: each lets you sign in once without your phone. You can turn it off on the same page. If you lose your phone and your backup codes, ask the platform team to reset it.
+
 ## 13. What the portal does not do yet
 
 - No email or text notifications: share links yourself.
 - No payments, grades, attendance or student records. Use FACTS for those.
 - No School Messenger archive yet.
 - No sign-in with FACTS: families have their own portal account.
-- No password reset by email and no two-step sign-in setup for school accounts yet.
+- No password reset by email yet.

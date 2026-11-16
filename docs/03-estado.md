@@ -20,6 +20,7 @@
 | Resolución de escuela por subdominio y modo ruta | Hecho | Pruebas unitarias + prueba manual con servidor |
 | Dominios propios | Modelado; resolución solo si `verified_at`. Falta flujo de verificación DNS | Pendiente (Fase 5) |
 | Login email + contraseña, 2FA, límite de intentos | Hecho | Login real en navegador (contraseña incorrecta y correcta) |
+| 2FA obligatorio para Super Admin: pantalla `/account/security` (QR + códigos de respaldo), código de respaldo en el login, recuperación con `npm run auth:reset-2fa` | Hecho | Pruebas (`tests/two-factor.test.ts`) |
 | Invitaciones | Hecho por enlace (Fase 3, ver Personal). Envío por correo pendiente | Pruebas + navegador |
 | Recuperación de contraseña | Pendiente: necesita proveedor de correo | — |
 | RBAC con ámbitos, anti‑escalada, separación de funciones | Hecho | 19 pruebas unitarias + 12 de servicios contra BD |
@@ -264,7 +265,6 @@ Guía: `docs/08-operaciones.md`.
 ## Lo que todavía no existe (no simulado)
 
 - **Recuperar contraseña:** no hay correo conectado, así que nadie puede restablecer su contraseña desde los paneles.
-- **Activar el inicio de sesión en dos pasos:** el login lo pide a quien lo tenga, pero no hay pantalla para activarlo.
 - Messenger (retirado), búsqueda, directorio, notificaciones, exportación de datos y pagos. En el gestor de módulos aparecen como "Coming later".
 - Login con FACTS u otro SIS (SSO).
 

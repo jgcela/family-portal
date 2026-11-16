@@ -3,7 +3,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { closeDb, platformDb, withTenant } from '@/server/db/client';
-import { auditLogs, membershipRoles, memberships, platformAdmins, roles, supportGrants } from '@/server/db/schema';
+import { auditLogs, membershipRoles, memberships, platformAdmins, roles, supportGrants, user } from '@/server/db/schema';
 import { loadAuthzContext } from '@/server/rbac/context';
 import { can, hasAnywhere } from '@/server/rbac/authorize';
 import { loadPlatformContext, type PlatformContext } from '@/server/services/platform';
@@ -30,6 +30,7 @@ beforeAll(async () => {
   a = await createSchool('sup-a');
   b = await createSchool('sup-b');
   agentId = await createUser('Support Agent');
+  await platformDb().update(user).set({ twoFactorEnabled: true }).where(eq(user.id, agentId));
   await platformDb().insert(platformAdmins).values({ userId: agentId, role: 'support' });
   agent = (await loadPlatformContext(agentId))!;
 });
