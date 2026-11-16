@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { brand, nav } from '@/config/site';
-import { Close, Mark, Menu } from './Icons';
+import { Close, Menu } from './Icons';
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -31,7 +31,7 @@ export function Header() {
     <header className="site-header" data-scrolled={scrolled}>
       <div className="wrap header-row">
         <a className="wordmark" href="/" aria-label={`${brand.name} home`} onClick={close}>
-          <Mark />
+          <img className="wordmark-logo" src="/logo.svg" alt="" width={1188} height={216} />
           <span className="wordmark-name">{brand.name}</span>
           <span className="wordmark-desc">{brand.descriptor}</span>
         </a>

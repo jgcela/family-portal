@@ -327,7 +327,7 @@ function CalendarTask() {
 
 function DocsTask() {
   const [version, setVersion] = useState(1);
-  const url = 'mapleridge.famitenly.example/d/family-handbook';
+  const url = 'mapleridge.famitenly.com/d/family-handbook';
   return (
     <>
       <TaskHead title="Replace the handbook" feature="documents">
