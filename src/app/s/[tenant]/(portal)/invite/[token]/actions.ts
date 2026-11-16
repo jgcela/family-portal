@@ -4,6 +4,7 @@ import { auth } from '@/server/auth/auth';
 import { getSession, getTenantOr404, tenantBase } from '@/server/request';
 import { acceptInvitation, viewInvitation } from '@/server/services/staff';
 import { ValidationError } from '@/server/services/modules';
+import { allowAttempt, clientIp, TOO_MANY } from '@/server/security/attempts';
 
 export type AcceptResult = { error?: string; email?: string } | undefined;
 
@@ -14,6 +15,7 @@ const str = (fd: FormData, k: string) => {
 
 /** New person: creates their account, then joins the school. The browser signs in afterwards. */
 export async function acceptNewAccountAction(tenantKey: string, token: string, _prev: AcceptResult, fd: FormData): Promise<AcceptResult> {
+  if (!(await allowAttempt(`invite:${await clientIp()}`, 10, 15 * 60))) return { error: TOO_MANY };
   const tenant = await getTenantOr404(tenantKey);
   const view = await viewInvitation(tenant.id, token);
   if (view.state !== 'valid') return { error: 'This invitation is no longer valid. Ask the school for a new one.' };
