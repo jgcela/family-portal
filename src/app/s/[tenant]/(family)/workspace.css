@@ -52,17 +52,6 @@
 .ws-crumb { font-size: 0.85rem; color: var(--ws-muted); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ws-crumb-here { color: var(--color-text); font-weight: 600; }
 .ws-top-right { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); }
-.ws-avatar {
-  flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--color-tint); color: var(--color-on-tint); font-weight: 700; font-size: 0.8rem;
-}
-.ws-user { font-size: 0.88rem; font-weight: 600; white-space: nowrap; }
-.ws-signout {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 var(--space-3);
-  border: 1px solid var(--ws-line); border-radius: 10px; color: var(--ws-muted);
-}
-.ws-signout .portal-signout { white-space: nowrap; background: none; border: 0; padding: 0; font: inherit; font-size: 0.85rem; color: inherit; cursor: pointer; min-height: 0; }
-.ws-signout:hover { color: var(--color-text); border-color: var(--border-strong); }
 
 /* ---------- Content ---------- */
 .ws-main { flex: 1; padding: clamp(var(--space-5), 4vw, 45px) clamp(var(--space-4), 3.5vw, 46px) var(--space-8); }
@@ -146,10 +135,6 @@ a.fam-card-title:hover { text-decoration: underline; color: var(--color-link); }
 .fam-reqs li { display: grid; gap: 4px; justify-items: start; padding-bottom: 10px; border-bottom: 1px solid var(--ws-line); }
 .fam-reqs a { font-size: 0.88rem; font-weight: 650; }
 .fam-reqs small { font-size: 0.78rem; color: var(--ws-muted); }
-.fam-account { border: 1px solid var(--ws-line); border-radius: var(--ws-r); padding: 4px 18px; }
-.fam-account summary { cursor: pointer; display: grid; min-height: 52px; align-content: center; font-weight: 650; font-size: 0.9rem; }
-.fam-account summary small { font-weight: 400; color: var(--ws-muted); font-size: 0.78rem; overflow-wrap: anywhere; }
-.fam-account[open] { padding-bottom: 18px; }
 
 /* ---------- Bottom bar (phones) ---------- */
 .ws-bottom { display: none; }
@@ -157,7 +142,6 @@ a.fam-card-title:hover { text-decoration: underline; color: var(--color-link); }
 @media (max-width: 1000px) {
   .ws { --ws-side: 210px; }
   .fam-cols { gap: var(--space-5); }
-  .ws-user { display: none; }
 }
 @media (max-width: 760px) {
   .ws { display: block; }
@@ -169,7 +153,6 @@ a.fam-card-title:hover { text-decoration: underline; color: var(--color-link); }
   .fam-kid { padding: 14px; }
   .ws-top-brand .ws-wordmark { font-size: 1rem; }
   .ws-crumb { display: none; }
-  .ws-signout { padding: 0 10px; }
   .ws-main { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
   .fam-cols { grid-template-columns: minmax(0, 1fr); }
   .fam-ask { padding: 16px; gap: var(--space-3); }

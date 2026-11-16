@@ -9,11 +9,11 @@ import { themeToCss } from '@/server/theme/tokens';
 import { assistantAvailableFor } from '@/server/services/assistant';
 import { familyAssistantAvailable } from '@/server/services/family-assistant';
 import PortalLayout from '../(portal)/layout';
-import { SignOutButton } from '../(portal)/account/sign-out';
-import { Icon } from '../(portal)/portal-icons';
+import { AccountMenu } from '@/app/_account/account-menu';
 import { WorkspaceBottomNav, WorkspaceCrumb, WorkspaceSidebarNav, type WorkspaceLink } from './workspace-nav';
 import '../portal.css';
 import './workspace.css';
+import '@/app/_account/account.css';
 
 type Props = { children: React.ReactNode; params: Promise<{ tenant: string }> };
 
@@ -30,12 +30,6 @@ export default async function FamilyWorkspaceLayout({ children, params }: Props)
   const school = p.shortName ?? p.displayName;
   const logo = view.theme.logo.primary;
   const name = session?.user.name ?? '';
-  const initials = name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
 
   const home: WorkspaceLink = { href: `${base}/family`, label: 'Home', icon: 'home' };
   const ask: WorkspaceLink[] = hasAssistant
@@ -53,6 +47,7 @@ export default async function FamilyWorkspaceLayout({ children, params }: Props)
     ...(active.has('volunteer') ? [{ href: `${base}/volunteer`, label: 'Volunteer', icon: 'heart' as const }] : []),
     { href: base || '/', label: 'School portal', icon: 'school' },
   ];
+  const settings: WorkspaceLink = { href: `${base}/settings`, label: 'Settings', icon: 'users' };
   const mine = [home, ...ask, ...requests, ...absence];
   const bottom = [home, ...ask, ...calendar, ...requests, ...absence].slice(0, 5);
 
@@ -92,16 +87,16 @@ export default async function FamilyWorkspaceLayout({ children, params }: Props)
               <span className="ws-wordmark">{school}</span>
             )}
           </Link>
-          <WorkspaceCrumb school={school} links={[...mine, ...schoolLinks]} />
+          <WorkspaceCrumb school={school} links={[...mine, ...schoolLinks, settings]} />
           <div className="ws-top-right">
-            <span className="ws-avatar" aria-hidden="true">
-              {initials}
-            </span>
-            <span className="ws-user">{name}</span>
-            <span className="ws-signout">
-              <Icon name="logout" size={18} />
-              <SignOutButton to={base || '/'} />
-            </span>
+            <AccountMenu
+              name={name}
+              email={session?.user.email ?? ''}
+              image={session?.user.image}
+              settingsHref={`${base}/settings`}
+              links={[{ href: base || '/', label: 'School portal' }]}
+              signOutTo={base || '/'}
+            />
           </div>
         </header>
         <main id="main" className="ws-main">

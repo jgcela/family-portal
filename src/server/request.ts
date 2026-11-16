@@ -107,7 +107,7 @@ export const getDisplayView = cache(async (tenantId: string) => {
   };
 });
 
-export type StaffContext = { ctx: AuthzContext; user: { id: string; name: string; email: string } };
+export type StaffContext = { ctx: AuthzContext; user: { id: string; name: string; email: string; image?: string | null } };
 
 /** For admin pages: signed in, active member, allowed into the dashboard. */
 export async function requireStaff(tenantKey: string): Promise<StaffContext & { tenant: Awaited<ReturnType<typeof getTenantOr404>> }> {

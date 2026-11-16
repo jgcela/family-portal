@@ -29,6 +29,10 @@ export default async function PlatformLayout({ children }: { children: React.Rea
       groups={groups}
       navLabel="Platform administration"
       userName={user.name}
+      userEmail={user.email}
+      userImage={user.image}
+      settingsHref="/platform/account"
+      signOutTo="/"
       userDetail={role}
     >
       {children}

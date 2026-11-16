@@ -22,7 +22,6 @@ import { formatPosted } from '@/app/s/[tenant]/(portal)/updates/announcement-lis
 import { fileLabel, formatBytes } from '@/app/s/[tenant]/admin/documents/shared';
 import { ITEM_STATUS, KIND, NOTICE_STATUS } from '../requests/labels';
 import { Icon } from '@/app/s/[tenant]/(portal)/portal-icons';
-import { PasswordForm } from './password-form';
 
 export const metadata = { title: 'My family' };
 export const dynamic = 'force-dynamic';
@@ -328,13 +327,6 @@ export default async function MyFamily({ params }: { params: Promise<{ tenant: s
             </section>
           )}
 
-          <details className="fam-account">
-            <summary>
-              Your account
-              <small>{session?.user.email}</small>
-            </summary>
-            <PasswordForm />
-          </details>
         </aside>
       </div>
     </div>
