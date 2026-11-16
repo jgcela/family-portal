@@ -2355,6 +2355,19 @@ button {
   color: var(--text-2);
 }
 
+.plan-reason {
+  background: var(--block-lilac);
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.45;
+  padding: 10px 12px;
+  border-radius: var(--r-img);
+}
+
 .price-note {
   font-size: 13px;
   color: var(--text-soft);

@@ -42,6 +42,7 @@ export function Pricing() {
             </div>
 
             <div className="plan-body">
+              {p.featuredReason && <p className="plan-reason">{p.featuredReason}</p>}
               {p.note && <p className="price-note">{p.note}</p>}
 
               <ul className="feature-list">
