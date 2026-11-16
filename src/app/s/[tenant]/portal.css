@@ -288,32 +288,7 @@
 .grade-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0 var(--space-3); }
 .grade-grid .check { display: flex; align-items: center; gap: var(--space-2); min-height: 36px; }
 .hint { font-size: 0.85rem; color: var(--color-text-muted, #555); }
-.family-hero { background: var(--color-primary); color: var(--color-on-primary); }
-.family-hero .container { padding-block: var(--space-7) var(--space-7); display: grid; gap: var(--space-2); }
-.family-hero h1 { color: inherit; font-size: clamp(1.8rem, 4vw, 2.5rem); }
-.family-grades-line { opacity: 0.92; }
-.family-body { padding-block: var(--space-6) var(--space-8); display: grid; gap: var(--space-7); }
-.family-actions { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); }
-.family-action { display: grid; gap: var(--space-1); align-content: start; height: 100%; padding: var(--space-4) var(--space-5); border: 1px solid var(--border-strong); border-radius: 8px; background: var(--color-surface); color: var(--color-text); text-decoration: none; }
-.family-action:hover { border-color: var(--color-link); }
-.family-action:hover .family-action-title { text-decoration: underline; }
-.family-action-icon { color: var(--color-link); margin-bottom: var(--space-1); }
-.family-action-title { font-weight: 700; color: var(--color-link); font-size: 1.05rem; }
-.family-action-text { color: var(--color-text-muted); font-size: 0.92rem; }
-.family-action-primary { background: var(--color-tint); border-color: transparent; }
-.family-action-primary .family-action-title, .family-action-primary .family-action-icon { color: var(--color-on-tint); }
-.family-action-primary .family-action-text { color: var(--color-text); }
-.family-grid { display: grid; gap: var(--space-7); grid-template-columns: minmax(0, 1fr); align-items: start; }
-.family-main { display: grid; gap: var(--space-7); min-width: 0; }
-.family-aside { display: grid; gap: var(--space-5); }
 @media (min-width: 1000px) { .family-grid { grid-template-columns: minmax(0, 1fr) 360px; } }
-.family-requests, .family-docs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
-.family-requests li, .family-docs li { display: grid; gap: 2px; justify-items: start; padding-bottom: var(--space-3); border-bottom: 1px solid var(--border); }
-.family-requests a, .family-docs a { font-weight: 600; }
-.family-request-meta { font-size: 0.85rem; color: var(--color-text-muted); }
-.family-account-line { color: var(--color-text); }
-.family-password summary { cursor: pointer; font-weight: 600; color: var(--color-link); min-height: 44px; display: flex; align-items: center; }
-.family-password[open] summary { margin-bottom: var(--space-3); }
 
 /* Calendar band (Upcoming events block): full width, events by month. */
 .cal-band { padding-block: var(--space-8); border-top: 1px solid var(--border); }

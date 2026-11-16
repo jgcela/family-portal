@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Icon } from './icons';
-import { QuickJump, ShellMobileMenu, ShellNav, type ShellGroup } from './nav';
+import { QuickJump, ShellCrumb, ShellMobileMenu, ShellSideNav, type ShellGroup } from './nav';
 import './shell.css';
 
 type Props = {
@@ -19,10 +19,12 @@ type Props = {
 
 /**
  * Back-office chrome shared by the school admin and the platform (Super Admin):
- * header with search and account, horizontal section nav, then the page on a
- * white sheet that overlaps a soft colour band.
+ * a sidebar with every section on large screens, a slim top bar with where you
+ * are, the "Go to…" search and the account, then the page on a calm white canvas.
+ * The school admin takes its accent from the school's theme; the platform uses ink.
  */
 export function AdminShell({ mark, title, subtitle, groups, navLabel, userName, userDetail, portalHref, banner, children }: Props) {
+  const tone = mark.tone ?? 'brand';
   const first = userName.split(/\s+/)[0] || userName;
   const initials = userName
     .split(/\s+/)
@@ -36,50 +38,53 @@ export function AdminShell({ mark, title, subtitle, groups, navLabel, userName, 
       <Icon name="external" size={16} />
     </Link>
   ) : null;
+  const brand = (
+    <span className="shell-brand">
+      <span className={`shell-mark shell-mark-${tone}`} aria-hidden="true">
+        {mark.text}
+      </span>
+      <span className="shell-brand-text">
+        <span className="shell-brand-name">{title}</span>
+        {subtitle && <span className="shell-brand-sub">{subtitle}</span>}
+      </span>
+    </span>
+  );
 
   return (
-    <div className="admin shell">
+    <div className={`admin shell shell-tone-${tone}`}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <header className="shell-top">
-        <div className="shell-wrap shell-bar">
-          <div className="shell-brand">
-            <span className={`shell-mark shell-mark-${mark.tone ?? 'brand'}`} aria-hidden="true">
-              {mark.text}
-            </span>
-            <span className="shell-brand-text">
-              <span className="shell-brand-name">{title}</span>
-              {subtitle && <span className="shell-brand-sub">{subtitle}</span>}
-            </span>
-          </div>
+      <aside className="shell-side">
+        {brand}
+        <ShellSideNav groups={groups} label={navLabel} />
+        {portalLink && <div className="shell-side-foot">{portalLink}</div>}
+      </aside>
+      <div className="shell-body">
+        <header className="shell-top">
+          <div className="shell-top-brand">{brand}</div>
+          <ShellCrumb groups={groups} />
           <QuickJump groups={groups} />
           <div className="shell-actions">
-            {portalLink}
             <span className="shell-user" title={userDetail ? `${userName} · ${userDetail}` : userName}>
               <span className="shell-avatar" aria-hidden="true">
                 {initials}
               </span>
               <span className="shell-user-text">
-                <span className="shell-user-hi">Hi, {first}</span>
+                <span className="shell-user-hi">{first}</span>
                 {userDetail && <span className="shell-user-detail">{userDetail}</span>}
               </span>
             </span>
             <ShellMobileMenu groups={groups} label={navLabel} extra={portalLink} />
           </div>
-        </div>
-        <div className="shell-wrap">
-          <ShellNav groups={groups} label={navLabel} />
-        </div>
-      </header>
-      <main id="main" className="shell-main">
-        <div className="shell-wrap">
+        </header>
+        <main id="main" className="shell-main">
           <div className="shell-sheet admin-main">
             {banner}
             {children}
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

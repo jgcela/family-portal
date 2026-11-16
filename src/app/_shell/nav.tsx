@@ -29,78 +29,44 @@ function useCloseOnRoute(close: () => void) {
   }, [pathname]);
 }
 
-/** Horizontal section nav: one link per single-item group, a dropdown for the rest. */
-export function ShellNav({ groups, label }: { groups: ShellGroup[]; label: string }) {
+/** Sidebar: every group as a small heading with its pages under it (no dropdowns). */
+export function ShellSideNav({ groups, label }: { groups: ShellGroup[]; label: string }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState<string | null>(null);
-  const navRef = useRef<HTMLElement>(null);
-  useCloseOnRoute(() => setOpen(null));
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (!navRef.current?.contains(e.target as Node)) setOpen(null);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      const trigger = navRef.current?.querySelector<HTMLButtonElement>(`[data-group="${CSS.escape(open)}"]`);
-      setOpen(null);
-      trigger?.focus();
-    };
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
   return (
-    <nav ref={navRef} className="shell-nav" aria-label={label}>
-      <ul className="shell-nav-list">
-        {groups.map((g) => {
-          const active = g.items.some((i) => isActive(pathname, i));
-          const only = g.items.length === 1 ? g.items[0] : undefined;
-          if (only) {
-            const i = only;
-            return (
-              <li key={g.title}>
-                <Link className="shell-nav-item" href={i.href} aria-current={isActive(pathname, i) ? 'page' : undefined}>
+    <nav className="shell-side-nav" aria-label={label}>
+      {groups.map((g) => (
+        <div key={g.title} className="shell-side-group">
+          {g.items.length > 1 && <p className="shell-side-title">{g.title}</p>}
+          <ul>
+            {g.items.map((i) => (
+              <li key={i.href}>
+                <Link className="shell-side-item" href={i.href} aria-current={isActive(pathname, i) ? 'page' : undefined}>
                   {i.label}
                 </Link>
               </li>
-            );
-          }
-          const isOpen = open === g.title;
-          const menuId = `shell-menu-${g.title.replace(/\W+/g, '-').toLowerCase()}`;
-          return (
-            <li key={g.title} className="shell-nav-group">
-              <button
-                type="button"
-                className="shell-nav-item"
-                data-group={g.title}
-                data-active={active || undefined}
-                aria-expanded={isOpen}
-                aria-controls={menuId}
-                onClick={() => setOpen(isOpen ? null : g.title)}
-              >
-                {g.title}
-                <Icon name="chevron" size={16} className="shell-chevron" />
-              </button>
-              <ul id={menuId} className="shell-menu" hidden={!isOpen}>
-                {g.items.map((i) => (
-                  <li key={i.href}>
-                    <Link href={i.href} aria-current={isActive(pathname, i) ? 'page' : undefined}>
-                      {i.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          );
-        })}
-      </ul>
+            ))}
+          </ul>
+        </div>
+      ))}
     </nav>
+  );
+}
+
+/** "School life / Announcements": where you are, from the nav groups. */
+export function ShellCrumb({ groups }: { groups: ShellGroup[] }) {
+  const pathname = usePathname();
+  let hit: { g: ShellGroup; i: ShellItem } | undefined;
+  for (const g of groups) for (const i of g.items) if (isActive(pathname, i) && (!hit || i.href.length > hit.i.href.length)) hit = { g, i };
+  return (
+    <p className="shell-crumb">
+      {hit && hit.g.items.length > 1 && (
+        <>
+          <span>{hit.g.title}</span>
+          <span aria-hidden="true"> / </span>
+        </>
+      )}
+      <span className="shell-crumb-here">{hit?.i.label ?? ''}</span>
+    </p>
   );
 }
 
