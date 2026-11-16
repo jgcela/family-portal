@@ -1,5 +1,4 @@
 import { brand, legal, legalName, nav, schoolPhoto } from '@/config/site';
-import { Mark } from './Icons';
 
 export function Footer() {
   return (
@@ -7,7 +6,7 @@ export function Footer() {
       <div className="wrap">
         <div className="footer-row">
           <a className="wordmark" href="/" aria-label={`${brand.name} home`}>
-            <Mark />
+            <img className="wordmark-logo" src="/logo.svg" alt="" width={1188} height={216} />
             <span className="wordmark-name">{brand.name}</span>
             <span className="wordmark-desc">{brand.descriptor}</span>
           </a>
@@ -25,9 +24,7 @@ export function Footer() {
             <a href="/terms">Terms</a>
           </nav>
         </div>
-        <p className="footer-wordmark" aria-hidden="true">
-          {brand.name}
-        </p>
+        <img className="footer-wordmark" src="/logo.svg" alt="" aria-hidden="true" width={1188} height={216} />
         <div className="footer-meta">
           <p>
             © {brand.year} {legalName()}. {brand.descriptor} for {brand.audience}.

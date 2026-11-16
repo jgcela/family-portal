@@ -8,15 +8,20 @@ export const brand = {
   /** Provisional name. Always spelled exactly like this. */
   name: 'FAMITENLY',
   descriptor: 'School Operations Platform',
-  /** Canonical domain, without protocol. Replace before launch. */
-  domain: 'famitenly.example',
+  /** Public domain shown in texts, without protocol. Not connected yet. */
+  domain: 'famitenly.com',
   /** Sales inbox used for the email fallback and footer. Replace before launch. */
   salesEmail: 'sales@famitenly.example',
   audience: 'independent and Catholic K–8 schools',
   year: 2026,
 } as const;
 
-export const siteUrl = `https://${brand.domain}`;
+/**
+ * Address used for canonical links, the sitemap and social previews. It stays
+ * on the Vercel address until famitenly.com is connected; then set
+ * NEXT_PUBLIC_SITE_URL=https://famitenly.com in Vercel and redeploy.
+ */
+export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://family-portal-mkt.vercel.app').replace(/\/+$/, '');
 
 /**
  * Who runs the site, for the privacy policy, terms and footer. Fill these in

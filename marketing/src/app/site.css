@@ -466,6 +466,23 @@ button {
   letter-spacing: 0.06em;
 }
 
+.wordmark-logo {
+  display: block;
+  height: 28px;
+  width: auto;
+  flex: none;
+}
+
+/* The logo already spells the name; keep the text for screen readers only. */
+.wordmark-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .wordmark-mark {
   width: 26px;
   height: 26px;
@@ -2825,9 +2842,8 @@ button {
     gap: 6px;
   }
 
-  .header-row .wordmark-name {
-    font-size: 16px;
-    letter-spacing: 0.03em;
+  .header-row .wordmark-logo {
+    height: 20px;
   }
 
   .header-cta {
@@ -2852,14 +2868,10 @@ button {
 }
 
 .footer-wordmark {
+  display: block;
   margin-top: 40px;
-  font-family: var(--font-display);
-  font-size: clamp(52px, 15.5vw, 228px);
-  font-weight: 300;
-  line-height: 0.9;
-  color: var(--text);
-  letter-spacing: -0.05em;
-  overflow: hidden;
+  width: 100%;
+  height: auto;
 }
 
 /* ---------- Reduced motion ---------- */
