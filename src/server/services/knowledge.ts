@@ -6,6 +6,7 @@
 // visibility → full-text index (generated tsvector column). A content hash
 // decides when to reindex; removing a source or unpublishing its record
 // deletes its chunks. Only approved sources are used for answers.
+import { LOCAL_OR_HTTPS } from '@/lib/safe-next';
 import { createHash } from 'node:crypto';
 import { and, asc, desc, eq, inArray, isNotNull, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -399,7 +400,7 @@ const textSourceSchema = z
     authoritative: z.boolean().default(false),
     effectiveDate: z.union([z.literal(''), z.iso.date()]).default(''),
     reviewBy: z.union([z.literal(''), z.iso.date()]).default(''),
-    url: z.union([z.literal(''), z.string().trim().max(500).regex(/^(\/|https:\/\/)/, 'Link: start with / or https://')]).default(''),
+    url: z.union([z.literal(''), z.string().trim().max(500).regex(LOCAL_OR_HTTPS, 'Link: start with / or https://')]).default(''),
   })
   .strict();
 
@@ -413,7 +414,7 @@ const sourceUpdateSchema = z
     authoritative: z.boolean().optional(),
     effectiveDate: z.union([z.literal(''), z.iso.date()]).optional(),
     reviewBy: z.union([z.literal(''), z.iso.date()]).optional(),
-    url: z.union([z.literal(''), z.string().trim().max(500).regex(/^(\/|https:\/\/)/, 'Link: start with / or https://')]).optional(),
+    url: z.union([z.literal(''), z.string().trim().max(500).regex(LOCAL_OR_HTTPS, 'Link: start with / or https://')]).optional(),
   })
   .strict();
 

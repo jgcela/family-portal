@@ -19,6 +19,38 @@ export const brand = {
 export const siteUrl = `https://${brand.domain}`;
 
 /**
+ * Who runs the site, for the privacy policy, terms and footer. Fill these in
+ * before launch: a real legal name and a real postal address. Until then the
+ * footer shows no address and the legal pages name the brand only.
+ */
+export const legal = {
+  /** Registered company name, e.g. "Famitenly LLC". */
+  entity: null as string | null,
+  /** Postal address shown in the footer and legal pages, one line per entry. */
+  address: [] as string[],
+  /** US state whose law governs the terms, e.g. "Colorado". */
+  governingState: null as string | null,
+  /** Inbox for privacy requests. Defaults to the sales inbox. */
+  privacyEmail: null as string | null,
+  /** Date shown as "Last updated" on both legal pages (YYYY-MM-DD). */
+  updated: '2026-11-15',
+};
+
+export const legalName = () => legal.entity ?? brand.name;
+export const privacyEmail = () => legal.privacyEmail ?? brand.salesEmail;
+
+/**
+ * Cookieless analytics. Set one at build time; with none set, no analytics
+ * script loads. Neither option sets cookies, so the site needs no cookie banner.
+ * - NEXT_PUBLIC_CF_ANALYTICS_TOKEN: Cloudflare Web Analytics site token (free).
+ * - NEXT_PUBLIC_PLAUSIBLE_DOMAIN: the domain as registered in Plausible (paid).
+ */
+export const analytics = {
+  cloudflareToken: process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN || null,
+  plausibleDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || null,
+} as const;
+
+/**
  * Demo request destination.
  * - formEndpoint: a URL that accepts a JSON POST (Formspree, Basin, HubSpot
  *   forms proxy, your own API). Set NEXT_PUBLIC_DEMO_FORM_ENDPOINT at build time.
@@ -174,8 +206,9 @@ export const proof = {
   schoolLogos: [] as { src: string; alt: string }[],
 };
 
+// Links start with "/" so they also work from the legal and thank-you pages.
 export const nav = [
-  { href: '#product', label: 'Product' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#pricing', label: 'Pricing' },
+  { href: '/#product', label: 'Product' },
+  { href: '/#how-it-works', label: 'How It Works' },
+  { href: '/#pricing', label: 'Pricing' },
 ] as const;

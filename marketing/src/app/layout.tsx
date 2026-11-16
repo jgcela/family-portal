@@ -3,6 +3,7 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
 import './site.css';
 import { brand, siteUrl } from '@/config/site';
+import { Analytics } from '@/components/Analytics';
 
 const title = `${brand.name} · ${brand.descriptor} for K–8 schools`;
 const description =
@@ -23,7 +24,15 @@ export const metadata: Metadata = {
     images: [{ url: '/og.png', width: 1200, height: 630, alt: `${brand.name} ${brand.descriptor}` }],
   },
   twitter: { card: 'summary_large_image', title, description, images: ['/og.png'] },
-  icons: { icon: '/icon.svg' },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
+  },
+  manifest: '/manifest.webmanifest',
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
@@ -40,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         {children}
+        <Analytics />
       </body>
     </html>
   );

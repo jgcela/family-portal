@@ -30,20 +30,25 @@ export function Header() {
   return (
     <header className="site-header" data-scrolled={scrolled}>
       <div className="wrap header-row">
-        <a className="wordmark" href="#top" aria-label={`${brand.name} home`} onClick={close}>
+        <a className="wordmark" href="/" aria-label={`${brand.name} home`} onClick={close}>
           <Mark />
           <span className="wordmark-name">{brand.name}</span>
           <span className="wordmark-desc">{brand.descriptor}</span>
+        </a>
+        {/* Always visible on phones, where the main nav folds into the menu. */}
+        <a className="btn btn-primary btn-sm header-cta" href="/#demo" onClick={close}>
+          Book a Demo
         </a>
         <button
           type="button"
           className="menu-toggle"
           aria-expanded={open}
           aria-controls="main-nav"
+          aria-label={open ? 'Close menu' : 'Menu'}
           onClick={() => setOpen((o) => !o)}
         >
           {open ? <Close /> : <Menu />}
-          {open ? 'Close' : 'Menu'}
+          <span className="menu-label">{open ? 'Close' : 'Menu'}</span>
         </button>
         <nav id="main-nav" className="main-nav" aria-label="Main" data-open={open}>
           {nav.map((n) => (
@@ -51,7 +56,7 @@ export function Header() {
               {n.label}
             </a>
           ))}
-          <a className="btn btn-primary btn-sm" href="#demo" onClick={close}>
+          <a className="btn btn-primary btn-sm nav-cta" href="/#demo" onClick={close}>
             Book a Demo
           </a>
         </nav>

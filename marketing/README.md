@@ -51,8 +51,26 @@ Colors and fonts are tokens at the top of `src/app/site.css`. The look is a ligh
    license that allows commercial use) and fill in `schoolPhoto`.
 5. **Proof.** Add testimonials, logos or measured results only with written
    approval from the school.
-6. **Legal pages.** Privacy policy and terms are not part of this site yet;
-   schools will ask for them (FERPA/COPPA questions).
+6. **Legal details.** Fill in `legal` in `src/config/site.ts`: registered
+   company name, postal address (shown in the footer and legal pages), the
+   state whose law governs the terms and, if different, a privacy inbox. The
+   drafts at `/privacy` and `/terms` should be reviewed by a lawyer before
+   launch; they promise deletion of demo requests within 24 months and answers
+   to privacy requests within 30 days.
+7. **Analytics.** Set `NEXT_PUBLIC_CF_ANALYTICS_TOKEN` (Cloudflare Web
+   Analytics, free) or `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` (Plausible, paid). Both are
+   cookieless, so the site needs no cookie banner. A demo request lands on
+   `/thank-you`: count that page as the conversion.
+
+## What the site includes
+
+- Pages: `/`, `/privacy`, `/terms`, `/thank-you` (not indexed) and a custom 404.
+- Each page has its own title, description, canonical link and social preview
+  (`src/lib/meta.ts`). `robots.txt` and `sitemap.xml` are generated at build.
+- Icons: `favicon.ico`, `icon.svg`, `apple-touch-icon.png`, 192/512 PNGs and
+  `manifest.webmanifest`. Regenerate the PNGs if `icon.svg` changes.
+- Security headers (CSP, HSTS, no framing) in `vercel.json`. If you add a
+  third-party script, add its host to `script-src` there.
 
 ## Deploy on Vercel
 
