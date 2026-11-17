@@ -1,4 +1,5 @@
 {
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- . ':(exclude)mobile'",
   "crons": [
     { "path": "/api/cron/knowledge", "schedule": "0 9 * * *" },
     { "path": "/api/cron/operations", "schedule": "0 13 * * *" }
